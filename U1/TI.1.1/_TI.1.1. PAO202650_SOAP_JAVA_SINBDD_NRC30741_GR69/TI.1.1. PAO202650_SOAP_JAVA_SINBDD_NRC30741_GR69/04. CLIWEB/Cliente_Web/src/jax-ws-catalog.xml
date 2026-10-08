@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog" prefer="system">
+    <system systemId="http://localhost:8080/WS_ConUni_Java_GR03/WSLogin?wsdl" uri="wsdl/localhost_8080/WS_ConUni_Java_GR03/WSLogin.wsdl"/>
+    <system systemId="http://localhost:8080/WS_ConUni_Java_GR03/WSLogin?xsd=1" uri="wsdl/localhost_8080/WS_ConUni_Java_GR03/WSLogin.xsd_1.xsd"/>
+    <system systemId="http://localhost:8080/WS_ConUni_Java_GR03/WSLongitud?wsdl" uri="wsdl/localhost_8080/WS_ConUni_Java_GR03/WSLongitud.wsdl"/>
+    <system systemId="http://localhost:8080/WS_ConUni_Java_GR03/WSLongitud?xsd=1" uri="wsdl/localhost_8080/WS_ConUni_Java_GR03/WSLongitud.xsd_1.xsd"/>
+    <system systemId="http://localhost:8080/WS_ConUni_Java_GR03/WSTemperatura?wsdl" uri="wsdl/localhost_8080/WS_ConUni_Java_GR03/WSTemperatura.wsdl"/>
+    <system systemId="http://localhost:8080/WS_ConUni_Java_GR03/WSTemperatura?xsd=1" uri="wsdl/localhost_8080/WS_ConUni_Java_GR03/WSTemperatura.xsd_1.xsd"/>
+    <system systemId="http://localhost:8080/WS_ConUni_Java_GR03/WSMasa?wsdl" uri="wsdl/localhost_8080/WS_ConUni_Java_GR03/WSMasa.wsdl"/>
+    <system systemId="http://localhost:8080/WS_ConUni_Java_GR03/WSMasa?xsd=1" uri="wsdl/localhost_8080/WS_ConUni_Java_GR03/WSMasa.xsd_1.xsd"/>
+</catalog>

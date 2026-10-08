@@ -1,0 +1,1 @@
+Dado que el presente proyecto no utiliza ninguna lógica de persistencia de datos, no existe MER.

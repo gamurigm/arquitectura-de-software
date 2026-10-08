@@ -1,0 +1,65 @@
+﻿/* espe-styles.css - Estilos Universales ESPE */
+
+:root {
+    --espe-azul-fondo: #0F4770;
+    --espe-azul-primario: #0277bd;
+    --espe-gris-secundario: #dbdbdb;
+    --espe-borde-radio-pronunciado: 20px;
+    /* Sombra pesada pero suave */
+    --espe-sombra: 0 15px 35px rgba(0,0,0,0.2), 0 5px 15px rgba(0,0,0,0.1);
+}
+
+/* Fondo de gradiente azul oscuro */
+.espe-background {
+    background: linear-gradient(135deg, #0F4770 0%, #0B5D99 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+/* El Contenedor Base Neumórfico */
+.espe-card {
+    background: white;
+    border-radius: var(--espe-borde-radio-pronunciado);
+    box-shadow: var(--espe-sombra);
+    border: none;
+    overflow: hidden; /* Importante para que la imagen respete los bordes redondeados */
+}
+
+/* Estilos de Formulario Limpios */
+.espe-form-control {
+    border: none;
+    border-bottom: 2px solid #eee;
+    border-radius: 0;
+    padding: 10px 5px;
+    box-shadow: none;
+}
+
+    .espe-form-control:focus {
+        border-bottom: 2px solid var(--espe-azul-primario);
+        outline: none;
+    }
+
+/* Botones ESPE Personalizados */
+.espe-btn-primary {
+    background-color: var(--espe-azul-primario);
+    color: white;
+    border: none;
+    border-radius: var(--espe-borde-radio-pronunciado);
+    font-weight: bold;
+    padding: 12px;
+}
+
+    .espe-btn-primary:hover {
+        background-color: #01579b;
+    }
+
+.espe-btn-secondary {
+    background-color: var(--espe-gris-secundario);
+    color: black;
+    border: none;
+    border-radius: var(--espe-borde-radio-pronunciado);
+    padding: 12px;
+}

@@ -1,0 +1,88 @@
+@page "/"
+@inject ec.edu.monster.Servicios.EstadoAplicacion EstadoApp
+@inject ec.edu.monster.Servicios.FabricaEstrategiaBackend Fabrica
+@inject NavigationManager NavManager
+
+<div class="espe-background">
+    <div class="espe-card" style="width: 800px;">
+        <div class="row g-0">
+            
+            <div class="col-md-6" style="background-color: #f8f9fa;">
+                <img src="/sullivan_computer.jpg" class="img-fluid" style="height: 100%; object-fit: cover;" alt="Imagen Login" />
+            </div>
+
+            <div class="col-md-6 p-5 d-flex flex-column justify-content-center">
+                <div class="text-center mb-4">
+                    <h4 style="color: #0F4770;">Sistema de Conversión de Unidades</h4>
+                    <small class="text-secondary">GRUPO #5</small>
+                </div>
+
+                <div class="mb-4 p-3 rounded" style="background-color: #e0f2f1; border-left: 4px solid #0F4770;">
+                    <label class="fw-bold text-secondary mb-1" style="font-size: 0.85rem;">ENTORNO DE CONEXIÓN</label>
+                    <select class="form-select espe-form-control bg-transparent border-0 border-bottom fw-bold" 
+                    style="color: #0F4770; box-shadow: none;"
+                            @bind:get="EstadoApp.BackendActual"
+                            @bind:set="(value) => EstadoApp.EstablecerBackend(value)">
+                        @foreach (var backend in Enum.GetValues<ec.edu.monster.Modelos.TipoBackend>())
+                        {
+                            <option value="@backend">@backend.ToString()</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label>Usuario</label>
+                    <input type="text" class="form-control espe-form-control" @bind="usuario" />
+                </div>
+                
+                <div class="mb-4">
+                    <label>Contraseña</label>
+                    <input type="password" class="form-control espe-form-control" @bind="contrasenia" />
+                </div>
+
+                <button class="btn espe-btn-primary w-100" @onclick="HacerLogin">Iniciar sesión</button>
+
+                @if (!string.IsNullOrEmpty(EstadoApp.TokenActual))
+                {
+                    <div class="alert alert-success mt-3 p-2 text-center" style="font-size: 0.8em; overflow-wrap: break-word;">
+                        Token obtenido correctamente
+                    </div>
+                }
+                @if (!string.IsNullOrEmpty(mensajeErrorLogin))
+                {
+                    <div class="alert alert-danger mt-3 p-2 text-center" style="font-size: 0.8em;">@mensajeErrorLogin</div>
+                }
+
+                <div class="text-center mt-4">
+                    <small class="text-info" style="font-size: 0.8rem;">Servidor web listo para conexiones.</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string usuario = "Monster";
+    private string contrasenia = "Monster9";
+    private string mensajeErrorLogin = "";
+
+    private async Task HacerLogin()
+    {
+        mensajeErrorLogin = "";
+        try
+        {
+            // patrón Strategy:
+            var adaptadorAuth = Fabrica.ObtenerAdaptadorAutenticacion(EstadoApp.BackendActual);
+            EstadoApp.TokenActual = await adaptadorAuth.IniciarSesionAsync(usuario, contrasenia);
+
+            if (!string.IsNullOrEmpty(EstadoApp.TokenActual))
+            {
+                NavManager.NavigateTo("/conversor");
+            }
+        }
+        catch (Exception ex)
+        {
+            mensajeErrorLogin = ex.Message;
+        }
+    }
+}

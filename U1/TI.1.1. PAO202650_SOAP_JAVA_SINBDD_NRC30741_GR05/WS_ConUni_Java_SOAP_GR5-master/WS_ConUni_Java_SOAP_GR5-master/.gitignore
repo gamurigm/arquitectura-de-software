@@ -1,0 +1,55 @@
+# ==========================================
+# 1. JAVA / MAVEN (Para Servidor y Consola)
+# ==========================================
+target/
+*.class
+*.jar
+*.war
+*.ear
+hs_err_pid*
+
+# ==========================================
+# 2. .NET / VISUAL STUDIO (Para Clientes C#)
+# ==========================================
+.vs/
+[Bb]in/
+[Oo]bj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.userprefs
+*.DotSettings.user
+
+# ==========================================
+# 3. MAUI / MÓVIL (Android, iOS, Windows, Mac)
+# ==========================================
+*.apk
+*.aab
+*.app
+*.ipa
+*.dSYM
+*.keystore
+*.jks
+AppPackages/
+BundleArtifacts/
+.maui/
+
+# ==========================================
+# 4. CACHÉ DE IDEs Y OS (NetBeans, VS Code, Windows)
+# ==========================================
+.idea/
+*.iml
+nbproject/private/
+.vscode/
+.DS_Store
+Thumbs.db
+$RECYCLE.BIN/
+
+/target/
+/04. SERVIDOR/target/
+/04. CLIENTE WEB/CWConUniJavaGR5/target/
+/04. CLIESC/ConversionUnidades_ClienteEscritorio_GR5/target/
+/04. CLIESC/target/
+/04.SERVIDOR/target/
+/04. CLICON/target/

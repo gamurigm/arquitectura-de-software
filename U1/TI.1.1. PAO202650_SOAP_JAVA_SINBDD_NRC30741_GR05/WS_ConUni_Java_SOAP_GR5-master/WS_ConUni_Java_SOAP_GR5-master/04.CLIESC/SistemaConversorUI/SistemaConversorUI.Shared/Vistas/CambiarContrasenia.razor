@@ -1,0 +1,101 @@
+@page "/cambiar-contrasenia"
+
+@inject ec.edu.monster.Servicios.EstadoAplicacion EstadoApp
+@inject ec.edu.monster.Servicios.FabricaEstrategiaBackend Fabrica
+@inject NavigationManager NavManager
+
+<div class="espe-background flex-column p-4" style="justify-content: center; align-items: center;">
+    
+    <div class="espe-card p-5" style="width: 500px; max-width: 90vw;">
+        <div class="text-center mb-4">
+            <h4 style="color: #004d40;">Cambiar Contraseña</h4>
+            <small class="text-secondary">Actualiza tus credenciales de seguridad</small>
+        </div>
+
+        <div class="mb-3">
+            <label class="fw-bold text-secondary mb-1">Contraseña Actual</label>
+            <input type="password" class="form-control espe-form-control" @bind="actual" />
+        </div>
+
+        <div class="mb-3">
+            <label class="fw-bold text-secondary mb-1">Nueva Contraseña</label>
+            <input type="password" class="form-control espe-form-control" @bind="nueva" />
+        </div>
+
+        <div class="mb-4">
+            <label class="fw-bold text-secondary mb-1">Confirmar Nueva Contraseña</label>
+            <input type="password" class="form-control espe-form-control" @bind="confirmacion" />
+        </div>
+
+        <div class="row g-2">
+            <div class="col">
+                <button class="btn espe-btn-secondary w-100" @onclick="Volver">Cancelar</button>
+            </div>
+            <div class="col">
+                <button class="btn espe-btn-primary w-100" @onclick="EjecutarCambio">Guardar</button>
+            </div>
+        </div>
+
+        @if (!string.IsNullOrEmpty(mensajeFeedback))
+        {
+            <div class="alert @claseAlerta mt-4 p-2 text-center" style="font-size: 0.9rem;">
+                @mensajeFeedback
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    private string actual = "";
+    private string nueva = "";
+    private string confirmacion = "";
+    
+    private string mensajeFeedback = "";
+    private string claseAlerta = "alert-danger";
+
+    private async Task EjecutarCambio()
+    {
+        mensajeFeedback = "";
+
+        if (string.IsNullOrWhiteSpace(actual) || string.IsNullOrWhiteSpace(nueva))
+        {
+            MostrarError("Todos los campos son obligatorios.");
+            return;
+        }
+
+        if (nueva != confirmacion)
+        {
+            MostrarError("Las contraseñas nuevas no coinciden.");
+            return;
+        }
+
+        try
+        {
+            // Consumimos el nuevo servicio a través del Factory
+            var adaptador = Fabrica.ObtenerAdaptadorAutenticacion(EstadoApp.BackendActual);
+            string respuestaServer = await adaptador.CambiarContraseniaAsync(actual, nueva, EstadoApp.TokenActual);
+            
+            // Si sale bien, pintamos de verde
+            claseAlerta = "alert-success";
+            mensajeFeedback = respuestaServer;
+            
+            // Limpiamos los campos
+            actual = nueva = confirmacion = "";
+        }
+        catch (Exception ex)
+        {
+            MostrarError(ex.Message);
+        }
+    }
+
+    private void MostrarError(string msj)
+    {
+        claseAlerta = "alert-danger";
+        mensajeFeedback = msj;
+    }
+
+    private void Volver()
+    {
+        NavManager.NavigateTo("/conversor");
+    }
+}

@@ -1,0 +1,199 @@
+@page "/conversor"
+@inject ec.edu.monster.Servicios.EstadoAplicacion EstadoApp
+@inject ec.edu.monster.Servicios.FabricaEstrategiaBackend Fabrica
+@inject NavigationManager NavManager
+
+<div class="espe-background flex-column p-4" style="justify-content: flex-start;">
+    
+    <div class="espe-card w-100 p-3 mb-4 d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
+    
+        <!-- Lado Izquierdo: Título -->
+        <div>
+            <h4 style="color: #004d40; margin-bottom: 0;">Conversor de unidades</h4>
+            <small class="text-secondary">Longitud, masa y temperatura con seguridad por token</small>
+        </div>
+
+        <!-- Lado Derecho: Info y Botón (Aquí está el div que consultaste) -->
+        <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center gap-2 gap-md-4 w-100" style="max-width: fit-content;">
+        
+            <div class="text-start text-md-end text-secondary" style="font-size: 0.8rem;">
+                Entorno: <strong>@EstadoApp.BackendActual.ToString()</strong><br />
+                Token: @(string.IsNullOrEmpty(EstadoApp.TokenActual) ? "Ninguno" : EstadoApp.TokenActual.Substring(0, 8) + "...")
+            </div>
+
+            <button class="btn btn-sm btn-outline-secondary" style="border-radius: 10px;" @onclick="@(() => NavManager.NavigateTo("/cambiar-contrasenia"))">
+                ⚙️ Perfil
+            </button>
+        
+            <button class="btn btn-outline-danger btn-sm w-100 mt-2 mt-md-0" @onclick="CerrarSesion">
+                &#x21A9; Cerrar Sesión
+            </button>
+        
+        </div>
+
+    </div>
+
+    
+
+    <div class="row w-100">
+        <div class="col-md-6 mb-4">
+            <div class="espe-card p-4 h-100">
+                
+                <div class="mb-3">
+                    <label class="fw-bold text-secondary">Tipo de conversion</label>
+                    <select class="form-select espe-form-control" value="@magnitudSeleccionada" @onchange="OnMagnitudChanged">
+                        @foreach (var magnitud in Enum.GetValues<TipoMagnitud>())
+                        {
+                            <option value="@magnitud">@magnitud</option>
+                        }
+                    </select>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="fw-bold text-secondary">Valor</label>
+                    <input type="number" class="form-control espe-form-control" @bind="peticion.Valor" />
+                </div>
+                
+                <div class="row mb-4">
+                    <div class="col">
+                        <label class="fw-bold text-secondary">Unidad inicial</label>
+                        <select class="form-select espe-form-control" @bind="peticion.UnidadOrigen">
+                            @RenderizarOpcionesUnidad()
+                        </select>
+                    </div>
+                    <div class="col">
+                        <label class="fw-bold text-secondary">Unidad final</label>
+                        <select class="form-select espe-form-control" @bind="peticion.UnidadDestino">
+                            @RenderizarOpcionesUnidad()
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="row g-2">
+                    <div class="col"><button class="btn espe-btn-primary w-100" @onclick="EjecutarConversion">Convertir</button></div>
+                    <div class="col"><button class="btn espe-btn-secondary w-100" @onclick="Limpiar">Limpiar</button></div>
+                </div>
+
+                @if (!string.IsNullOrEmpty(mensajeError))
+                {
+                    <div class="alert alert-danger mt-3 p-2 text-center" style="font-size: 0.9rem;">@mensajeError</div>
+                }
+
+                <div class="mt-4 p-2 text-center rounded fw-bold text-white" style="background-color: #004d40; font-size: 1.2rem;">
+                    @textoResultado
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="espe-card p-4 h-100">
+                <h6 class="mb-3 text-secondary fw-bold">Historial de conversiones</h6>
+                <textarea class="form-control espe-form-control" style="height: 300px; resize: none;" readonly>@historial</textarea>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private TipoMagnitud magnitudSeleccionada = TipoMagnitud.Longitud;
+    private PeticionConversion peticion = new PeticionConversion();
+    
+    private string textoResultado = "Resultado: listo para convertir";
+    private string mensajeError = "";
+    private string historial = "";
+
+    protected override void OnInitialized()
+    {
+        if (string.IsNullOrEmpty(EstadoApp.TokenActual))
+        {
+            NavManager.NavigateTo("/");
+            return;
+        }
+        
+        // Inicializamos los valores por defecto
+        EstablecerUnidadesPorDefecto(TipoMagnitud.Longitud);
+    }
+
+    // 1. Lógica dinámica para renderizar los <option> según la magnitud elegida
+    private RenderFragment RenderizarOpcionesUnidad() => builder =>
+    {
+        int seq = 0;
+        Array valoresEnum = magnitudSeleccionada switch
+        {
+            TipoMagnitud.Masa => Enum.GetValues(typeof(UnidadMasa)),
+            TipoMagnitud.Temperatura => Enum.GetValues(typeof(UnidadTemperatura)),
+            _ => Enum.GetValues(typeof(UnidadLongitud))
+        };
+
+        foreach (var val in valoresEnum)
+        {
+            builder.OpenElement(seq++, "option");
+            builder.AddAttribute(seq++, "value", val.ToString());
+            builder.AddContent(seq++, val.ToString());
+            builder.CloseElement();
+        }
+    };
+
+    // 2. Evento al cambiar el combo superior
+    private void OnMagnitudChanged(ChangeEventArgs e)
+    {
+        if (Enum.TryParse<TipoMagnitud>(e.Value?.ToString(), out var nuevaMagnitud))
+        {
+            magnitudSeleccionada = nuevaMagnitud;
+            EstablecerUnidadesPorDefecto(nuevaMagnitud);
+        }
+    }
+
+    private void EstablecerUnidadesPorDefecto(TipoMagnitud magnitud)
+    {
+        peticion.TipoConversion = magnitud.ToString();
+        peticion.UnidadOrigen = magnitud switch
+        {
+            TipoMagnitud.Masa => UnidadMasa.GRAMO.ToString(),
+            TipoMagnitud.Temperatura => UnidadTemperatura.CELSIUS.ToString(),
+            _ => UnidadLongitud.METRO.ToString()
+        };
+        peticion.UnidadDestino = magnitud switch
+        {
+            TipoMagnitud.Masa => UnidadMasa.KILOGRAMO.ToString(),
+            TipoMagnitud.Temperatura => UnidadTemperatura.FAHRENHEIT.ToString(),
+            _ => UnidadLongitud.MILIMETRO.ToString()
+        };
+    }
+
+    // 3. LA CONEXIÓN A LOS ADAPTADORES
+    private async Task EjecutarConversion()
+    {
+        mensajeError = "";
+        textoResultado = "Calculando...";
+
+        try
+        {
+            var adaptador = Fabrica.ObtenerAdaptadorConversion(EstadoApp.BackendActual);
+            double resultadoNum = await adaptador.ConvertirAsync(peticion, EstadoApp.TokenActual);
+            
+            textoResultado = $"Resultado: {resultadoNum}";
+            
+            // Agregamos al historial
+            historial = $"[{DateTime.Now.ToString("HH:mm:ss")}] {peticion.Valor} {peticion.UnidadOrigen} -> {resultadoNum} {peticion.UnidadDestino} ({EstadoApp.BackendActual})\n" + historial;
+        }
+        catch (Exception ex)
+        {
+            textoResultado = "Error en conversión";
+            mensajeError = ex.Message;
+        }
+    }
+
+    private void Limpiar()
+    {
+        peticion.Valor = 0;
+        textoResultado = "Resultado: listo para convertir";
+        mensajeError = "";
+    }
+
+    private void CerrarSesion()
+    {
+        EstadoApp.TokenActual = string.Empty;
+        NavManager.NavigateTo("/");
+    }
+}
