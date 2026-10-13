@@ -11,8 +11,8 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import ec.edu.monster.conuniclientemovil.R;
+import ec.edu.monster.conuniclientemovil.controlador.ControladorConversion;
 import ec.edu.monster.conuniclientemovil.modelo.Sesion;
-import ec.edu.monster.conuniclientemovil.servicios.ServicioSOAP;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
@@ -31,6 +31,7 @@ public final class ActividadConversion extends AppCompatActivity {
 
     private final ExecutorService ejecutor = Executors.newSingleThreadExecutor();
     private Sesion sesion;
+    private ControladorConversion controlador;
     private Spinner selectorTipo;
     private Spinner selectorOrigen;
     private Spinner selectorDestino;
@@ -48,6 +49,7 @@ public final class ActividadConversion extends AppCompatActivity {
             volverAlLogin("La sesión terminó. Inicie sesión nuevamente.");
             return;
         }
+        controlador = new ControladorConversion(getApplicationContext(), sesion.obtenerToken());
 
         selectorTipo = findViewById(R.id.selectorTipoConversion);
         selectorOrigen = findViewById(R.id.selectorUnidadOrigen);
@@ -107,8 +109,7 @@ public final class ActividadConversion extends AppCompatActivity {
 
         ejecutor.execute(() -> {
             try {
-                double resultado = new ServicioSOAP(getApplicationContext(), sesion.obtenerToken())
-                        .convertir(tipo, valor, origen, destino);
+                double resultado = controlador.convertir(tipo, valor, origen, destino);
                 runOnUiThread(() -> {
                     campoResultado.setText(formatear(resultado));
                     textoEstado.setText("Conversión completada.");

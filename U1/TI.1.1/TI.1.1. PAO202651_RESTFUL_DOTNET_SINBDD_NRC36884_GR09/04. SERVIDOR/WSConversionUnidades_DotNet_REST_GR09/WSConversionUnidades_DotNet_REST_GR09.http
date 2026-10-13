@@ -1,0 +1,22 @@
+@WSConversionUnidades_DotNet_REST_GR09_HostAddress = http://127.0.0.1:19082
+@token = pega_aqui_el_token
+
+GET {{WSConversionUnidades_DotNet_REST_GR09_HostAddress}}/api/salud
+Accept: application/json
+
+###
+GET {{WSConversionUnidades_DotNet_REST_GR09_HostAddress}}/api/catalogo
+Accept: application/json
+
+###
+POST {{WSConversionUnidades_DotNet_REST_GR09_HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{"usuario":"monster","clave":"monster9"}
+
+###
+POST {{WSConversionUnidades_DotNet_REST_GR09_HostAddress}}/api/conversiones/longitud
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{"valor":10,"unidadOrigen":"metros","unidadDestino":"pies"}

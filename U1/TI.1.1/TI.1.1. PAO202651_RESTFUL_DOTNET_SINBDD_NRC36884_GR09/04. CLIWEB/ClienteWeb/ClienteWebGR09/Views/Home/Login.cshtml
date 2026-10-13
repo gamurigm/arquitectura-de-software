@@ -1,0 +1,23 @@
+@model LoginViewModel
+@{
+    ViewData["Title"] = "Iniciar sesión";
+}
+<section class="auth-card">
+    <p class="eyebrow">ACCESO SEGURO</p>
+    <h1>Iniciar sesión</h1>
+    <p class="muted">Autentíquese para convertir unidades desde la API central.</p>
+    @if (TempData["Mensaje"] is string mensaje)
+    {
+        <div class="notice">@mensaje</div>
+    }
+    <form asp-action="Login" method="post" class="form-stack">
+        <div asp-validation-summary="ModelOnly" class="form-error"></div>
+        <label asp-for="Usuario">Usuario</label>
+        <input asp-for="Usuario" autocomplete="username" class="field" />
+        <span asp-validation-for="Usuario" class="form-error"></span>
+        <label asp-for="Clave">Clave</label>
+        <input asp-for="Clave" autocomplete="current-password" class="field" />
+        <span asp-validation-for="Clave" class="form-error"></span>
+        <button class="button button-primary" type="submit">Ingresar</button>
+    </form>
+</section>

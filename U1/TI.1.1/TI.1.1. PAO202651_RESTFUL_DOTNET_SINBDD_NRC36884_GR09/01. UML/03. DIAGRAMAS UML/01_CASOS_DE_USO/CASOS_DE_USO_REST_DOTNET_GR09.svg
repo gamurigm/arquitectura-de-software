@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="760" viewBox="0 0 1280 760" role="img" aria-labelledby="titulo descripcion">
+  <title id="titulo">Casos de uso — Conversor de Unidades Monster REST .NET GR09</title>
+  <desc id="descripcion">Diagrama UML de casos de uso para autenticación, consulta de catálogo, conversión de unidades y cierre de sesión desde cuatro clientes.</desc>
+  <defs>
+    <marker id="flecha" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#6c8292"/>
+    </marker>
+    <style>
+      text { font-family: Segoe UI, Arial, sans-serif; fill: #19384e; }
+      .boundary { fill: #f7fafc; stroke: #52758b; stroke-width: 2; }
+      .usecase { fill: #ffffff; stroke: #176b87; stroke-width: 2; }
+      .association { fill: none; stroke: #6c8292; stroke-width: 2; }
+      .include { fill: none; stroke: #748a99; stroke-width: 2; stroke-dasharray: 7 6; marker-end: url(#flecha); }
+      .caption { fill: #61798a; font-size: 16px; }
+    </style>
+  </defs>
+  <rect width="1280" height="760" fill="#ffffff"/>
+  <text x="640" y="42" text-anchor="middle" font-size="25" font-weight="700">CASOS DE USO · CONVERSOR DE UNIDADES MONSTER</text>
+  <text x="640" y="68" text-anchor="middle" class="caption">API REST .NET · GR09</text>
+  <rect class="boundary" x="305" y="96" width="925" height="550" rx="16"/>
+  <text x="767" y="128" text-anchor="middle" font-size="19" font-weight="650">Sistema Conversor de Unidades</text>
+
+  <g class="association">
+    <path d="M174 251 L395 202"/>
+    <path d="M174 251 L395 324"/>
+    <path d="M174 251 L395 446"/>
+    <path d="M174 251 L395 568"/>
+  </g>
+  <g class="include">
+    <path d="M595 437 C654 410 670 310 717 258"/>
+    <path d="M595 451 C662 460 671 487 717 502"/>
+  </g>
+  <text x="643" y="340" class="caption" font-size="14">&lt;&lt;include&gt;&gt;</text>
+  <text x="646" y="477" class="caption" font-size="14">&lt;&lt;include&gt;&gt;</text>
+
+  <g aria-label="Actor usuario">
+    <circle cx="145" cy="192" r="24" fill="none" stroke="#15324b" stroke-width="3"/>
+    <path d="M145 216 L145 285 M108 240 L182 240 M145 285 L112 328 M145 285 L178 328" fill="none" stroke="#15324b" stroke-width="3" stroke-linecap="round"/>
+    <text x="145" y="356" text-anchor="middle" font-size="18" font-weight="650">Usuario</text>
+  </g>
+  <rect x="36" y="390" width="220" height="170" rx="10" fill="#f2f6f8" stroke="#c9d6df"/>
+  <text x="146" y="420" text-anchor="middle" font-size="14" font-weight="700">Canales del usuario</text>
+  <text x="58" y="451" font-size="14">• Consola .NET</text>
+  <text x="58" y="479" font-size="14">• Escritorio WPF</text>
+  <text x="58" y="507" font-size="14">• Web ASP.NET Core MVC</text>
+  <text x="58" y="535" font-size="14">• Android .NET MAUI</text>
+
+  <g>
+    <ellipse class="usecase" cx="495" cy="202" rx="150" ry="42"/>
+    <text x="495" y="208" text-anchor="middle" font-size="17">Iniciar sesión</text>
+
+    <ellipse class="usecase" cx="495" cy="324" rx="150" ry="42"/>
+    <text x="495" y="330" text-anchor="middle" font-size="17">Consultar catálogo</text>
+
+    <ellipse class="usecase" cx="495" cy="446" rx="150" ry="42"/>
+    <text x="495" y="452" text-anchor="middle" font-size="17">Convertir unidades</text>
+
+    <ellipse class="usecase" cx="495" cy="568" rx="150" ry="42"/>
+    <text x="495" y="574" text-anchor="middle" font-size="17">Cerrar sesión</text>
+
+    <ellipse class="usecase" cx="875" cy="258" rx="150" ry="42"/>
+    <text x="875" y="254" text-anchor="middle" font-size="16">Validar token</text>
+    <text x="875" y="275" text-anchor="middle" font-size="13">vigente y válido</text>
+
+    <ellipse class="usecase" cx="875" cy="502" rx="170" ry="48"/>
+    <text x="875" y="497" text-anchor="middle" font-size="16">Validar magnitud,</text>
+    <text x="875" y="519" text-anchor="middle" font-size="16">unidades y valor</text>
+  </g>
+  <text x="760" y="620" text-anchor="middle" class="caption">Conversión requiere token Bearer. Catálogo e inicio de sesión son públicos.</text>
+</svg>

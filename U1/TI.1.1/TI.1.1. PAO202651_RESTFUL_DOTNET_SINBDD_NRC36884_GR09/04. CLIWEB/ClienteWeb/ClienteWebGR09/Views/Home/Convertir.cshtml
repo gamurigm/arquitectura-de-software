@@ -1,0 +1,67 @@
+@model ConversionViewModel
+@{
+    ViewData["Title"] = "Conversión";
+}
+<section class="workspace-card">
+    <div class="workspace-heading">
+        <div>
+            <p class="eyebrow">SESIÓN ACTIVA · @ViewBag.Usuario</p>
+            <h1>Conversor de unidades</h1>
+        </div>
+        <form asp-action="Salir" method="post">
+            <button class="button button-secondary" type="submit">Cerrar sesión</button>
+        </form>
+    </div>
+    <p class="muted">Seleccione magnitud, unidades y valor. El servidor valida y calcula cada conversión.</p>
+    <form asp-action="Convertir" method="post" class="conversion-form">
+        <div asp-validation-summary="ModelOnly" class="form-error"></div>
+        <label asp-for="Magnitud">Magnitud</label>
+        <select asp-for="Magnitud" id="Magnitud" class="field">
+            @foreach (var magnitud in Model.Catalogo.Keys)
+            {
+                <option value="@magnitud" selected="@(Model.Magnitud == magnitud ? "selected" : null)">@magnitud</option>
+            }
+        </select>
+        <label asp-for="Valor">Valor</label>
+        <input asp-for="Valor" type="number" step="any" class="field" />
+        <span asp-validation-for="Valor" class="form-error"></span>
+        <div class="unit-grid">
+            <div>
+                <label asp-for="UnidadOrigen">Unidad de origen</label>
+                <select asp-for="UnidadOrigen" id="UnidadOrigen" class="field">
+                    @foreach (var grupo in Model.Catalogo)
+                    {
+                        foreach (var unidad in grupo.Value)
+                        {
+                            <option value="@unidad" data-magnitud="@grupo.Key" selected="@(Model.UnidadOrigen == unidad ? "selected" : null)">@unidad</option>
+                        }
+                    }
+                </select>
+            </div>
+            <div>
+                <label asp-for="UnidadDestino">Unidad de destino</label>
+                <select asp-for="UnidadDestino" id="UnidadDestino" class="field">
+                    @foreach (var grupo in Model.Catalogo)
+                    {
+                        foreach (var unidad in grupo.Value)
+                        {
+                            <option value="@unidad" data-magnitud="@grupo.Key" selected="@(Model.UnidadDestino == unidad ? "selected" : null)">@unidad</option>
+                        }
+                    }
+                </select>
+            </div>
+        </div>
+        <button class="button button-primary" type="submit">Convertir</button>
+    </form>
+    @if (!string.IsNullOrWhiteSpace(Model.Resultado))
+    {
+        <div class="result-card"><span>Resultado</span><strong>@Model.Resultado</strong></div>
+    }
+    @if (!string.IsNullOrWhiteSpace(Model.MensajeError))
+    {
+        <div class="form-error notice-error">@Model.MensajeError</div>
+    }
+</section>
+@section Scripts {
+    <script src="~/js/conversor.js" asp-append-version="true"></script>
+}

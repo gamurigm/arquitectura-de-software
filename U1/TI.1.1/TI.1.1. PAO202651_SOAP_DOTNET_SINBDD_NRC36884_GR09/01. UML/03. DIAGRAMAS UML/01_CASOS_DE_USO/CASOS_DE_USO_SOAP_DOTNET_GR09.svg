@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
+<title id="title">Casos de uso del Conversor de Unidades Monster SOAP .NET GR09</title>
+<desc id="desc">Actor usuario, cinco operaciones y validación de token para las operaciones protegidas.</desc>
+<defs><marker id="include" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#64748b"/></marker></defs>
+<style>
+text{font-family:Aptos,Segoe UI,Arial,sans-serif;fill:#18324f}.title{font-size:26px;font-weight:700}.sub{font-size:15px;fill:#536579}.boundary{fill:#f8fafc;stroke:#15375b;stroke-width:3}.case{fill:#fff;stroke:#087e8b;stroke-width:2.5}.actor{stroke:#15375b;stroke-width:4;fill:none;stroke-linecap:round}.assoc{stroke:#64748b;stroke-width:2.2;fill:none}.inc{stroke:#64748b;stroke-width:1.8;fill:none;stroke-dasharray:8 6;marker-end:url(#include)}.label{font-size:17px}.small{font-size:14px;fill:#536579}.note{fill:#e8f4f4;stroke:#9ccaca;stroke-width:1.5}
+</style>
+<rect width="1200" height="720" fill="#ffffff"/>
+<text x="600" y="42" text-anchor="middle" class="title">Casos de uso · Conversor de Unidades Monster</text>
+<text x="600" y="68" text-anchor="middle" class="sub">Servidor SOAP .NET GR09 · token requerido en operaciones protegidas</text>
+<rect x="260" y="100" width="900" height="560" rx="16" class="boundary"/>
+<text x="710" y="132" text-anchor="middle" class="label" font-weight="700">Sistema Conversor de Unidades Monster</text>
+<!-- Actor -->
+<circle cx="112" cy="290" r="22" class="actor"/><path d="M112 312 L112 390 M70 345 L154 345 M112 390 L76 445 M112 390 L148 445" class="actor"/>
+<text x="112" y="478" text-anchor="middle" class="label">Usuario</text>
+<!-- Associations -->
+<path d="M150 330 L310 210 M150 345 L310 300 M150 355 L310 390 M150 365 L310 480 M150 375 L310 570" class="assoc"/>
+<!-- Use cases -->
+<ellipse cx="440" cy="210" rx="130" ry="42" class="case"/><text x="440" y="216" text-anchor="middle" class="label">Iniciar sesión</text>
+<ellipse cx="440" cy="300" rx="130" ry="42" class="case"/><text x="440" y="306" text-anchor="middle" class="label">Cambiar contraseña</text>
+<ellipse cx="440" cy="390" rx="130" ry="42" class="case"/><text x="440" y="396" text-anchor="middle" class="label">Convertir longitud</text>
+<ellipse cx="440" cy="480" rx="130" ry="42" class="case"/><text x="440" y="486" text-anchor="middle" class="label">Convertir masa</text>
+<ellipse cx="440" cy="570" rx="130" ry="42" class="case"/><text x="440" y="576" text-anchor="middle" class="label">Convertir temperatura</text>
+<ellipse cx="890" cy="420" rx="150" ry="50" class="case"/><text x="890" y="415" text-anchor="middle" class="label">Validar token</text><text x="890" y="438" text-anchor="middle" class="small">vigencia: 15 minutos</text>
+<!-- Includes from protected use cases -->
+<path d="M560 300 C680 300 700 360 745 390" class="inc"/>
+<path d="M570 390 L740 410" class="inc"/>
+<path d="M570 480 L740 435" class="inc"/>
+<path d="M560 570 C680 570 700 500 745 450" class="inc"/>
+<text x="680" y="328" class="small">«include»</text>
+<rect x="300" y="615" width="820" height="30" rx="7" class="note"/>
+<text x="710" y="635" text-anchor="middle" class="small">El catálogo de unidades se presenta en los clientes; este servidor no publica una operación de catálogo.</text>
+</svg>

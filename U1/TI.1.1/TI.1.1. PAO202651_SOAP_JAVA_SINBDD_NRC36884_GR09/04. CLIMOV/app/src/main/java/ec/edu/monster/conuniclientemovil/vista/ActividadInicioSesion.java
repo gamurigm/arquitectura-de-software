@@ -7,8 +7,8 @@ import android.widget.EditText;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import ec.edu.monster.conuniclientemovil.R;
+import ec.edu.monster.conuniclientemovil.controlador.ControladorAutenticacion;
 import ec.edu.monster.conuniclientemovil.modelo.Sesion;
-import ec.edu.monster.conuniclientemovil.servicios.ServicioSOAP;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -40,7 +40,7 @@ public final class ActividadInicioSesion extends AppCompatActivity {
         botonIngreso.setEnabled(false);
         ejecutor.execute(() -> {
             try {
-                String token = new ServicioSOAP(getApplicationContext(), null)
+                String token = new ControladorAutenticacion(getApplicationContext())
                         .iniciarSesion(usuario, contrasenia);
                 runOnUiThread(() -> {
                     Intent intent = new Intent(this, ActividadConversion.class);

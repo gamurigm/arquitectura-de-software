@@ -1,7 +1,7 @@
 package ec.edu.monster.conversion;
 
-import ec.edu.monster.conversion.dto.ConversionResponse;
-import ec.edu.monster.conversion.dto.TokenResponse;
+import ec.edu.monster.conversion.modelo.dto.ConversionResponse;
+import ec.edu.monster.conversion.modelo.dto.TokenResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
