@@ -1,1 +1,5 @@
-Arquitectura Monster
+UML — Conversor de Unidades Monster, SOAP Java GR09
+
+01. ERS: ERS_SOAP_JAVA_SINBDD_NRC36884_GR09.docx
+02. ECUD: ECUD_SOAP_JAVA_SINBDD_GR09.docx
+03. DIAGRAMAS UML/01_CASOS_DE_USO: PNG y fuente PlantUML.

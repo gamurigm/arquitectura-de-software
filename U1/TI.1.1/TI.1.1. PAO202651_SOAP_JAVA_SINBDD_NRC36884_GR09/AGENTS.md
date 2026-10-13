@@ -9,6 +9,11 @@
 - Ejecuta los comandos desde el directorio del módulo que contiene el `pom.xml` o `build.gradle.kts` correspondiente. El proyecto móvil usa Gradle y los módulos Java usan Maven.
 - Ejecuta y prueba el proyecto localmente. No uses Docker; cuando el usuario vaya a iniciar el servidor manualmente, déjalo detenido.
 
+## Patrón arquitectónico
+
+- Todos los clientes Java siguen MVC explícito: modelo, vista, controlador y servicio/adaptador SOAP. Mantén cada responsabilidad en su paquete.
+- El servidor publica controladores SOAP y separa lógica en servicios, modelos, enumeraciones y seguridad. Documenta esa separación junto con MVC de los clientes.
+
 ## Contrato SOAP de GR09
 
 - El endpoint predeterminado local es `http://127.0.0.1:19080/04.SERVIDOR/WSConversionUnidades_Java_SOAP_GR09`; permite cambiar la dirección con la propiedad `ws.base.url` o la variable `WS_BASE_URL`.

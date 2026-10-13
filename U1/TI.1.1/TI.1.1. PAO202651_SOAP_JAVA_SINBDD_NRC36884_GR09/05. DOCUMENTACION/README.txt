@@ -1,1 +1,2 @@
-Arquitectura Monster
+Documentación SOAP Java GR09:
+02. MANUAL TECNICO/MANUAL_SOAP_JAVA_SINBDD_GR09.docx.

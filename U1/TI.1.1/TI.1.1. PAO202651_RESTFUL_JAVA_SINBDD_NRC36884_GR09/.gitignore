@@ -1,0 +1,26 @@
+# Archivos temporales de ejecucion
+*.log
+*.err
+*.pid
+
+# Compilacion intermedia (se conservan los JAR/WAR empaquetados)
+**/target/classes/
+**/target/test-classes/
+**/target/maven-status/
+**/target/maven-archiver/
+**/target/generated-sources/
+**/target/generated-test-sources/
+**/target/surefire-reports/
+**/target/original-*.jar
+**/target/*-shaded.jar
+**/target/*.jar.original
+**/target/Cliente_Web/
+dependency-reduced-pom.xml
+
+# IDE
+.idea/
+*.iml
+nbproject/private/
+build/
+.gradle/
+local.properties

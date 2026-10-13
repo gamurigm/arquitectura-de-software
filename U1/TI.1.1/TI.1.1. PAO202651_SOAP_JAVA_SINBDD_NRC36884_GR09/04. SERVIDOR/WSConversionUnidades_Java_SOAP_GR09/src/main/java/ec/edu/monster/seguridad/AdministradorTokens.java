@@ -7,8 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public final class AdministradorTokens {
 
-    private static final Duration VIGENCIA = Duration.ofMinutes(10
-    );
+    private static final Duration VIGENCIA = Duration.ofMinutes(15);
     private static final ConcurrentHashMap<String, Instant> TOKENS = new ConcurrentHashMap<>();
 
     private AdministradorTokens() {

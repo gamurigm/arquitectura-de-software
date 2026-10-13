@@ -19,7 +19,7 @@ public class ClienteWSConversor {
     private static final QName QNOMBRE_PUERTO = new QName(ESPACIO_NOMBRES, "WSConversionUnidades_Java_SOAP_GR09Port");
 
     private static final List<String> BASES_URL_POR_DEFECTO = List.of(
-            "http://localhost:8080/04.SERVIDOR/WSConversionUnidades_Java_SOAP_GR09"
+            "http://localhost:19080/04.SERVIDOR/WSConversionUnidades_Java_SOAP_GR09"
     );
 
     private final ContratoWSConversor puerto;

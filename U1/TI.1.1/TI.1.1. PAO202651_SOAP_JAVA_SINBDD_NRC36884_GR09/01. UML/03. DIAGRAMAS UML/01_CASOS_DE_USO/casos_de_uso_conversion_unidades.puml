@@ -1,0 +1,32 @@
+@startuml
+title Casos de uso — SOAP Java — GR09
+left to right direction
+actor Usuario
+rectangle "Conversor de Unidades Monster — SOAP Java GR09" {
+  usecase "Iniciar sesión" as Login
+  usecase "Validar credenciales" as Credenciales
+  usecase "Cambiar contraseña" as Cambiar
+  usecase "Validar token" as Token
+  usecase "Validar contraseña actual" as ClaveActual
+  usecase "Convertir unidades" as Convertir
+  usecase "Convertir longitud" as Longitud
+  usecase "Convertir masa" as Masa
+  usecase "Convertir temperatura" as Temperatura
+  usecase "Cerrar sesión local" as Logout
+  Login .> Credenciales : <<include>>
+  Cambiar .> Token : <<include>>
+  Cambiar .> ClaveActual : <<include>>
+  Convertir .> Token : <<include>>
+  Longitud -|> Convertir
+  Masa -|> Convertir
+  Temperatura -|> Convertir
+}
+Usuario -- Login
+Usuario -- Cambiar
+Usuario -- Convertir
+Usuario -- Logout
+note bottom of Cambiar
+Cambio de contraseña solo en consola.
+Logout local no revoca token servidor.
+end note
+@enduml

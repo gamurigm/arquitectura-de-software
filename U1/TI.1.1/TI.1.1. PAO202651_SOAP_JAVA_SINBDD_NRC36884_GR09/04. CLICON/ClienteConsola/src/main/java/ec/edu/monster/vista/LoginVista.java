@@ -22,7 +22,7 @@ public class LoginVista {
         } catch (Exception ex) {
             mensajes.mostrarError(ex.getMessage());
             mensajes.mostrarMensaje(
-                    "Si el contexto es distinto, pruebe ejecutar con -Dws.base.url=http://localhost:8080/TU_CONTEXTO"
+                    "Si el endpoint cambia, configure WS_BASE_URL o la propiedad -Dws.base.url con su URL base."
             );
             return;
         }
