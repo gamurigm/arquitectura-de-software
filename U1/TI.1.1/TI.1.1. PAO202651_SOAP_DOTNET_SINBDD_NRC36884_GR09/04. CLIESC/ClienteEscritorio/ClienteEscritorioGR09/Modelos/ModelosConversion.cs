@@ -22,20 +22,24 @@ public static class CatalogoUnidades
 {
     private static readonly OpcionUnidad[] Longitudes =
     [
-        new("MILIMETRO", "Milímetro"),
-        new("CENTIMETRO", "Centímetro"),
-        new("METRO", "Metro"),
-        new("KILOMETRO", "Kilómetro"),
-        new("YARDA", "Yarda")
+        new("MILIMETROS", "Milímetros"),
+        new("CENTIMETROS", "Centímetros"),
+        new("METROS", "Metros"),
+        new("KILOMETROS", "Kilómetros"),
+        new("PIES", "Pies"),
+        new("YARDAS", "Yardas"),
+        new("MILLAS", "Millas")
     ];
 
     private static readonly OpcionUnidad[] Masas =
     [
-        new("MILIGRAMO", "Miligramo"),
-        new("GRAMO", "Gramo"),
-        new("KILOGRAMO", "Kilogramo"),
-        new("TONELADA", "Tonelada"),
-        new("ONZA", "Onza")
+        new("MILIGRAMOS", "Miligramos"),
+        new("GRAMOS", "Gramos"),
+        new("KILOGRAMOS", "Kilogramos"),
+        new("TONELADAS", "Toneladas"),
+        new("ONZAS", "Onzas"),
+        new("LIBRAS", "Libras"),
+        new("QUINTALES", "Quintales")
     ];
 
     private static readonly OpcionUnidad[] Temperaturas =
@@ -43,7 +47,9 @@ public static class CatalogoUnidades
         new("CELSIUS", "Celsius"),
         new("FAHRENHEIT", "Fahrenheit"),
         new("KELVIN", "Kelvin"),
-        new("RANKINE", "Rankine")
+        new("RANKINE", "Rankine"),
+        new("NEWTON", "Newton"),
+        new("REAUMUR", "Réaumur")
     ];
 
     public static IReadOnlyList<OpcionUnidad> Obtener(TipoConversion tipo) => tipo switch

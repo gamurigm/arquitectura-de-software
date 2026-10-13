@@ -7,6 +7,7 @@ import java.util.Scanner;
 
 public class ConversorTemperaturaPrueba {
 
+    @SuppressWarnings("resource") // System.in pertenece al proceso y debe permanecer abierto.
     public static void main(String[] args) {
 
         Scanner sc = new Scanner(System.in);

@@ -27,7 +27,21 @@ public final class MapeadorUnidades {
             throw new IllegalArgumentException("La unidad es obligatoria");
         }
         try {
-            return Enum.valueOf(tipo, unidad.trim().toUpperCase(Locale.ROOT));
+            String nombre = unidad.trim().toUpperCase(Locale.ROOT);
+            String normalizado = switch (nombre) {
+                case "MILIMETROS" -> "MILIMETRO";
+                case "CENTIMETROS" -> "CENTIMETRO";
+                case "METROS" -> "METRO";
+                case "KILOMETROS" -> "KILOMETRO";
+                case "YARDAS" -> "YARDA";
+                case "MILIGRAMOS" -> "MILIGRAMO";
+                case "GRAMOS" -> "GRAMO";
+                case "KILOGRAMOS" -> "KILOGRAMO";
+                case "TONELADAS" -> "TONELADA";
+                case "ONZAS" -> "ONZA";
+                default -> nombre;
+            };
+            return Enum.valueOf(tipo, normalizado);
         } catch (IllegalArgumentException ex) {
             throw new IllegalArgumentException("Unidad no soportada: " + unidad, ex);
         }

@@ -6,5 +6,7 @@ public enum UnidadMasa
     GRAMO,
     KILOGRAMO,
     TONELADA,
-    ONZA
+    ONZA,
+    LIBRAS,
+    QUINTALES
 }

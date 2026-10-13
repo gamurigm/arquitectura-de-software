@@ -10,7 +10,9 @@ public class ConversorLongitud implements IConversor<UnidadLongitud> {
             UnidadLongitud.CENTIMETRO, 0.01,
             UnidadLongitud.METRO, 1.0,
             UnidadLongitud.KILOMETRO, 1000.0,
-            UnidadLongitud.YARDA, 0.9144);
+            UnidadLongitud.YARDA, 0.9144,
+            UnidadLongitud.PIES, 0.3048,
+            UnidadLongitud.MILLAS, 1609.344);
 
     @Override
     public double convertir(double valor, UnidadLongitud unidadInicial, UnidadLongitud unidadFinal) {

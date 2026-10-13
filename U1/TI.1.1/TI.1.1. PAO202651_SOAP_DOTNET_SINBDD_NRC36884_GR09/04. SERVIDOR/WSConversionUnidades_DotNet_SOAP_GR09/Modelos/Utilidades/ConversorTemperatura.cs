@@ -11,37 +11,26 @@ public sealed class ConversorTemperatura : IConversor<UnidadTemperatura>
             return valor;
         }
 
-        return origen switch
+        var celsius = origen switch
         {
-            UnidadTemperatura.CELSIUS => destino switch
-            {
-                UnidadTemperatura.FAHRENHEIT => valor * 9 / 5 + 32,
-                UnidadTemperatura.KELVIN => valor + 273.15,
-                UnidadTemperatura.RANKINE => (valor + 273.15) * 9 / 5,
-                _ => throw new ArgumentOutOfRangeException(nameof(destino))
-            },
-            UnidadTemperatura.FAHRENHEIT => destino switch
-            {
-                UnidadTemperatura.CELSIUS => (valor - 32) * 5 / 9,
-                UnidadTemperatura.KELVIN => (valor - 32) * 5 / 9 + 273.15,
-                UnidadTemperatura.RANKINE => valor + 459.67,
-                _ => throw new ArgumentOutOfRangeException(nameof(destino))
-            },
-            UnidadTemperatura.KELVIN => destino switch
-            {
-                UnidadTemperatura.CELSIUS => valor - 273.15,
-                UnidadTemperatura.FAHRENHEIT => (valor - 273.15) * 9 / 5 + 32,
-                UnidadTemperatura.RANKINE => valor * 9 / 5,
-                _ => throw new ArgumentOutOfRangeException(nameof(destino))
-            },
-            UnidadTemperatura.RANKINE => destino switch
-            {
-                UnidadTemperatura.CELSIUS => (valor - 491.67) * 5 / 9,
-                UnidadTemperatura.FAHRENHEIT => valor - 459.67,
-                UnidadTemperatura.KELVIN => valor * 5 / 9,
-                _ => throw new ArgumentOutOfRangeException(nameof(destino))
-            },
+            UnidadTemperatura.CELSIUS => valor,
+            UnidadTemperatura.FAHRENHEIT => (valor - 32d) * 5d / 9d,
+            UnidadTemperatura.KELVIN => valor - 273.15d,
+            UnidadTemperatura.RANKINE => valor * 5d / 9d - 273.15d,
+            UnidadTemperatura.NEWTON => valor * 100d / 33d,
+            UnidadTemperatura.REAUMUR => valor * 5d / 4d,
             _ => throw new ArgumentOutOfRangeException(nameof(origen))
+        };
+
+        return destino switch
+        {
+            UnidadTemperatura.CELSIUS => celsius,
+            UnidadTemperatura.FAHRENHEIT => celsius * 9d / 5d + 32d,
+            UnidadTemperatura.KELVIN => celsius + 273.15d,
+            UnidadTemperatura.RANKINE => (celsius + 273.15d) * 9d / 5d,
+            UnidadTemperatura.NEWTON => celsius * 33d / 100d,
+            UnidadTemperatura.REAUMUR => celsius * 4d / 5d,
+            _ => throw new ArgumentOutOfRangeException(nameof(destino))
         };
     }
 }

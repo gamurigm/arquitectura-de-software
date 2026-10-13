@@ -1,0 +1,12 @@
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="transparent_black">#B3000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="colorPrimary">#4885A6</color>
+    <color name="colorPrimaryDark">#37627D</color>
+    <color name="colorAccent">#03DAC5</color>
+    <color name="colorBackground">#F5F5F5</color>
+    <color name="colorOnPrimary">#FFFFFF</color>
+    <color name="colorOnSecondary">#000000</color>
+    <color name="semiTransparentWhite">#B3FFFFFF</color>
+</resources>

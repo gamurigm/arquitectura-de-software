@@ -11,15 +11,15 @@ import jakarta.xml.ws.soap.SOAPFaultException;
 public class ConversionVista {
 
     private static final String[] UNIDADES_LONGITUD = {
-        "MILIMETRO", "CENTIMETRO", "METRO", "KILOMETRO", "YARDA"
+        "MILIMETROS", "CENTIMETROS", "METROS", "KILOMETROS", "PIES", "YARDAS", "MILLAS"
     };
 
     private static final String[] UNIDADES_MASA = {
-        "MILIGRAMO", "GRAMO", "KILOGRAMO", "TONELADA", "ONZA"
+        "MILIGRAMOS", "GRAMOS", "KILOGRAMOS", "TONELADAS", "ONZAS", "LIBRAS", "QUINTALES"
     };
 
     private static final String[] UNIDADES_TEMPERATURA = {
-        "CELSIUS", "FAHRENHEIT", "KELVIN", "RANKINE"
+        "CELSIUS", "FAHRENHEIT", "KELVIN", "RANKINE", "NEWTON", "REAUMUR"
     };
 
     private final MensajesModelo mensajes = new MensajesModelo();

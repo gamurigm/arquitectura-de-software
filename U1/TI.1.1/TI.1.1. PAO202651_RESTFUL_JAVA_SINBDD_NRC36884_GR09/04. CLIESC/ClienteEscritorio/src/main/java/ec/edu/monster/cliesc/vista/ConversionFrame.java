@@ -34,9 +34,9 @@ public class ConversionFrame extends JFrame {
     private static final Map<String, List<String>> RESPALDO = new LinkedHashMap<>();
 
     static {
-        RESPALDO.put("longitud", List.of("centimetros", "metros", "pies", "yardas", "millas"));
-        RESPALDO.put("masa", List.of("gramos", "kilogramos", "onzas", "libras", "quintales"));
-        RESPALDO.put("temperatura", List.of("fahrenheit", "kelvin", "celsius", "newton", "reaumur"));
+        RESPALDO.put("longitud", List.of("milimetros", "centimetros", "metros", "kilometros", "pies", "yardas", "millas"));
+        RESPALDO.put("masa", List.of("miligramos", "gramos", "kilogramos", "toneladas", "onzas", "libras", "quintales"));
+        RESPALDO.put("temperatura", List.of("celsius", "fahrenheit", "kelvin", "rankine", "newton", "reaumur"));
     }
 
     private final ControladorCliente api;

@@ -47,7 +47,20 @@ public sealed class ServicioConversor(
             throw new ArgumentException("La unidad es obligatoria");
         }
 
-        var nombre = unidad.Trim();
+        var nombre = unidad.Trim().ToUpperInvariant() switch
+        {
+            "MILIMETROS" => "MILIMETRO",
+            "CENTIMETROS" => "CENTIMETRO",
+            "METROS" => "METRO",
+            "KILOMETROS" => "KILOMETRO",
+            "YARDAS" => "YARDA",
+            "MILIGRAMOS" => "MILIGRAMO",
+            "GRAMOS" => "GRAMO",
+            "KILOGRAMOS" => "KILOGRAMO",
+            "TONELADAS" => "TONELADA",
+            "ONZAS" => "ONZA",
+            var otro => otro
+        };
         foreach (var nombreValido in Enum.GetNames<T>())
         {
             if (string.Equals(nombre, nombreValido, StringComparison.OrdinalIgnoreCase))

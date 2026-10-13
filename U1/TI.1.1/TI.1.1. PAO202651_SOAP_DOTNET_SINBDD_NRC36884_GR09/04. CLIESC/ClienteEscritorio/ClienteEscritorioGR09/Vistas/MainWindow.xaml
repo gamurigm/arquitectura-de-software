@@ -1,31 +1,82 @@
 <Window x:Class="ClienteEscritorioGR09.Vistas.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Conversor de Unidades Monster GR09"
-        Height="670" Width="760" MinHeight="600" MinWidth="600"
-        WindowStartupLocation="CenterScreen" Background="#F3F6F9">
+        Title="Conversor de unidades Monster GR09"
+        Height="650" Width="820" MinHeight="560" MinWidth="620"
+        WindowStartupLocation="CenterScreen" Background="#121212">
+    <Window.Resources>
+        <Style TargetType="TextBlock">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+        </Style>
+        <Style TargetType="TextBox">
+            <Setter Property="Height" Value="34"/>
+            <Setter Property="Padding" Value="8,5"/>
+            <Setter Property="Background" Value="#404040"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="CaretBrush" Value="White"/>
+            <Setter Property="BorderBrush" Value="#555555"/>
+        </Style>
+        <Style TargetType="PasswordBox">
+            <Setter Property="Height" Value="34"/>
+            <Setter Property="Padding" Value="8,5"/>
+            <Setter Property="Background" Value="#404040"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="CaretBrush" Value="White"/>
+            <Setter Property="BorderBrush" Value="#555555"/>
+        </Style>
+        <Style TargetType="ComboBox">
+            <Setter Property="Height" Value="34"/>
+            <Setter Property="Background" Value="#404040"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderBrush" Value="#555555"/>
+        </Style>
+        <Style TargetType="Button">
+            <Setter Property="Height" Value="38"/>
+            <Setter Property="Padding" Value="12,6"/>
+            <Setter Property="Background" Value="#5B88E5"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="BorderThickness" Value="0"/>
+        </Style>
+    </Window.Resources>
     <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <Border Margin="28" Padding="28" Background="White" CornerRadius="12">
+        <Border MaxWidth="760" Margin="24" Padding="26" Background="#151515"
+                BorderBrush="#333333" BorderThickness="1" CornerRadius="6">
             <StackPanel>
-                <TextBlock Text="Conversor de Unidades" FontSize="28" FontWeight="Bold" Foreground="#172B4D"/>
-                <TextBlock Text="SOAP .NET · GR09" Margin="0,4,0,22" Foreground="#526581"/>
+                <TextBlock Text="Conversor de unidades" FontSize="26" FontWeight="Bold"/>
+                <TextBlock Text="Monster · SOAP .NET · GR09" Margin="0,4,0,20" Foreground="#B8B8C4"/>
 
-                <StackPanel x:Name="PanelLogin">
-                    <TextBlock Text="Iniciar sesión" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,12"/>
-                    <TextBlock Text="Usuario"/>
-                    <TextBox x:Name="UsuarioBox" Height="34" Margin="0,4,0,12" Padding="8"/>
-                    <TextBlock Text="Contraseña"/>
-                    <PasswordBox x:Name="ContraseniaBox" Height="34" Margin="0,4,0,14" Padding="8"/>
-                    <Button Content="Iniciar sesión" Height="38" Click="IniciarSesion_Click"/>
-                </StackPanel>
+                <Grid x:Name="PanelLogin">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="24"/>
+                        <ColumnDefinition Width="172"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" MaxWidth="330" VerticalAlignment="Center">
+                        <TextBlock Text="Iniciar sesión" FontSize="22" FontWeight="SemiBold"/>
+                        <TextBlock Text="Ingresa tus credenciales para continuar."
+                                   Margin="0,4,0,18" Foreground="#B8B8C4"/>
+                        <TextBlock Text="Usuario" FontWeight="SemiBold"/>
+                        <TextBox x:Name="UsuarioBox" Margin="0,5,0,12"/>
+                        <TextBlock Text="Contraseña" FontWeight="SemiBold"/>
+                        <PasswordBox x:Name="ContraseniaBox" Margin="0,5,0,18"/>
+                        <Button Content="Iniciar sesión" Click="IniciarSesion_Click"/>
+                    </StackPanel>
+                    <Border Grid.Column="2" BorderBrush="#333333" BorderThickness="1">
+                        <Image Source="pack://application:,,,/Resources/Images/monsterlogin.jpg"
+                               Width="172" Height="300" Stretch="UniformToFill"
+                               ToolTip="Monster"/>
+                    </Border>
+                </Grid>
 
                 <StackPanel x:Name="PanelConversor" Visibility="Collapsed">
-                    <TextBlock Text="Nueva conversión" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,12"/>
-                    <TextBlock Text="Magnitud"/>
-                    <ComboBox x:Name="MagnitudBox" Height="34" Margin="0,4,0,12"
+                    <TextBlock Text="Nueva conversión" FontSize="20" FontWeight="SemiBold" Margin="0,0,0,16"/>
+                    <TextBlock Text="Magnitud" FontWeight="SemiBold"/>
+                    <ComboBox x:Name="MagnitudBox" Margin="0,5,0,12"
                               SelectionChanged="Magnitud_SelectionChanged"/>
-                    <TextBlock Text="Valor"/>
-                    <TextBox x:Name="ValorBox" Height="34" Margin="0,4,0,12" Padding="8"/>
+                    <TextBlock Text="Valor" FontWeight="SemiBold"/>
+                    <TextBox x:Name="ValorBox" Margin="0,5,0,12"/>
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
@@ -33,29 +84,30 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <StackPanel Grid.Column="0">
-                            <TextBlock Text="Desde"/>
-                            <ComboBox x:Name="UnidadInicialBox" Height="34" Margin="0,4,0,12"/>
+                            <TextBlock Text="Desde" FontWeight="SemiBold"/>
+                            <ComboBox x:Name="UnidadInicialBox" Margin="0,5,0,14"/>
                         </StackPanel>
                         <StackPanel Grid.Column="2">
-                            <TextBlock Text="Hasta"/>
-                            <ComboBox x:Name="UnidadFinalBox" Height="34" Margin="0,4,0,12"/>
+                            <TextBlock Text="Hasta" FontWeight="SemiBold"/>
+                            <ComboBox x:Name="UnidadFinalBox" Margin="0,5,0,14"/>
                         </StackPanel>
                     </Grid>
-                    <Button Content="Convertir" Height="38" Click="Convertir_Click"/>
+                    <Button Content="Convertir" Click="Convertir_Click"/>
                     <TextBlock x:Name="ResultadoText" FontSize="18" FontWeight="SemiBold"
-                               Margin="0,14,0,18" Foreground="#087E5B"/>
+                               Margin="0,14,0,18" Foreground="#A9BFF4"/>
 
-                    <Expander Header="Cambiar contraseña" Margin="0,0,0,12">
+                    <Expander Header="Cambiar contraseña" Foreground="White" Margin="0,0,0,12">
                         <StackPanel Margin="0,10,0,4">
-                            <PasswordBox x:Name="ContraseniaActualBox" Height="34" Margin="0,4,0,10" Padding="8"/>
-                            <PasswordBox x:Name="ContraseniaNuevaBox" Height="34" Margin="0,4,0,10" Padding="8"/>
-                            <Button Content="Actualizar contraseña" Height="36" Click="CambiarContrasenia_Click"/>
+                            <TextBlock Text="Contraseña actual"/>
+                            <PasswordBox x:Name="ContraseniaActualBox" Margin="0,5,0,10"/>
+                            <TextBlock Text="Contraseña nueva"/>
+                            <PasswordBox x:Name="ContraseniaNuevaBox" Margin="0,5,0,10"/>
+                            <Button Content="Actualizar contraseña" Click="CambiarContrasenia_Click"/>
                         </StackPanel>
                     </Expander>
-                    <Button Content="Cerrar sesión" Height="36" Click="CerrarSesion_Click"/>
+                    <Button Content="Cerrar sesión" Background="#303030" Click="CerrarSesion_Click"/>
                 </StackPanel>
-
-                <TextBlock x:Name="EstadoText" Margin="0,18,0,0" TextWrapping="Wrap" Foreground="#9B2C2C"/>
+                <TextBlock x:Name="EstadoText" Margin="0,18,0,0" TextWrapping="Wrap" Foreground="#FF8585"/>
             </StackPanel>
         </Border>
     </ScrollViewer>

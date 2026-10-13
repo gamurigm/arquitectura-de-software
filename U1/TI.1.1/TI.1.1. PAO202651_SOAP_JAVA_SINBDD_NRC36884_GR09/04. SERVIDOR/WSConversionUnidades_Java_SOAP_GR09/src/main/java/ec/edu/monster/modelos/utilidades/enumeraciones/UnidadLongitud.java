@@ -5,5 +5,7 @@ public enum UnidadLongitud {
     CENTIMETRO,
     METRO,
     KILOMETRO,
-    YARDA
+    YARDA,
+    PIES,
+    MILLAS
 }

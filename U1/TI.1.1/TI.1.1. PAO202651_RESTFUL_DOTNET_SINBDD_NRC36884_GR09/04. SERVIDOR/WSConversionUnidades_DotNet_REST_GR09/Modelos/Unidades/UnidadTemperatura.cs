@@ -6,5 +6,6 @@ public enum UnidadTemperatura
     Kelvin,
     Celsius,
     Newton,
-    Reaumur
+    Reaumur,
+    Rankine
 }

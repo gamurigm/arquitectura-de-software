@@ -26,9 +26,20 @@ public sealed record CatalogoRespuesta(
     Dictionary<string, List<string>> Magnitudes,
     string Mensaje);
 
-public sealed record ErrorRespuesta(bool Exito, int Codigo, string Error, string Mensaje, string Ruta);
+public sealed record ErrorRespuesta(
+    bool Exito,
+    int Codigo,
+    string Error,
+    string Mensaje,
+    string Ruta,
+    DateTimeOffset Timestamp);
 
 public sealed record RespuestaOperacion(bool Exito, string Mensaje);
+
+public sealed class ErrorServicioException(int codigo, string mensaje) : InvalidOperationException(mensaje)
+{
+    public int Codigo { get; } = codigo;
+}
 
 public sealed class EstadoCliente
 {

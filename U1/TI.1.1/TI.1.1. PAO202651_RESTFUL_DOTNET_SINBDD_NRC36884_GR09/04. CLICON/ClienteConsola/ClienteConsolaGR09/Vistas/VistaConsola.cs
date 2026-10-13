@@ -70,7 +70,8 @@ public sealed class VistaConsola
 
     public void MostrarInicio(string mensaje)
     {
-        Console.WriteLine("CONVERSOR DE UNIDADES GR09 · REST .NET");
+        Console.WriteLine("CONVERSOR DE UNIDADES MONSTER — GR09");
+        Console.WriteLine("Servicio REST .NET | Inicio de sesión");
         Console.WriteLine(mensaje);
     }
 

@@ -3,7 +3,7 @@ package ec.edu.monster.clienteescritorio.servicios;
 import jakarta.xml.ws.BindingProvider;
 import jakarta.xml.ws.Service;
 import jakarta.xml.ws.handler.Handler;
-import java.net.URL;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import javax.xml.namespace.QName;
@@ -21,6 +21,7 @@ public final class ClienteSOAP {
     private final ContratoWSConversor puerto;
     private String token;
 
+    @SuppressWarnings("rawtypes") // La API Jakarta XML WS declara la cadena como List<Handler>.
     public ClienteSOAP() {
         String direccionServicio = System.getProperty("ws.base.url");
         if (direccionServicio == null || direccionServicio.isBlank()) {
@@ -32,7 +33,7 @@ public final class ClienteSOAP {
         direccionServicio = direccionServicio.trim().replaceAll("/+$", "");
 
         try {
-            Service servicio = Service.create(new URL(direccionServicio + "?WSDL"), NOMBRE_SERVICIO);
+            Service servicio = Service.create(new URI(direccionServicio + "?WSDL").toURL(), NOMBRE_SERVICIO);
             puerto = servicio.getPort(NOMBRE_PUERTO, ContratoWSConversor.class);
             BindingProvider proveedor = (BindingProvider) puerto;
             proveedor.getRequestContext().put(

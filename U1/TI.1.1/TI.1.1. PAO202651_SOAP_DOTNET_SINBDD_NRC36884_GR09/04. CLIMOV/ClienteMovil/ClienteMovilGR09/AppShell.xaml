@@ -4,7 +4,7 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:vistas="clr-namespace:ClienteMovilGR09.Vistas"
-    Title="Conversor de unidades GR09">
+    Title="Conversor de unidades GR09" BackgroundColor="#151515" ForegroundColor="White" TitleColor="White">
 
     <ShellContent
         Title="Conversor"

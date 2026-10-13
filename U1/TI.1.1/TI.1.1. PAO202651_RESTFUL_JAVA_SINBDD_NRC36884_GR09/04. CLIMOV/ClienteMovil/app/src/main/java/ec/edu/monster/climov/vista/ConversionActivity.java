@@ -34,9 +34,9 @@ public class ConversionActivity extends AppCompatActivity {
     private static final Map<String, List<String>> RESPALDO = new LinkedHashMap<>();
 
     static {
-        RESPALDO.put("longitud", Arrays.asList("centimetros", "metros", "pies", "yardas", "millas"));
-        RESPALDO.put("masa", Arrays.asList("gramos", "kilogramos", "onzas", "libras", "quintales"));
-        RESPALDO.put("temperatura", Arrays.asList("fahrenheit", "kelvin", "celsius", "newton", "reaumur"));
+        RESPALDO.put("longitud", Arrays.asList("milimetros", "centimetros", "metros", "kilometros", "pies", "yardas", "millas"));
+        RESPALDO.put("masa", Arrays.asList("miligramos", "gramos", "kilogramos", "toneladas", "onzas", "libras", "quintales"));
+        RESPALDO.put("temperatura", Arrays.asList("celsius", "fahrenheit", "kelvin", "rankine", "newton", "reaumur"));
     }
 
     private TokenStore store;

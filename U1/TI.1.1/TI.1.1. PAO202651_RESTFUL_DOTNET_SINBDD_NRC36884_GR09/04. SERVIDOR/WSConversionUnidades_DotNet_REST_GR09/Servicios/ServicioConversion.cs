@@ -30,6 +30,14 @@ public sealed class ServicioConversion(
                 "El valor debe ser un número finito.");
         }
 
+        if (magnitud == Magnitud.Masa && solicitud.Valor.Value < 0)
+        {
+            throw new ErrorApiException(
+                StatusCodes.Status400BadRequest,
+                "Datos inválidos",
+                "La masa no puede ser negativa");
+        }
+
         var origen = solicitud.UnidadOrigen?.Trim().ToLowerInvariant();
         var destino = solicitud.UnidadDestino?.Trim().ToLowerInvariant();
         if (string.IsNullOrWhiteSpace(origen) || string.IsNullOrWhiteSpace(destino))

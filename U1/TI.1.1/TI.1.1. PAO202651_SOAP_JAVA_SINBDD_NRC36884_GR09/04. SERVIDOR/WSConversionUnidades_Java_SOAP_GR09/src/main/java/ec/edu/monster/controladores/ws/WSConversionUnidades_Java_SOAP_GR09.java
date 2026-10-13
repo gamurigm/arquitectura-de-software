@@ -1,6 +1,5 @@
 package ec.edu.monster.controladores.ws;
 
-import ec.edu.monster.controladores.manejadoresws.ManejadorAutenticacion;
 import ec.edu.monster.modelos.utilidades.ConversorLongitud;
 import ec.edu.monster.modelos.utilidades.ConversorMasa;
 import ec.edu.monster.modelos.utilidades.ConversorTemperatura;

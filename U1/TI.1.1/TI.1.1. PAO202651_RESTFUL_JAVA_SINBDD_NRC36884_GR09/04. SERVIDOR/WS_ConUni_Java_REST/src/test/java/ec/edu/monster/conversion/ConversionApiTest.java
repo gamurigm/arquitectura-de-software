@@ -12,8 +12,10 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.NonNull;
 
 import java.util.Map;
+import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -28,12 +30,13 @@ class ConversionApiTest {
     @Autowired
     private TestRestTemplate rest;
 
+    @NonNull
     private String iniciarSesion() {
         Map<String, String> credenciales = Map.of("usuario", "monster", "clave", "monster9");
         ResponseEntity<TokenResponse> respuesta = rest.postForEntity("/api/auth/login", credenciales, TokenResponse.class);
         assertEquals(HttpStatus.OK, respuesta.getStatusCode());
-        assertNotNull(respuesta.getBody());
-        return respuesta.getBody().token();
+        TokenResponse cuerpo = Objects.requireNonNull(respuesta.getBody());
+        return Objects.requireNonNull(cuerpo.token());
     }
 
     @Test
@@ -67,8 +70,7 @@ class ConversionApiTest {
                 "/api/conversiones/longitud", HttpMethod.POST, new HttpEntity<>(cuerpo, headers), ConversionResponse.class);
 
         assertEquals(HttpStatus.OK, respuesta.getStatusCode());
-        assertNotNull(respuesta.getBody());
-        assertEquals(32.808399, respuesta.getBody().resultado(), 0.001);
+        assertEquals(32.808399, Objects.requireNonNull(respuesta.getBody()).resultado(), 0.001);
     }
 
     @Test
@@ -83,7 +85,7 @@ class ConversionApiTest {
                 "/api/conversiones/longitud", HttpMethod.POST, new HttpEntity<>(cuerpo, headers), String.class);
 
         assertEquals(HttpStatus.BAD_REQUEST, respuesta.getStatusCode());
-        assertTrue(respuesta.getBody().contains("Unidad invalida"));
+        assertTrue(Objects.requireNonNull(respuesta.getBody()).contains("Unidad invalida"));
     }
 
     @Test
@@ -98,7 +100,6 @@ class ConversionApiTest {
                 "/api/conversiones/temperatura", HttpMethod.POST, new HttpEntity<>(cuerpo, headers), ConversionResponse.class);
 
         assertEquals(HttpStatus.OK, respuesta.getStatusCode());
-        assertNotNull(respuesta.getBody());
-        assertEquals(212.0, respuesta.getBody().resultado(), 0.0001);
+        assertEquals(212.0, Objects.requireNonNull(respuesta.getBody()).resultado(), 0.0001);
     }
 }

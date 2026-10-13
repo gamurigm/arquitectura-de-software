@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog" prefer="system">
+    <system systemId="http://localhost:8080/WSConversion/WSConversion?wsdl" uri="xml-resources/web-service-references/WSConversion/wsdl/localhost_8080/WSConversion/WSConversion.wsdl"/>
+    <system systemId="http://localhost:8080/WSConversion/WSConversion?xsd=1" uri="xml-resources/web-service-references/WSConversion/wsdl/localhost_8080/WSConversion/WSConversion.xsd_1.xsd"/>
+    <system systemId="http://localhost:8080/WS_ConversionUnidades/WSConversion?wsdl" uri="xml-resources/web-service-references/WSConversion_1/wsdl/localhost_8080/WS_ConversionUnidades/WSConversion.wsdl"/>
+    <system systemId="http://localhost:8080/WS_ConversionUnidades/WSConversion?xsd=1" uri="xml-resources/web-service-references/WSConversion_1/wsdl/localhost_8080/WS_ConversionUnidades/WSConversion.xsd_1.xsd"/>
+    <system systemId="http://192.168.43.3:8080/WSConversion/WSConversion?wsdl" uri="xml-resources/web-service-references/WSConversion/wsdl/192.168.43.3_8080/WSConversion/WSConversion.wsdl"/>
+    <system systemId="http://192.168.43.3:8080/WSConversion/WSConversion?xsd=1" uri="xml-resources/web-service-references/WSConversion/wsdl/192.168.43.3_8080/WSConversion/WSConversion.xsd_1.xsd"/>
+</catalog>

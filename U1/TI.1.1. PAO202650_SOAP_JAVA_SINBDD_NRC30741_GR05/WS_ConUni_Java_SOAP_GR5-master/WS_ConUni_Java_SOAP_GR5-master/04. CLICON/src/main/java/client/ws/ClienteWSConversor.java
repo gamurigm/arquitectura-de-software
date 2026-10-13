@@ -106,6 +106,7 @@ public class ClienteWSConversor {
         return baseNormalizada;
     }
 
+    @SuppressWarnings("rawtypes") // La API Jakarta XML WS declara la cadena como List<Handler>.
     private void configurarManejadorToken(BindingProvider proveedor) {
         Binding enlace = proveedor.getBinding();
         List<Handler> cadenaManejadores = new ArrayList<>(enlace.getHandlerChain());

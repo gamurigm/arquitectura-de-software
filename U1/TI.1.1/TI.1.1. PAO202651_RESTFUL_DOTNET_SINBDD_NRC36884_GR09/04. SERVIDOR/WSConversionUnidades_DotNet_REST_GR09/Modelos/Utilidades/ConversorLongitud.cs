@@ -9,8 +9,10 @@ public sealed class ConversorLongitud : IConversor<UnidadLongitud>
 
     private static double Factor(UnidadLongitud unidad) => unidad switch
     {
+        UnidadLongitud.Milimetros => 0.001,
         UnidadLongitud.Centimetros => 0.01,
         UnidadLongitud.Metros => 1,
+        UnidadLongitud.Kilometros => 1000,
         UnidadLongitud.Pies => 0.3048,
         UnidadLongitud.Yardas => 0.9144,
         UnidadLongitud.Millas => 1609.344,

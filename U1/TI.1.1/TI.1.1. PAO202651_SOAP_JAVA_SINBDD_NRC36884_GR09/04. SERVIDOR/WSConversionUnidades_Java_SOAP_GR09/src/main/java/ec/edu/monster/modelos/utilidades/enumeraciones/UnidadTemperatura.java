@@ -4,5 +4,7 @@ public enum UnidadTemperatura {
     CELSIUS,
     FAHRENHEIT,
     KELVIN,
-    RANKINE
+    RANKINE,
+    NEWTON,
+    REAUMUR
 }

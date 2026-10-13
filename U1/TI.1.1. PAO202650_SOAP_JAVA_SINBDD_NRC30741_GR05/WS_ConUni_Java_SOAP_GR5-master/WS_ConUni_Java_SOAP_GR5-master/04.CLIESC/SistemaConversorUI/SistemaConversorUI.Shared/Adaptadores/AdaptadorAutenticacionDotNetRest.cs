@@ -54,5 +54,5 @@ public class AdaptadorAutenticacionDotNetRest : IAdaptadorAutenticacion
     }
 
     // Clase interna temporal para mapear el JSON de respuesta
-    private class LoginResponseDto { public string Token { get; set; } }
+    private class LoginResponseDto { public string? Token { get; set; } }
 }

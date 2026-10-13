@@ -10,7 +10,9 @@ public class ConversorMasa implements IConversor<UnidadMasa> {
             UnidadMasa.GRAMO, 1.0,
             UnidadMasa.KILOGRAMO, 1000.0,
             UnidadMasa.TONELADA, 1_000_000.0,
-            UnidadMasa.ONZA, 28.3495);
+            UnidadMasa.ONZA, 28.349523125,
+            UnidadMasa.LIBRAS, 453.59237,
+            UnidadMasa.QUINTALES, 100_000.0);
 
     @Override
     public double convertir(double valor, UnidadMasa unidadInicial, UnidadMasa unidadFinal) {

@@ -10,9 +10,9 @@
     Map<String, List<String>> catalogo = (Map<String, List<String>>) request.getAttribute("catalogo");
     if (catalogo == null) {
         catalogo = new LinkedHashMap<>();
-        catalogo.put("longitud", Arrays.asList("centimetros", "metros", "pies", "yardas", "millas"));
-        catalogo.put("masa", Arrays.asList("gramos", "kilogramos", "onzas", "libras", "quintales"));
-        catalogo.put("temperatura", Arrays.asList("fahrenheit", "kelvin", "celsius", "newton", "reaumur"));
+        catalogo.put("longitud", Arrays.asList("milimetros", "centimetros", "metros", "kilometros", "pies", "yardas", "millas"));
+        catalogo.put("masa", Arrays.asList("miligramos", "gramos", "kilogramos", "toneladas", "onzas", "libras", "quintales"));
+        catalogo.put("temperatura", Arrays.asList("celsius", "fahrenheit", "kelvin", "rankine", "newton", "reaumur"));
     }
     String magnitud = (String) request.getAttribute("magnitud");
     if (magnitud == null) {

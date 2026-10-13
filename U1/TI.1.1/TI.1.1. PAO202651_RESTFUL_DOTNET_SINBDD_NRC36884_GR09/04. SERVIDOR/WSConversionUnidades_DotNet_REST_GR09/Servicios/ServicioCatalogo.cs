@@ -6,9 +6,9 @@ public sealed class ServicioCatalogo
 {
     private static readonly Dictionary<Magnitud, List<string>> Unidades = new()
     {
-        [Magnitud.Longitud] = ["centimetros", "metros", "pies", "yardas", "millas"],
-        [Magnitud.Masa] = ["gramos", "kilogramos", "onzas", "libras", "quintales"],
-        [Magnitud.Temperatura] = ["fahrenheit", "kelvin", "celsius", "newton", "reaumur"]
+        [Magnitud.Longitud] = ["milimetros", "centimetros", "metros", "kilometros", "pies", "yardas", "millas"],
+        [Magnitud.Masa] = ["miligramos", "gramos", "kilogramos", "toneladas", "onzas", "libras", "quintales"],
+        [Magnitud.Temperatura] = ["celsius", "fahrenheit", "kelvin", "rankine", "newton", "reaumur"]
     };
 
     public CatalogoRespuesta ObtenerCatalogo() =>

@@ -14,6 +14,8 @@ public sealed class ConversorLongitud : IConversor<UnidadLongitud>
         UnidadLongitud.METRO => 1.0,
         UnidadLongitud.KILOMETRO => 1000.0,
         UnidadLongitud.YARDA => 0.9144,
+        UnidadLongitud.PIES => 0.3048,
+        UnidadLongitud.MILLAS => 1609.344,
         _ => throw new ArgumentOutOfRangeException(nameof(unidad))
     };
 }

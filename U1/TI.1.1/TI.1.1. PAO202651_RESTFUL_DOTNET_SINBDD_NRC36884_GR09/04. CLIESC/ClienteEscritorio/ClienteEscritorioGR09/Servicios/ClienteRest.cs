@@ -71,7 +71,9 @@ public sealed class ClienteRest(HttpClient http)
             if (!respuesta.IsSuccessStatusCode)
             {
                 var error = JsonSerializer.Deserialize<ErrorRespuesta>(json, OpcionesJson);
-                throw new InvalidOperationException(error?.Mensaje ?? $"La API respondió HTTP {(int)respuesta.StatusCode}.");
+                throw new ErrorServicioException(
+                    (int)respuesta.StatusCode,
+                    error?.Mensaje ?? $"La API respondió HTTP {(int)respuesta.StatusCode}.");
             }
 
             return JsonSerializer.Deserialize<T>(json, OpcionesJson)

@@ -1,7 +1,9 @@
 using ClienteWebGR09.Services;
 
 var builder = WebApplication.CreateBuilder(args);
-var apiUrl = builder.Configuration["Api:Url"] ?? "http://127.0.0.1:19082/";
+var apiUrl = Environment.GetEnvironmentVariable("CONVERSOR_API_URL")
+    ?? builder.Configuration["Api:Url"]
+    ?? "http://127.0.0.1:19082/";
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddDistributedMemoryCache();

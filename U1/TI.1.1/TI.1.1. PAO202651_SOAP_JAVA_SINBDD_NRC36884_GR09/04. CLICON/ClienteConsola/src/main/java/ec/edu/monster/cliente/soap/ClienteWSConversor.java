@@ -4,7 +4,7 @@ import jakarta.xml.ws.Binding;
 import jakarta.xml.ws.BindingProvider;
 import jakarta.xml.ws.Service;
 import jakarta.xml.ws.handler.Handler;
-import java.net.URL;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import javax.xml.namespace.QName;
@@ -42,7 +42,7 @@ public class ClienteWSConversor {
 
             for (String wsdl : wsdlsCandidatos) {
                 try {
-                    Service servicio = Service.create(new URL(wsdl), QNOMBRE_SERVICIO);
+                    Service servicio = Service.create(new URI(wsdl).toURL(), QNOMBRE_SERVICIO);
                     ContratoWSConversor puertoTemporal = servicio.getPort(QNOMBRE_PUERTO, ContratoWSConversor.class);
 
                     BindingProvider proveedor = (BindingProvider) puertoTemporal;
@@ -104,6 +104,7 @@ public class ClienteWSConversor {
         return baseNormalizada;
     }
 
+    @SuppressWarnings("rawtypes") // La API Jakarta XML WS declara la cadena como List<Handler>.
     private void configurarManejadorToken(BindingProvider proveedor) {
         Binding enlace = proveedor.getBinding();
         List<Handler> cadenaManejadores = new ArrayList<>(enlace.getHandlerChain());

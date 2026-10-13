@@ -134,9 +134,9 @@
     
     <script>
         const dicUnidades = {
-            longitud: ["milimetro", "centimetro", "metro", "kilometro", "yarda"],
-            masa: ["miligramo", "gramo", "kilogramo", "tonelada", "onza"],
-            temperatura: ["celsius", "fahrenheit", "kelvin", "rankine"]
+            longitud: ["milimetros", "centimetros", "metros", "kilometros", "pies", "yardas", "millas"],
+            masa: ["miligramos", "gramos", "kilogramos", "toneladas", "onzas", "libras", "quintales"],
+            temperatura: ["celsius", "fahrenheit", "kelvin", "rankine", "newton", "reaumur"]
         };
 
         function actualizarListas() {

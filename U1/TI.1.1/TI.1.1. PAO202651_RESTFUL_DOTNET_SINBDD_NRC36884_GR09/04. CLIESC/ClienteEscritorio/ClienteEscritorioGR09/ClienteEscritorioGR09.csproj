@@ -9,5 +9,8 @@
     <UseWPF>true</UseWPF>
     <RootNamespace>ClienteEscritorioGR09</RootNamespace>
   </PropertyGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Images\monsterlogin.jpg" />
+  </ItemGroup>
 
 </Project>

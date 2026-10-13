@@ -8,6 +8,8 @@ import ec.edu.monster.conversion.modelo.utilidades.IConversor;
 import ec.edu.monster.conversion.modelo.dto.ConversionRequest;
 import ec.edu.monster.conversion.modelo.dto.ConversionResponse;
 import ec.edu.monster.conversion.excepciones.UnidadInvalidaException;
+import ec.edu.monster.conversion.excepciones.ApiException;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.Locale;
@@ -37,6 +39,9 @@ public class ConversionService {
     }
 
     public ConversionResponse convertir(Magnitud magnitud, ConversionRequest peticion) {
+        if (magnitud == Magnitud.MASA && peticion.valor() < 0) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Datos invalidos", "La masa no puede ser negativa");
+        }
         String origen = peticion.unidadOrigen().trim().toLowerCase(Locale.ROOT);
         String destino = peticion.unidadDestino().trim().toLowerCase(Locale.ROOT);
 

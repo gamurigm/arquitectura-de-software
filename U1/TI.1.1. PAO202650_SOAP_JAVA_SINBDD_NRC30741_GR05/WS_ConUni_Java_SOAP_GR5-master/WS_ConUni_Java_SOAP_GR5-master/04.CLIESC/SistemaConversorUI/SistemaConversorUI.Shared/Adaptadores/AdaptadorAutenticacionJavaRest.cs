@@ -63,6 +63,6 @@ public class AdaptadorAutenticacionJavaRest : IAdaptadorAutenticacion
     }
 
     // Clases internas para mapear el JSON de respuesta de Java
-    private class LoginResponseDto { public string Token { get; set; } }
-    private class MensajeErrorDto { public string Mensaje { get; set; } }
+    private class LoginResponseDto { public string? Token { get; set; } }
+    private class MensajeErrorDto { public string? Mensaje { get; set; } }
 }

@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">WS_CONV_UNIDADES_SOAP_JAVA</string>
+    <string name="button_consultar_description">Boton para navegar entre secciones</string>
+</resources>

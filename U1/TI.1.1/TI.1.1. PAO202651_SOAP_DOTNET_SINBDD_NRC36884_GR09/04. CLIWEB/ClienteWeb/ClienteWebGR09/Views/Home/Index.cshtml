@@ -3,8 +3,8 @@
     ViewData["Title"] = "Conversor de Unidades";
     var autenticado = ViewBag.Autenticado is true;
 }
-<div class="container py-4" style="max-width: 720px">
-    <header class="mb-4">
+<div class="soap-content">
+    <header class="page-intro">
         <h1 class="h2">Conversor de Unidades</h1>
         <p class="text-secondary">Monster · SOAP .NET · GR09</p>
     </header>
@@ -20,9 +20,10 @@
 
     @if (!autenticado)
     {
-        <section class="card shadow-sm">
-            <div class="card-body">
+        <section class="auth-card login-shell">
+            <div class="login-copy">
                 <h2 class="h5">Iniciar sesión</h2>
+                <p class="muted">Ingresa tus credenciales para continuar.</p>
                 <form asp-action="IniciarSesion" method="post">
                     <div class="mb-3">
                         <label class="form-label" for="Usuario">Usuario</label>
@@ -36,6 +37,7 @@
                     <button class="btn btn-primary" type="submit">Iniciar sesión</button>
                 </form>
             </div>
+            <img class="monster-image" src="~/images/monsterlogin.jpg" alt="Monster, imagen del conversor" />
         </section>
     }
     else

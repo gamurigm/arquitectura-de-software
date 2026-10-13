@@ -48,5 +48,5 @@ public class AdaptadorConversionJavaRest : IAdaptadorConversion
     }
 
     private class ConversionResponseDto { public double ValorConvertido { get; set; } }
-    private class MensajeErrorDto { public string Mensaje { get; set; } }
+    private class MensajeErrorDto { public string? Mensaje { get; set; } }
 }

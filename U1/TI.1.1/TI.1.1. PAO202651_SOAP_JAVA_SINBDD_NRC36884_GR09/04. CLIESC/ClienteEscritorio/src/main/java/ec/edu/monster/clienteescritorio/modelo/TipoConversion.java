@@ -1,9 +1,9 @@
 package ec.edu.monster.clienteescritorio.modelo;
 
 public enum TipoConversion {
-    LONGITUD("Longitud", "longitud", new String[]{"milimetro", "centimetro", "metro", "kilometro", "yarda"}),
-    MASA("Masa", "masa", new String[]{"miligramo", "gramo", "kilogramo", "tonelada", "onza"}),
-    TEMPERATURA("Temperatura", "temperatura", new String[]{"celsius", "fahrenheit", "kelvin", "rankine"});
+    LONGITUD("Longitud", "longitud", new String[]{"milimetros", "centimetros", "metros", "kilometros", "pies", "yardas", "millas"}),
+    MASA("Masa", "masa", new String[]{"miligramos", "gramos", "kilogramos", "toneladas", "onzas", "libras", "quintales"}),
+    TEMPERATURA("Temperatura", "temperatura", new String[]{"celsius", "fahrenheit", "kelvin", "rankine", "newton", "reaumur"});
 
     private final String nombreVisible;
     private final String valorServicio;

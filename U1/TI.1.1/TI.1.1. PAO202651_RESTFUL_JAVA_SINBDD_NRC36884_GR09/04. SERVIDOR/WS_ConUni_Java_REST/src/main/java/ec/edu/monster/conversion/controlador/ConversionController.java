@@ -28,21 +28,21 @@ public class ConversionController {
 
     @PostMapping("/longitud")
     @Operation(summary = "Convertir longitud",
-            description = "Unidades: centimetros, metros, pies, yardas, millas.")
+            description = "Unidades: milimetros, centimetros, metros, kilometros, pies, yardas, millas.")
     public ConversionResponse longitud(@Valid @RequestBody ConversionRequest request) {
         return conversionService.convertir(Magnitud.LONGITUD, request);
     }
 
     @PostMapping("/masa")
     @Operation(summary = "Convertir masa",
-            description = "Unidades: gramos, kilogramos, onzas, libras, quintales.")
+            description = "Unidades: miligramos, gramos, kilogramos, toneladas, onzas, libras, quintales.")
     public ConversionResponse masa(@Valid @RequestBody ConversionRequest request) {
         return conversionService.convertir(Magnitud.MASA, request);
     }
 
     @PostMapping("/temperatura")
     @Operation(summary = "Convertir temperatura",
-            description = "Unidades: fahrenheit, kelvin, celsius, newton, reaumur.")
+            description = "Unidades: celsius, fahrenheit, kelvin, rankine, newton, reaumur.")
     public ConversionResponse temperatura(@Valid @RequestBody ConversionRequest request) {
         return conversionService.convertir(Magnitud.TEMPERATURA, request);
     }

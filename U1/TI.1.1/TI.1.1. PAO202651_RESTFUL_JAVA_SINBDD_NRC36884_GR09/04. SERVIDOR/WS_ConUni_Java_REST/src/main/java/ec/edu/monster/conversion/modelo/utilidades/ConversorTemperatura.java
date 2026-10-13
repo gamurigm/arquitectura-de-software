@@ -18,6 +18,7 @@ public class ConversorTemperatura implements IConversor<UnidadTemperatura> {
             case KELVIN -> valor - 273.15;
             case NEWTON -> valor * 100.0 / 33.0;
             case REAUMUR -> valor * 5.0 / 4.0;
+            case RANKINE -> valor * 5.0 / 9.0 - 273.15;
         };
     }
 
@@ -28,6 +29,7 @@ public class ConversorTemperatura implements IConversor<UnidadTemperatura> {
             case KELVIN -> celsius + 273.15;
             case NEWTON -> celsius * 33.0 / 100.0;
             case REAUMUR -> celsius * 4.0 / 5.0;
+            case RANKINE -> (celsius + 273.15) * 9.0 / 5.0;
         };
     }
 }

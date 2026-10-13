@@ -24,9 +24,9 @@ public final class ActividadConversion extends AppCompatActivity {
     private static final String[] TIPOS_VISIBLES = {"Longitud", "Masa", "Temperatura"};
     private static final String[] TIPOS_SERVICIO = {"longitud", "masa", "temperatura"};
     private static final String[][] UNIDADES = {
-        {"milimetro", "centimetro", "metro", "kilometro", "yarda"},
-        {"miligramo", "gramo", "kilogramo", "tonelada", "onza"},
-        {"celsius", "fahrenheit", "kelvin", "rankine"}
+        {"milimetros", "centimetros", "metros", "kilometros", "pies", "yardas", "millas"},
+        {"miligramos", "gramos", "kilogramos", "toneladas", "onzas", "libras", "quintales"},
+        {"celsius", "fahrenheit", "kelvin", "rankine", "newton", "reaumur"}
     };
 
     private final ExecutorService ejecutor = Executors.newSingleThreadExecutor();

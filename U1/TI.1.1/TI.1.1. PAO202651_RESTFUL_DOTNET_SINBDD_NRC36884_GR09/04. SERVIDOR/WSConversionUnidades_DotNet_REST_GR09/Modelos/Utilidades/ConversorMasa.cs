@@ -9,8 +9,10 @@ public sealed class ConversorMasa : IConversor<UnidadMasa>
 
     private static double Factor(UnidadMasa unidad) => unidad switch
     {
+        UnidadMasa.Miligramos => 0.000001,
         UnidadMasa.Gramos => 0.001,
         UnidadMasa.Kilogramos => 1,
+        UnidadMasa.Toneladas => 1000,
         UnidadMasa.Onzas => 0.028349523125,
         UnidadMasa.Libras => 0.45359237,
         UnidadMasa.Quintales => 100,

@@ -13,6 +13,7 @@ public sealed class ConversorTemperatura : IConversor<UnidadTemperatura>
             UnidadTemperatura.Kelvin => valor - 273.15d,
             UnidadTemperatura.Newton => valor * 100d / 33d,
             UnidadTemperatura.Reaumur => valor * 5d / 4d,
+            UnidadTemperatura.Rankine => valor * 5d / 9d - 273.15d,
             _ => throw new ArgumentOutOfRangeException(nameof(origen))
         };
 
@@ -23,6 +24,7 @@ public sealed class ConversorTemperatura : IConversor<UnidadTemperatura>
             UnidadTemperatura.Kelvin => celsius + 273.15d,
             UnidadTemperatura.Newton => celsius * 33d / 100d,
             UnidadTemperatura.Reaumur => celsius * 4d / 5d,
+            UnidadTemperatura.Rankine => (celsius + 273.15d) * 9d / 5d,
             _ => throw new ArgumentOutOfRangeException(nameof(destino))
         };
     }
