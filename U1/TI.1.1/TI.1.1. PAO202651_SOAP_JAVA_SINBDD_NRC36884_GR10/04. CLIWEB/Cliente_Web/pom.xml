@@ -22,13 +22,22 @@
         <dependency>
             <groupId>jakarta.xml.ws</groupId>
             <artifactId>jakarta.xml.ws-api</artifactId>
-            <version>4.0.1</version>
+            <version>4.0.2</version>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.jws</groupId>
+            <artifactId>jakarta.jws-api</artifactId>
+            <version>3.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.xml.soap</groupId>
+            <artifactId>jakarta.xml.soap-api</artifactId>
+            <version>3.0.2</version>
         </dependency>
         <dependency>
             <groupId>com.sun.xml.ws</groupId>
             <artifactId>jaxws-rt</artifactId>
-            <version>4.0.2</version>
-            <scope>runtime</scope>
+            <version>4.0.3</version>
         </dependency>
     </dependencies>
 
@@ -41,71 +50,6 @@
                 <configuration>
                     <failOnMissingWebXml>false</failOnMissingWebXml>
                 </configuration>
-            </plugin>
-            
-            <plugin>
-                <groupId>com.sun.xml.ws</groupId>
-                <artifactId>jaxws-maven-plugin</artifactId>
-                <version>4.0.2</version>
-                <configuration>
-                    <vmArgs>
-                        <vmArg>-Djavax.xml.accessExternalSchema=all</vmArg>
-                    </vmArgs>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>wsimport-generate-WSTemperatura</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>wsimport</goal>
-                        </goals>
-                        <configuration>
-                            <wsdlUrls>
-                                <wsdlUrl>https://javasoap.dr00p3r.top/WS_ConUni_Java_GR03/WSTemperatura?WSDL</wsdlUrl>
-                            </wsdlUrls>
-                            <packageName>ec.edu.monster.clientesws</packageName>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>wsimport-generate-WSLongitud</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>wsimport</goal>
-                        </goals>
-                        <configuration>
-                            <wsdlUrls>
-                                <wsdlUrl>https://javasoap.dr00p3r.top/WS_ConUni_Java_GR03/WSLongitud?WSDL</wsdlUrl>
-                            </wsdlUrls>
-                            <packageName>ec.edu.monster.clientesws</packageName>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>wsimport-generate-WSMasa</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>wsimport</goal>
-                        </goals>
-                        <configuration>
-                            <wsdlUrls>
-                                <wsdlUrl>https://javasoap.dr00p3r.top/WS_ConUni_Java_GR03/WSMasa?WSDL</wsdlUrl>
-                            </wsdlUrls>
-                            <packageName>ec.edu.monster.clientesws</packageName>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>wsimport-generate-WSLogin</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>wsimport</goal>
-                        </goals>
-                        <configuration>
-                            <wsdlUrls>
-                                <wsdlUrl>https://javasoap.dr00p3r.top/WS_ConUni_Java_GR03/WSLogin?WSDL</wsdlUrl>
-                            </wsdlUrls>
-                            <packageName>ec.edu.monster.clientesws</packageName>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>

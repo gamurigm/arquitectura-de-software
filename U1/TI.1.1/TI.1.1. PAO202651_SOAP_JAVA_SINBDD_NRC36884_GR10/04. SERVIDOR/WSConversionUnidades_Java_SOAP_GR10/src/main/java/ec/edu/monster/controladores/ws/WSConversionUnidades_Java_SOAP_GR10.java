@@ -4,10 +4,10 @@ import ec.edu.monster.controladores.manejadoresws.ManejadorAutenticacion;
 import ec.edu.monster.modelos.utilidades.ConversorLongitud;
 import ec.edu.monster.modelos.utilidades.ConversorMasa;
 import ec.edu.monster.modelos.utilidades.ConversorTemperatura;
-import ec.edu.monster.modelos.utilidades.enums.UnidadLongitud;
-import ec.edu.monster.modelos.utilidades.enums.UnidadMasa;
-import ec.edu.monster.modelos.utilidades.enums.UnidadTemperatura;
-import ec.edu.monster.modelos.utilidades.mapeadores.UnidadMapper;
+import ec.edu.monster.modelos.utilidades.enumeraciones.UnidadLongitud;
+import ec.edu.monster.modelos.utilidades.enumeraciones.UnidadMasa;
+import ec.edu.monster.modelos.utilidades.enumeraciones.UnidadTemperatura;
+import ec.edu.monster.modelos.utilidades.mapeadores.MapeadorUnidades;
 import ec.edu.monster.seguridad.AdministradorCredenciales;
 import ec.edu.monster.seguridad.AdministradorTokens;
 import ec.edu.monster.servicios.ServicioConversor;
@@ -53,10 +53,11 @@ public class WSConversionUnidades_Java_SOAP_GR10 {
             @WebParam(name = "valor") double valor,
             @WebParam(name = "unidadInicial") String unidadInicial,
             @WebParam(name = "unidadFinal") String unidadFinal) {
+        validarValor(valor);
         return servicioLongitud.convertir(
                 valor,
-                UnidadMapper.toLongitud(unidadInicial),
-                UnidadMapper.toLongitud(unidadFinal));
+                MapeadorUnidades.aLongitud(unidadInicial),
+                MapeadorUnidades.aLongitud(unidadFinal));
     }
 
     @WebMethod(operationName = "convertirMasa")
@@ -64,10 +65,14 @@ public class WSConversionUnidades_Java_SOAP_GR10 {
             @WebParam(name = "valor") double valor,
             @WebParam(name = "unidadInicial") String unidadInicial,
             @WebParam(name = "unidadFinal") String unidadFinal) {
+        validarValor(valor);
+        if (valor < 0) {
+            throw new IllegalArgumentException("La masa no puede ser negativa");
+        }
         return servicioMasa.convertir(
                 valor,
-                UnidadMapper.toMasa(unidadInicial),
-                UnidadMapper.toMasa(unidadFinal));
+                MapeadorUnidades.aMasa(unidadInicial),
+                MapeadorUnidades.aMasa(unidadFinal));
     }
 
     @WebMethod(operationName = "convertirTemperatura")
@@ -75,9 +80,16 @@ public class WSConversionUnidades_Java_SOAP_GR10 {
             @WebParam(name = "valor") double valor,
             @WebParam(name = "unidadInicial") String unidadInicial,
             @WebParam(name = "unidadFinal") String unidadFinal) {
+        validarValor(valor);
         return servicioTemperatura.convertir(
                 valor,
-                UnidadMapper.toTemperatura(unidadInicial),
-                UnidadMapper.toTemperatura(unidadFinal));
+                MapeadorUnidades.aTemperatura(unidadInicial),
+                MapeadorUnidades.aTemperatura(unidadFinal));
+    }
+
+    private static void validarValor(double valor) {
+        if (!Double.isFinite(valor)) {
+            throw new IllegalArgumentException("El valor debe ser un número finito");
+        }
     }
 }

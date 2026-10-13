@@ -1,6 +1,6 @@
 package ec.edu.monster.modelos.utilidades;
 
-import ec.edu.monster.modelos.utilidades.enums.UnidadTemperatura;
+import ec.edu.monster.modelos.utilidades.enumeraciones.UnidadTemperatura;
 
 public class ConversorTemperatura implements IConversor<UnidadTemperatura> {
 

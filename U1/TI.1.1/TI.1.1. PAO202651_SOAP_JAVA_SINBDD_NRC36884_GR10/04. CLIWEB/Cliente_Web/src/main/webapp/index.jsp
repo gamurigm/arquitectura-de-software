@@ -111,7 +111,7 @@
             <div class="form-section">
                 <h3>Ingrese sus credenciales:</h3>
                 
-                <form method="POST" action="LoginServlet">
+                <form method="POST" action="iniciar-sesion">
                     <div class="input-group">
                         <label>Usuario:</label>
                         <input type="text" name="txtUsuario" required>

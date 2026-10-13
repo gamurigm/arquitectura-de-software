@@ -134,9 +134,9 @@
     
     <script>
         const dicUnidades = {
-            longitud: ["centimetros", "metros", "pies", "yardas", "millas"],
-            masa: ["gramos", "kilogramos", "libras", "quintales"],
-            temperatura: ["fahrenheit", "kelvin", "celsius", "newton", "reaumur"]
+            longitud: ["milimetro", "centimetro", "metro", "kilometro", "yarda"],
+            masa: ["miligramo", "gramo", "kilogramo", "tonelada", "onza"],
+            temperatura: ["celsius", "fahrenheit", "kelvin", "rankine"]
         };
 
         function actualizarListas() {
@@ -167,7 +167,7 @@
                 const formData = new URLSearchParams(new FormData(this));
 
                 try {
-                    const response = await fetch('ConversorServlet', {
+                    const response = await fetch('convertir', {
                         method: 'POST',
                         body: formData
                     });
@@ -227,7 +227,7 @@
         </form>
 
         <div id="errorTxt" class="error"></div>
-        <a href="index.jsp" class="logout">Cerrar Sesión</a>
+        <a href="cerrar-sesion" class="logout">Cerrar Sesión</a>
     </div>
 </body>
 </html>

@@ -1,6 +1,6 @@
 package ec.edu.monster.modelos.utilidades;
 
-import ec.edu.monster.modelos.utilidades.enums.UnidadMasa;
+import ec.edu.monster.modelos.utilidades.enumeraciones.UnidadMasa;
 import java.util.Map;
 
 public class ConversorMasa implements IConversor<UnidadMasa> {

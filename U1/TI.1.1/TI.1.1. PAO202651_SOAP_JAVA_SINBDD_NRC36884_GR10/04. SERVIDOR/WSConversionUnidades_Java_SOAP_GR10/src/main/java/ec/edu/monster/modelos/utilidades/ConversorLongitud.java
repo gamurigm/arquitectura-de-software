@@ -1,6 +1,6 @@
 package ec.edu.monster.modelos.utilidades;
 
-import ec.edu.monster.modelos.utilidades.enums.UnidadLongitud;
+import ec.edu.monster.modelos.utilidades.enumeraciones.UnidadLongitud;
 import java.util.Map;
 
 public class ConversorLongitud implements IConversor<UnidadLongitud> {
