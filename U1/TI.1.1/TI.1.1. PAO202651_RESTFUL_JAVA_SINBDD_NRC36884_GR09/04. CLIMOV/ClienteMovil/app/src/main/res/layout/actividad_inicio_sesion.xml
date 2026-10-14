@@ -9,97 +9,194 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_margin="14dp"
-        android:background="@drawable/fondo_tarjeta"
-        android:gravity="center_vertical"
-        android:padding="24dp">
+        android:paddingStart="20dp"
+        android:paddingTop="22dp"
+        android:paddingEnd="20dp"
+        android:paddingBottom="28dp">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="MONSTER  ·  REST JAVA  ·  GR09"
-            android:textColor="@color/azul"
+            android:layout_marginBottom="12dp"
+            android:background="@drawable/fondo_etiqueta"
+            android:paddingHorizontal="13dp"
+            android:paddingVertical="8dp"
+            android:text="●  MONSTER   /   REST JAVA · GR09"
+            android:textColor="@color/menta"
             android:textSize="12sp"
             android:textStyle="bold"
-            android:letterSpacing="0.12"
-            android:layout_marginBottom="10dp" />
+            android:letterSpacing="0.06" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/login_titulo"
-            android:textColor="@color/texto"
-            android:textSize="28sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="24dp" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="190dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/fondo_hero"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="16dp">
 
-        <TextView
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="CONVIERTE EN SEGUNDOS"
+                    android:textColor="@color/menta"
+                    android:textSize="10sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.08" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Unidades,\nsin enredos"
+                    android:textColor="@color/texto"
+                    android:textSize="25sp"
+                    android:fontFamily="sans-serif-black"
+                    android:lineSpacingMultiplier="0.94" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Longitud · masa · temperatura"
+                    android:textColor="@color/texto_muted"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <ImageView
+                android:layout_width="106dp"
+                android:layout_height="162dp"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/fondo_imagen"
+            android:clipToOutline="true"
+                android:contentDescription="Monster, mascota del conversor"
+                android:padding="2dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/imagen_inicio_sesion" />
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/servidor"
-            android:textColor="@color/texto"
-            android:textStyle="bold" />
+            android:background="@drawable/fondo_tarjeta"
+            android:elevation="3dp"
+            android:orientation="vertical"
+            android:padding="20dp">
 
-        <EditText
-            android:id="@+id/campoBaseUrl"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_marginBottom="14dp"
-            android:background="@drawable/fondo_campo"
-            android:hint="@string/base_url"
-            android:inputType="textUri"
-            android:text="@string/base_url"
-            android:textColor="@color/texto" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Tu espacio"
+                android:textColor="@color/texto"
+                android:textSize="24sp"
+                android:fontFamily="sans-serif-black" />
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/usuario"
-            android:textColor="@color/texto"
-            android:textStyle="bold" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="16dp"
+                android:text="Inicia sesión para empezar a convertir."
+                android:textColor="@color/texto_muted"
+                android:textSize="14sp" />
 
-        <EditText
-            android:id="@+id/campoUsuario"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_marginBottom="14dp"
-            android:background="@drawable/fondo_campo"
-            android:inputType="text"
-            android:text="Monster"
-            android:textColor="@color/texto" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:labelFor="@id/campoBaseUrl"
+                android:text="SERVIDOR"
+                android:textColor="@color/texto"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.06" />
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/clave"
-            android:textColor="@color/texto"
-            android:textStyle="bold" />
+            <EditText
+                android:id="@+id/campoBaseUrl"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_marginTop="6dp"
+                android:layout_marginBottom="12dp"
+                android:background="@drawable/fondo_campo"
+                android:hint="@string/base_url"
+                android:inputType="textUri"
+                android:paddingHorizontal="12dp"
+                android:text="@string/base_url"
+                android:textColor="@color/texto"
+                android:textColorHint="@color/texto_muted"
+                android:textSize="14sp" />
 
-        <EditText
-            android:id="@+id/campoClave"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:background="@drawable/fondo_campo"
-            android:inputType="textPassword"
-            android:text="Monster9"
-            android:textColor="@color/texto" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:labelFor="@id/campoUsuario"
+                android:text="USUARIO"
+                android:textColor="@color/texto"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.06" />
 
-        <Button
-            android:id="@+id/botonLogin"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_marginTop="24dp"
-            android:backgroundTint="@color/azul"
-            android:text="@string/iniciar_sesion"
-            android:textColor="@color/negro_fondo" />
+            <EditText
+                android:id="@+id/campoUsuario"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_marginTop="6dp"
+                android:layout_marginBottom="12dp"
+                android:background="@drawable/fondo_campo"
+                android:inputType="text"
+                android:paddingHorizontal="12dp"
+                android:text="Monster"
+                android:textColor="@color/texto"
+                android:textSize="16sp" />
 
-        <TextView
-            android:id="@+id/textoError"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:gravity="center"
-            android:textColor="@color/error"
-            android:textSize="13sp" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:labelFor="@id/campoClave"
+                android:text="CONTRASEÑA"
+                android:textColor="@color/texto"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.06" />
+
+            <EditText
+                android:id="@+id/campoClave"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_marginTop="6dp"
+                android:background="@drawable/fondo_campo"
+                android:inputType="textPassword"
+                android:paddingHorizontal="12dp"
+                android:text="Monster9"
+                android:textColor="@color/texto"
+                android:textSize="16sp" />
+
+            <Button
+                android:id="@+id/botonLogin"
+                android:layout_width="match_parent"
+                android:layout_height="54dp"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/fondo_boton_primario"
+                android:text="Entrar al conversor"
+                android:textAllCaps="false"
+                android:textColor="@color/negro_fondo"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/textoError"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:gravity="center"
+                android:textColor="@color/error"
+                android:textSize="13sp" />
+        </LinearLayout>
     </LinearLayout>
 </ScrollView>

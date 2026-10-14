@@ -4,95 +4,169 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#0B1020"
+    android:background="#08111F"
     android:fillViewport="true"
     tools:context="ec.edu.monster.vista.ActividadInicioSesion">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="14dp"
-        android:background="@drawable/fondo_tarjeta"
-        android:gravity="center_horizontal"
         android:orientation="vertical"
-        android:padding="24dp">
+        android:paddingStart="20dp"
+        android:paddingTop="22dp"
+        android:paddingEnd="20dp"
+        android:paddingBottom="28dp">
 
         <TextView
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:letterSpacing="0.12"
-            android:text="MONSTER  ·  SOAP JAVA  ·  GR09"
-            android:textColor="#52E0D2"
+            android:layout_marginBottom="12dp"
+            android:background="@drawable/fondo_etiqueta"
+            android:paddingHorizontal="13dp"
+            android:paddingVertical="8dp"
+            android:text="●  MONSTER   /   SOAP JAVA · GR09"
+            android:textColor="#72E8D7"
             android:textSize="12sp"
-            android:textStyle="bold" />
-
-        <ImageView
-            android:layout_width="180dp"
-            android:layout_height="150dp"
-            android:contentDescription="Monstruo"
-            android:scaleType="centerCrop"
-            android:src="@drawable/imagen_inicio_sesion" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="Ingrese sus credenciales"
-            android:textColor="#F4F7FC"
-            android:textSize="28sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:labelFor="@id/campoUsuario"
-            android:text="Usuario"
-            android:textColor="#F4F7FC"
-            android:textStyle="bold" />
-
-        <EditText
-            android:id="@+id/campoUsuario"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:background="@drawable/fondo_campo"
-            android:inputType="text"
-            android:paddingHorizontal="12dp"
-            android:text="Monster"
-            android:textColor="#F4F7FC"
-            android:textColorHint="#A9B7CB" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
-            android:labelFor="@id/campoContrasenia"
-            android:text="Contraseña"
-            android:textColor="#F4F7FC"
-            android:textStyle="bold" />
-
-        <EditText
-            android:id="@+id/campoContrasenia"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:background="@drawable/fondo_campo"
-            android:inputType="textPassword"
-            android:paddingHorizontal="12dp"
-            android:text="Monster9"
-            android:textColor="#F4F7FC"
-            android:textColorHint="#A9B7CB" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/botonInicioSesion"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:layout_marginTop="24dp"
-            android:background="@drawable/fondo_boton_primario"
-            android:text="INICIAR SESIÓN"
-            android:textColor="#0B1020"
-            android:textSize="16sp"
             android:textStyle="bold"
-            app:backgroundTint="@null" />
+            android:letterSpacing="0.06" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="190dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/fondo_hero"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="16dp">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="CONVIERTE EN SEGUNDOS"
+                    android:textColor="#72E8D7"
+                    android:textSize="10sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.08" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Unidades,\nsin enredos"
+                    android:textColor="#F4F7FC"
+                    android:textSize="25sp"
+                    android:fontFamily="sans-serif-black"
+                    android:lineSpacingMultiplier="0.94" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Longitud · masa · temperatura"
+                    android:textColor="#B9C7D9"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <ImageView
+                android:layout_width="106dp"
+                android:layout_height="162dp"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/fondo_imagen"
+            android:clipToOutline="true"
+                android:contentDescription="Monster, mascota del conversor"
+                android:padding="2dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/imagen_inicio_sesion" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/fondo_tarjeta"
+            android:elevation="3dp"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Tu espacio"
+                android:textColor="#F4F7FC"
+                android:textSize="24sp"
+                android:fontFamily="sans-serif-black" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="16dp"
+                android:text="Ingresa tus credenciales para continuar."
+                android:textColor="#A9B7CB"
+                android:textSize="14sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:labelFor="@id/campoUsuario"
+                android:text="USUARIO"
+                android:textColor="#DCE6F3"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.06" />
+
+            <EditText
+                android:id="@+id/campoUsuario"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_marginTop="6dp"
+                android:layout_marginBottom="12dp"
+                android:background="@drawable/fondo_campo"
+                android:inputType="text"
+                android:paddingHorizontal="12dp"
+                android:text="Monster"
+                android:textColor="#F4F7FC"
+                android:textSize="16sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:labelFor="@id/campoContrasenia"
+                android:text="CONTRASEÑA"
+                android:textColor="#DCE6F3"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.06" />
+
+            <EditText
+                android:id="@+id/campoContrasenia"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_marginTop="6dp"
+                android:background="@drawable/fondo_campo"
+                android:inputType="textPassword"
+                android:paddingHorizontal="12dp"
+                android:text="Monster9"
+                android:textColor="#F4F7FC"
+                android:textSize="16sp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/botonInicioSesion"
+                android:layout_width="match_parent"
+                android:layout_height="54dp"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/fondo_boton_primario"
+                android:text="Entrar al conversor"
+                android:textAllCaps="false"
+                android:textColor="#08111F"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:backgroundTint="@null" />
+        </LinearLayout>
     </LinearLayout>
 </ScrollView>
