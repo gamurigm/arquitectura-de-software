@@ -22,7 +22,7 @@ Arquitectura **cliente-servidor REST** con autenticación por **token** y **sin 
 
 - **Stack:** Java 21, Spring Boot 3.5.x, Spring Web, Maven. Sin base de datos.
 - **Puerto:** `8080` (contexto raíz `/`).
-- **Credenciales:** `monster` / `monster9`. El token (UUID) vive en memoria 10 minutos.
+- **Credenciales:** `Monster` / `Monster9`. El token (UUID) vive en memoria 10 minutos.
 
 ### Endpoints
 
@@ -54,7 +54,7 @@ java -jar target/WS_ConUni_Java_REST.jar
 # 1) Login
 curl -X POST http://localhost:8080/api/auth/login \
      -H "Content-Type: application/json" \
-     -d '{"usuario":"monster","clave":"monster9"}'
+     -d '{"usuario":"Monster","clave":"Monster9"}'
 
 # 2) Conversión (usar el token devuelto)
 curl -X POST http://localhost:8080/api/conversiones/longitud \

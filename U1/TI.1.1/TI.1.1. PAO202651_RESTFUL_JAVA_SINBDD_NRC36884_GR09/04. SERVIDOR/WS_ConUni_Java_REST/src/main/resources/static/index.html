@@ -26,11 +26,11 @@
     <h2>Endpoint de seguridad</h2>
     <table>
         <tr><th>Metodo</th><th>Ruta</th><th>Descripcion</th></tr>
-        <tr><td>POST</td><td><code>/api/auth/login</code></td><td>Login (usuario: monster / clave: monster9). Devuelve token.</td></tr>
+        <tr><td>POST</td><td><code>/api/auth/login</code></td><td>Login (usuario: Monster / clave: Monster9). Devuelve token.</td></tr>
         <tr><td>POST</td><td><code>/api/auth/logout</code></td><td>Revoca el token (requiere Authorization).</td></tr>
     </table>
 
-    <h2>Endpoint de catalogo (publico)</h2>
+    <h2>Endpoint de obtenerCatalogo (publico)</h2>
     <p><code>GET /api/catalogo</code></p>
 
     <h2>Endpoints de conversion (requieren token)</h2>
@@ -44,7 +44,7 @@
     <h2>Ejemplo</h2>
     <pre>curl -X POST http://localhost:8080/api/auth/login ^
   -H "Content-Type: application/json" ^
-  -d "{\"usuario\":\"monster\",\"clave\":\"monster9\"}"
+  -d "{\"usuario\":\"Monster\",\"clave\":\"Monster9\"}"
 
 curl -X POST http://localhost:8080/api/conversiones/longitud ^
   -H "Content-Type: application/json" ^

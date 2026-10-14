@@ -23,8 +23,8 @@ java -jar target/WS_ConUni_Java_REST.jar
 
 ## Autenticacion
 
-- Usuario: `monster`
-- Clave: `monster9`
+- Usuario: `Monster`
+- Clave: `Monster9`
 - El token (UUID) expira a los **10 minutos** (configurable en `application.properties`).
 
 ## Endpoints
@@ -44,7 +44,7 @@ java -jar target/WS_ConUni_Java_REST.jar
 ```bash
 curl -X POST http://localhost:8080/api/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"usuario":"monster","clave":"monster9"}'
+  -d '{"usuario":"Monster","clave":"Monster9"}'
 ```
 
 Respuesta:
@@ -54,7 +54,7 @@ Respuesta:
   "exito": true,
   "token": "4777dca7a8b94c6e9a97f6c0a5e780da",
   "tipo": "Bearer",
-  "usuario": "monster",
+  "usuario": "Monster",
   "expiraEnSegundos": 600,
   "mensaje": "Autenticacion exitosa."
 }

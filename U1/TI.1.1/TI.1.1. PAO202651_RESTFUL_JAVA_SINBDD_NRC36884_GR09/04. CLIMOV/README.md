@@ -21,17 +21,17 @@ La app habilita `usesCleartextTraffic` para permitir HTTP local.
 
 ## Uso
 
-1. **Login:** servidor, usuario y clave (por defecto `monster` / `monster9`). El token se guarda en
+1. **Login:** servidor, usuario y clave (por defecto `Monster` / `Monster9`). El token se guarda en
    `SharedPreferences`.
 2. **Conversión:** elija magnitud, unidades de origen/destino, ingrese el valor y presione **CONVERTIR**.
 3. **Cerrar sesión** limpia la sesión y vuelve al login.
 
 ## Estructura
 
-- `modelo/` - solicitudes, respuestas y `TokenStore`.
-- `vista/` - pantallas `LoginActivity` y `ConversionActivity`.
+- `modelo/` - solicitudes, respuestas y `AlmacenTokens`.
+- `vista/` - pantallas `ActividadInicioSesion` y `ActividadConversion`.
 - `controlador/` - coordinación de login, catálogo y conversión.
-- `servicios/` - `ApiService` y `ApiClient` con Retrofit.
+- `servicios/` - `ServicioApi` y `ClienteApi` con Retrofit.
 
 ## Unidades
 

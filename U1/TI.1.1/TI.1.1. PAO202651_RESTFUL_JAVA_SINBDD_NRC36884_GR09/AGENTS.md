@@ -18,7 +18,7 @@
 
 - El servidor escucha en `http://localhost:8080` por defecto. Consulta `application.properties` antes de cambiar configuración.
 - `GET /api/salud`, `POST /api/auth/login` y `GET /api/catalogo` son públicos. Las conversiones y `POST /api/auth/logout` requieren `Authorization: Bearer <token>`.
-- Credenciales iniciales: `monster` / `monster9`. El token vive 10 minutos en memoria y desaparece al reiniciar el servidor.
+- Credenciales iniciales: `Monster` / `Monster9`. El token vive 10 minutos en memoria y desaparece al reiniciar el servidor.
 - Unidades, límites y respuestas del servidor son autoridad. Antes de cambiar una conversión, revisa catálogo, enums y validadores.
 
 ## Cambios y verificación

@@ -23,7 +23,7 @@ java -jar target/ClienteEscritorio.jar
 
 ## Uso
 
-1. En la ventana de login indique servidor, usuario y clave (por defecto `monster` / `monster9`).
+1. En la ventana de login indique servidor, usuario y clave (por defecto `Monster` / `Monster9`).
 2. En la ventana principal seleccione la **magnitud** (Longitud, Masa o Temperatura).
 3. Elija **unidad de origen** y **unidad de destino** (se cargan desde `/api/catalogo`).
 4. Ingrese el **valor** y presione **CONVERTIR**.

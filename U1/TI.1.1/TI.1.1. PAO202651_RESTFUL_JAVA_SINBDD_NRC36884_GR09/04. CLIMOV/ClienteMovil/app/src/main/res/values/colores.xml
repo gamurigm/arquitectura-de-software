@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="negro_fondo">#0B1020</color>
+    <color name="panel">#121C30</color>
+    <color name="campo">#17243A</color>
+    <color name="azul">#52E0D2</color>
+    <color name="azul_oscuro">#37BFB2</color>
+    <color name="borde_claro">#2D3A55</color>
+    <color name="texto">#F4F7FC</color>
+    <color name="texto_muted">#A9B7CB</color>
+    <color name="violeta">#A78BFA</color>
+    <color name="error">#FF8585</color>
+    <color name="exito">#52E0D2</color>
+</resources>

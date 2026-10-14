@@ -24,7 +24,7 @@ java -jar target/ClienteConsola.jar
 ## Uso
 
 1. Indica la URL del servidor (Enter para `http://localhost:8080`).
-2. Inicia sesión (Enter para `monster` / `monster9`). La clave se oculta en una terminal interactiva.
+2. Inicia sesión (Enter para `Monster` / `Monster9`). La clave se oculta en una terminal interactiva.
 3. Elige una opción del menú:
    - `1` Convertir Longitud
    - `2` Convertir Masa
