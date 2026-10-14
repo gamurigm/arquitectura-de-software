@@ -1,6 +1,6 @@
 package ec.edu.monster.controlador;
 
-import ec.edu.monster.cliente.soap.ClienteWSConversor;
+import ec.edu.monster.servicios.soap.ClienteWSConversor;
 import ec.edu.monster.modelo.ConversionModelo;
 import ec.edu.monster.modelo.TipoConversion;
 
@@ -45,6 +45,12 @@ public class ConversionControlador {
         }
         if (modelo.obtenerUnidadFinal() == null || modelo.obtenerUnidadFinal().isBlank()) {
             throw new IllegalArgumentException("La unidad final es obligatoria.");
+        }
+        if (!Double.isFinite(modelo.obtenerValor())) {
+            throw new IllegalArgumentException("El valor debe ser un número finito.");
+        }
+        if (modelo.obtenerTipoConversion() == TipoConversion.MASA && modelo.obtenerValor() < 0) {
+            throw new IllegalArgumentException("La masa no puede ser negativa.");
         }
     }
 }

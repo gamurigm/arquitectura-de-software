@@ -1,9 +1,8 @@
 package ec.edu.monster.vista;
 
 import ec.edu.monster.controlador.ConversionControlador;
-import ec.edu.monster.controlador.LoginControlador;
+import ec.edu.monster.controlador.ControladorInicioSesion;
 import ec.edu.monster.modelo.ConversionModelo;
-import ec.edu.monster.modelo.MensajesModelo;
 import ec.edu.monster.modelo.TipoConversion;
 import ec.edu.monster.util.EntradaUtil;
 import jakarta.xml.ws.soap.SOAPFaultException;
@@ -22,11 +21,11 @@ public class ConversionVista {
         "CELSIUS", "FAHRENHEIT", "KELVIN", "RANKINE", "NEWTON", "REAUMUR"
     };
 
-    private final MensajesModelo mensajes = new MensajesModelo();
+    private final MensajesVista mensajes = new MensajesVista();
     private final ConversionControlador conversionControlador;
-    private final LoginControlador loginControlador;
+    private final ControladorInicioSesion loginControlador;
 
-    public ConversionVista(ConversionControlador conversionControlador, LoginControlador loginControlador) {
+    public ConversionVista(ConversionControlador conversionControlador, ControladorInicioSesion loginControlador) {
         this.conversionControlador = conversionControlador;
         this.loginControlador = loginControlador;
     }

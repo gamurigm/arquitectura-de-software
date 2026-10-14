@@ -9,6 +9,9 @@ public final class EntradaUtil {
 
     private static final Console CONSOLA = System.console();
     private static final BufferedReader ENTRADA = new BufferedReader(new InputStreamReader(System.in));
+    private static final String AMARILLO = "\u001B[93m";
+    private static final String ROJO = "\u001B[91m";
+    private static final String RESET = "\u001B[0m";
 
     private EntradaUtil() {
     }
@@ -19,19 +22,37 @@ public final class EntradaUtil {
             if (!texto.isEmpty()) {
                 return texto;
             }
-            System.err.println("Entrada invalida. El valor no puede quedar vacio.");
+            mostrarError("Entrada invalida. El valor no puede quedar vacio.");
         }
     }
 
+    public static String leerTextoConPredeterminado(String mensaje, String predeterminado) {
+        String texto = leerLinea(mensaje).trim();
+        return texto.isEmpty() ? predeterminado : texto;
+    }
+
     public static String leerContrasenia(String mensaje) {
+        return leerContrasenia(mensaje, null);
+    }
+
+    public static String leerContrasenia(String mensaje, String predeterminada) {
         if (CONSOLA == null) {
             throw new IllegalStateException("Ejecute el cliente desde una consola interactiva para ocultar la contrasena.");
         }
-        char[] contrasenia = CONSOLA.readPassword("%s", mensaje);
-        if (contrasenia == null) {
-            throw new IllegalStateException("No se pudo leer la contrasena desde la consola.");
+        while (true) {
+            char[] contrasenia = CONSOLA.readPassword("%s", colorear(mensaje, AMARILLO));
+            if (contrasenia == null) {
+                throw new IllegalStateException("No se pudo leer la contrasena desde la consola.");
+            }
+            String valor = new String(contrasenia).trim();
+            if (valor.isEmpty() && predeterminada != null) {
+                return predeterminada;
+            }
+            if (!valor.isEmpty()) {
+                return valor;
+            }
+            mostrarError("Entrada invalida. La contrasena no puede quedar vacia.");
         }
-        return new String(contrasenia).trim();
     }
 
     public static int leerEntero(String mensaje) {
@@ -40,7 +61,7 @@ public final class EntradaUtil {
             try {
                 return Integer.parseInt(valor);
             } catch (NumberFormatException ex) {
-                System.err.println("Entrada invalida. Debe ingresar un numero entero.");
+                mostrarError("Entrada invalida. Debe ingresar un numero entero.");
             }
         }
     }
@@ -49,23 +70,26 @@ public final class EntradaUtil {
         while (true) {
             String valor = leerLinea(mensaje).trim().replace(',', '.');
             try {
-                return Double.parseDouble(valor);
+                double numero = Double.parseDouble(valor);
+                if (Double.isFinite(numero)) {
+                    return numero;
+                }
             } catch (NumberFormatException ex) {
-                System.err.println("Entrada invalida. Debe ingresar un numero decimal.");
             }
+            mostrarError("Entrada invalida. Debe ingresar un numero decimal finito.");
         }
     }
 
     private static String leerLinea(String mensaje) {
         try {
             if (CONSOLA != null) {
-                String linea = CONSOLA.readLine("%s", mensaje);
+                String linea = CONSOLA.readLine("%s", colorear(mensaje, AMARILLO));
                 if (linea == null) {
                     throw new IllegalStateException("No hay mas entrada disponible.");
                 }
                 return linea;
             }
-            System.out.print(mensaje);
+            System.out.print(colorear(mensaje, AMARILLO));
             System.out.flush();
             String linea = ENTRADA.readLine();
             if (linea == null) {
@@ -75,6 +99,14 @@ public final class EntradaUtil {
         } catch (IOException ex) {
             throw new IllegalStateException("No se pudo leer la entrada de la consola.", ex);
         }
+    }
+
+    private static void mostrarError(String mensaje) {
+        System.err.println(colorear(mensaje, ROJO));
+    }
+
+    private static String colorear(String texto, String color) {
+        return CONSOLA != null && System.getenv("NO_COLOR") == null ? color + texto + RESET : texto;
     }
 }
 

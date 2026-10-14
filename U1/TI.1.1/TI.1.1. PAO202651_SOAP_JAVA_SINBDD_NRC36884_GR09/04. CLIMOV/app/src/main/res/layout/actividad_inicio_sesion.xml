@@ -4,31 +4,43 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#080808"
+    android:background="#0B1020"
     android:fillViewport="true"
-    tools:context=".vista.ActividadInicioSesion">
+    tools:context="ec.edu.monster.vista.ActividadInicioSesion">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="14dp"
+        android:background="@drawable/fondo_tarjeta"
         android:gravity="center_horizontal"
         android:orientation="vertical"
         android:padding="24dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:letterSpacing="0.12"
+            android:text="MONSTER  ·  SOAP JAVA  ·  GR09"
+            android:textColor="#52E0D2"
+            android:textSize="12sp"
+            android:textStyle="bold" />
 
         <ImageView
             android:layout_width="180dp"
             android:layout_height="150dp"
             android:contentDescription="Monstruo"
             android:scaleType="centerCrop"
-            android:src="@drawable/monsterlogin" />
+            android:src="@drawable/imagen_inicio_sesion" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:text="Ingrese sus credenciales"
-            android:textColor="#FFFFFF"
-            android:textSize="24sp"
+            android:textColor="#F4F7FC"
+            android:textSize="28sp"
             android:textStyle="bold" />
 
         <TextView
@@ -37,18 +49,19 @@
             android:layout_marginTop="24dp"
             android:labelFor="@id/campoUsuario"
             android:text="Usuario"
-            android:textColor="#FFFFFF"
+            android:textColor="#F4F7FC"
             android:textStyle="bold" />
 
         <EditText
             android:id="@+id/campoUsuario"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:background="@drawable/bg_input_white"
+            android:background="@drawable/fondo_campo"
             android:inputType="text"
             android:paddingHorizontal="12dp"
-            android:textColor="#0F0F0F"
-            android:textColorHint="#5C5C5C" />
+            android:text="Monster"
+            android:textColor="#F4F7FC"
+            android:textColorHint="#A9B7CB" />
 
         <TextView
             android:layout_width="match_parent"
@@ -56,26 +69,28 @@
             android:layout_marginTop="14dp"
             android:labelFor="@id/campoContrasenia"
             android:text="Contraseña"
-            android:textColor="#FFFFFF"
+            android:textColor="#F4F7FC"
             android:textStyle="bold" />
 
         <EditText
             android:id="@+id/campoContrasenia"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:background="@drawable/bg_input_white"
+            android:background="@drawable/fondo_campo"
             android:inputType="textPassword"
             android:paddingHorizontal="12dp"
-            android:textColor="#0F0F0F" />
+            android:text="Monster9"
+            android:textColor="#F4F7FC"
+            android:textColorHint="#A9B7CB" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/botonInicioSesion"
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:layout_marginTop="24dp"
-            android:background="@drawable/bg_button_blue"
+            android:background="@drawable/fondo_boton_primario"
             android:text="INICIAR SESIÓN"
-            android:textColor="#FFFFFF"
+            android:textColor="#0B1020"
             android:textSize="16sp"
             android:textStyle="bold"
             app:backgroundTint="@null" />

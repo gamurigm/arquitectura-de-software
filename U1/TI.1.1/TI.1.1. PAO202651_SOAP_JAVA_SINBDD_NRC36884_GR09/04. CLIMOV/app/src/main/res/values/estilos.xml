@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="TemaConversorMovil" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">#52E0D2</item>
+        <item name="colorPrimaryVariant">#37BFB2</item>
+        <item name="colorOnPrimary">#0B1020</item>
+        <item name="colorSecondary">#A78BFA</item>
+        <item name="android:windowBackground">#0B1020</item>
+        <item name="android:statusBarColor">#0B1020</item>
+        <item name="android:navigationBarColor">#0B1020</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:colorAccent">#52E0D2</item>
+        <item name="android:textColorPrimary">#F4F7FC</item>
+    </style>
+</resources>

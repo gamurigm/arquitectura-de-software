@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <string name="nombre_aplicacion">Conversor de unidades GR09</string>
+    <string name="url_servicio_soap">http://10.0.2.2:19080/04.SERVIDOR/WSConversionUnidades_Java_SOAP_GR09</string>
+</resources>

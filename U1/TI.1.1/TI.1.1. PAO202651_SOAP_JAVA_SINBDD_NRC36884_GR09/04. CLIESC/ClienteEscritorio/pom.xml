@@ -11,7 +11,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>21</maven.compiler.release>
-        <exec.mainClass>ec.edu.monster.clienteescritorio.controlador.ControladorPrincipal</exec.mainClass>
+        <exec.mainClass>ec.edu.monster.controlador.ControladorPrincipal</exec.mainClass>
     </properties>
 
     <dependencies>
@@ -47,7 +47,7 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>3.5.0</version>
                 <configuration>
-                    <mainClass>ec.edu.monster.clienteescritorio.controlador.ControladorPrincipal</mainClass>
+                    <mainClass>ec.edu.monster.controlador.ControladorPrincipal</mainClass>
                 </configuration>
             </plugin>
         </plugins>

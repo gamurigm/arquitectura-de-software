@@ -12,6 +12,10 @@ public class ServicioConversor<T> {
     }
 
     public double convertir(double valor, T origen, T destino) {
-        return conversor.convertir(valor, origen, destino);
+        double resultado = conversor.convertir(valor, origen, destino);
+        if (!Double.isFinite(resultado)) {
+            throw new IllegalArgumentException("El resultado excede el rango permitido.");
+        }
+        return resultado;
     }
 }
