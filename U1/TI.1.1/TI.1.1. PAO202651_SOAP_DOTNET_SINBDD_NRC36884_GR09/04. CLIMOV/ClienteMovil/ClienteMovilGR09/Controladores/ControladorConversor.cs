@@ -6,12 +6,12 @@ namespace ClienteMovilGR09.Controladores;
 public sealed class ControladorConversor
 {
     private const string RutaServicio = "/04.SERVIDOR/WSConversionUnidades_DotNet_SOAP_GR09";
-    private readonly ClienteSoap _servicio = new(ObtenerEndpoint());
+    private readonly ClienteSOAP _servicio = new(ObtenerEndpoint());
     private readonly ModeloSesion _sesion = new();
 
     public async Task IniciarSesionAsync(string usuario, string contrasenia)
     {
-        var token = await _servicio.LoginAsync(usuario, contrasenia);
+        var token = await _servicio.IniciarSesionAsync(usuario, contrasenia);
         _sesion.Iniciar(token);
     }
 

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"] · Conversor GR09</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/estilos.css" asp-append-version="true" />
+</head>
+<body>
+    <header class="encabezado-sitio">
+        <a class="marca" asp-controller="Inicio" asp-action="Inicio">Conversor de unidades <span>Monster</span></a>
+        <span class="leyenda-encabezado">SOAP .NET · GR09</span>
+    </header>
+    <main class="contenedor-pagina">
+        @RenderBody()
+    </main>
+    <footer class="pie-sitio">Conversor de unidades · SOAP .NET · GR09</footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/sitio.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Secuencias", required: false)
+</body>
+</html>

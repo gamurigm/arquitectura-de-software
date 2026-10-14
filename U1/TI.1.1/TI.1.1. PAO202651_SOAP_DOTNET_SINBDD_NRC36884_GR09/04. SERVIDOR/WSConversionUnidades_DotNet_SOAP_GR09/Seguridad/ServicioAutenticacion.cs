@@ -13,7 +13,7 @@ public sealed class ServicioAutenticacion
         _tokens = tokens;
     }
 
-    public string Login(string usuario, string contrasenia)
+    public string IniciarSesion(string usuario, string contrasenia)
     {
         lock (_bloqueo)
         {

@@ -6,7 +6,7 @@ using ClienteConsolaGR09.Modelos;
 
 namespace ClienteConsolaGR09.Servicios;
 
-public sealed class ClienteSoap
+public sealed class ClienteSOAP
 {
     private const string EspacioNombres = "http://ws.controladores.monster.edu.ec/";
     private const string NombreContrato = "WSConversionUnidades_Java_SOAP_GR09";
@@ -14,7 +14,7 @@ public sealed class ClienteSoap
     private static readonly HttpClient ClienteHttp = new() { Timeout = TimeSpan.FromSeconds(20) };
     private readonly Uri _endpoint;
 
-    public ClienteSoap(string? endpoint = null)
+    public ClienteSOAP(string? endpoint = null)
     {
         var direccion = endpoint
             ?? Environment.GetEnvironmentVariable("CONVERSOR_SOAP_URL")
@@ -22,7 +22,7 @@ public sealed class ClienteSoap
         _endpoint = new Uri(direccion, UriKind.Absolute);
     }
 
-    public Task<string> LoginAsync(string usuario, string contrasenia, CancellationToken cancellationToken = default) =>
+    public Task<string> IniciarSesionAsync(string usuario, string contrasenia, CancellationToken cancellationToken = default) =>
         EnviarAsync("login", null, cancellationToken,
             ("usuario", usuario),
             ("contrasenia", contrasenia));

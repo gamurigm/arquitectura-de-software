@@ -5,12 +5,12 @@ namespace ClienteEscritorioGR09.Controladores;
 
 public sealed class ControladorConversor
 {
-    private readonly ClienteSoap _servicio = new();
+    private readonly ClienteSOAP _servicio = new();
     private readonly ModeloSesion _sesion = new();
 
     public async Task IniciarSesionAsync(string usuario, string contrasenia)
     {
-        var token = await _servicio.LoginAsync(usuario, contrasenia);
+        var token = await _servicio.IniciarSesionAsync(usuario, contrasenia);
         _sesion.Iniciar(token);
     }
 

@@ -11,10 +11,10 @@ public sealed class ServicioConversor(
     public double ConvertirLongitud(double valor, string unidadInicial, string unidadFinal)
     {
         ValidarValor(valor);
-        return conversorLongitud.Convertir(
+        return ValidarResultado(conversorLongitud.Convertir(
             valor,
             ParsearUnidad<UnidadLongitud>(unidadInicial),
-            ParsearUnidad<UnidadLongitud>(unidadFinal));
+            ParsearUnidad<UnidadLongitud>(unidadFinal)));
     }
 
     public double ConvertirMasa(double valor, string unidadInicial, string unidadFinal)
@@ -25,19 +25,19 @@ public sealed class ServicioConversor(
             throw new ArgumentException("La masa no puede ser negativa");
         }
 
-        return conversorMasa.Convertir(
+        return ValidarResultado(conversorMasa.Convertir(
             valor,
             ParsearUnidad<UnidadMasa>(unidadInicial),
-            ParsearUnidad<UnidadMasa>(unidadFinal));
+            ParsearUnidad<UnidadMasa>(unidadFinal)));
     }
 
     public double ConvertirTemperatura(double valor, string unidadInicial, string unidadFinal)
     {
         ValidarValor(valor);
-        return conversorTemperatura.Convertir(
+        return ValidarResultado(conversorTemperatura.Convertir(
             valor,
             ParsearUnidad<UnidadTemperatura>(unidadInicial),
-            ParsearUnidad<UnidadTemperatura>(unidadFinal));
+            ParsearUnidad<UnidadTemperatura>(unidadFinal)));
     }
 
     private static T ParsearUnidad<T>(string unidad) where T : struct, Enum
@@ -78,5 +78,15 @@ public sealed class ServicioConversor(
         {
             throw new ArgumentException("El valor debe ser un número finito");
         }
+    }
+
+    private static double ValidarResultado(double resultado)
+    {
+        if (!double.IsFinite(resultado))
+        {
+            throw new ArgumentException("El resultado excede el rango permitido");
+        }
+
+        return resultado;
     }
 }

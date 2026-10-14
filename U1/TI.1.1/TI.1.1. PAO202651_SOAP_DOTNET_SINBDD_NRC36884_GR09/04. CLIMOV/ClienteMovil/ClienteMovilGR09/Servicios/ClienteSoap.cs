@@ -6,7 +6,7 @@ using ClienteMovilGR09.Modelos;
 
 namespace ClienteMovilGR09.Servicios;
 
-public sealed class ClienteSoap
+public sealed class ClienteSOAP
 {
     private const string EspacioNombres = "http://ws.controladores.monster.edu.ec/";
     private const string NombreContrato = "WSConversionUnidades_Java_SOAP_GR09";
@@ -14,15 +14,17 @@ public sealed class ClienteSoap
     private static readonly HttpClient ClienteHttp = new() { Timeout = TimeSpan.FromSeconds(20) };
     private readonly Uri _endpoint;
 
-    public ClienteSoap(string? endpoint = null)
+    public ClienteSOAP(string? endpoint = null)
     {
         var direccion = endpoint
             ?? Environment.GetEnvironmentVariable("CONVERSOR_SOAP_URL")
-            ?? "http://127.0.0.1:19081/04.SERVIDOR/WSConversionUnidades_DotNet_SOAP_GR09";
+            ?? (OperatingSystem.IsAndroid()
+                ? "http://10.0.2.2:19081/04.SERVIDOR/WSConversionUnidades_DotNet_SOAP_GR09"
+                : "http://127.0.0.1:19081/04.SERVIDOR/WSConversionUnidades_DotNet_SOAP_GR09");
         _endpoint = new Uri(direccion, UriKind.Absolute);
     }
 
-    public Task<string> LoginAsync(string usuario, string contrasenia, CancellationToken cancellationToken = default) =>
+    public Task<string> IniciarSesionAsync(string usuario, string contrasenia, CancellationToken cancellationToken = default) =>
         EnviarAsync("login", null, cancellationToken,
             ("usuario", usuario),
             ("contrasenia", contrasenia));
@@ -77,7 +79,19 @@ public sealed class ClienteSoap
             Encoding.UTF8,
             "text/xml");
 
-        using var respuesta = await ClienteHttp.SendAsync(peticion, cancellationToken);
+        HttpResponseMessage respuesta;
+        try
+        {
+            respuesta = await ClienteHttp.SendAsync(peticion, cancellationToken);
+        }
+        catch (HttpRequestException excepcion) when (excepcion.StatusCode is null)
+        {
+            throw new InvalidOperationException(
+                $"No se pudo conectar con el servidor SOAP en {_endpoint}. Revise que el servidor esté iniciado.",
+                excepcion);
+        }
+
+        using var respuestaUsada = respuesta;
         var xml = await respuesta.Content.ReadAsStringAsync(cancellationToken);
         XDocument documento;
         try

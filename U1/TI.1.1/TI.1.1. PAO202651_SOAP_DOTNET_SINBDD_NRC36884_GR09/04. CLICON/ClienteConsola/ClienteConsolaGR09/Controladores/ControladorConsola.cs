@@ -6,7 +6,7 @@ namespace ClienteConsolaGR09.Controladores;
 
 public sealed class ControladorConsola
 {
-    private readonly ClienteSoap _servicio = new();
+    private readonly ClienteSOAP _servicio = new();
     private readonly ModeloSesion _sesion = new();
     private readonly VistaConsola _vista = new();
 
@@ -17,9 +17,15 @@ public sealed class ControladorConsola
         {
             try
             {
-                var usuario = _vista.LeerTexto("Usuario: ");
-                var contrasenia = _vista.LeerContrasenia("Contraseña: ");
-                _sesion.Iniciar(await _servicio.LoginAsync(usuario, contrasenia));
+                var usuario = _vista.LeerTexto("Usuario [Monster]: ");
+                if (usuario.Length == 0) usuario = "Monster";
+                var contrasenia = _vista.LeerContrasenia("Contraseña [Monster9]: ", "Monster9");
+                if (string.IsNullOrWhiteSpace(usuario))
+                {
+                    _vista.MostrarError("El usuario no puede quedar vacío.");
+                    continue;
+                }
+                _sesion.Iniciar(await _servicio.IniciarSesionAsync(usuario, contrasenia));
                 _vista.MostrarMensaje("Sesión iniciada.");
             }
             catch (Exception excepcion)
@@ -45,6 +51,11 @@ public sealed class ControladorConsola
                     var tipo = (TipoConversion)(opcion - 1);
                     var unidades = CatalogoUnidades.Obtener(tipo);
                     var valor = _vista.LeerNumero("Valor: ");
+                    if (tipo == TipoConversion.Masa && valor < 0)
+                    {
+                        _vista.MostrarError("La masa no puede ser negativa.");
+                        continue;
+                    }
                     var inicial = _vista.LeerUnidad("Unidad inicial", unidades);
                     var final = _vista.LeerUnidad("Unidad final", unidades);
                     var resultado = await _servicio.ConvertirAsync(
