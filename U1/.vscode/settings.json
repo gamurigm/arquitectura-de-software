@@ -1,0 +1,16 @@
+{
+  "java.compile.nullAnalysis.mode": "automatic",
+  "java.configuration.runtimes": [
+    { "name": "JavaSE-17", "path": "D:\\tools\\jdk\\jdk-17.0.18+8" },
+    { "name": "JavaSE-21", "path": "D:\\tools\\jdk\\jdk-21.0.9+10", "default": true }
+  ],
+  "dotnetAcquisitionExtension.sharedExistingDotnetPath": "D:\\tools\\dotnet10\\dotnet.exe",
+  "java.import.exclusions": [
+    "**/node_modules/**",
+    "**/.metadata/**",
+    "**/archetype-resources/**",
+    "**/META-INF/maven/**",
+    "**/*TI.1.1. PAO202650_SOAP_JAVA_SINBDD_NRC30741_GR69/**",
+    "**/TI.1.1. PAO202650_SOAP_JAVA_SINBDD_NRC30741_GR69/**"
+  ]
+}
