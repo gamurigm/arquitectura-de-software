@@ -9,7 +9,7 @@ public sealed class ControladorConversor(ClienteRest servicio)
 
     public async Task<TokenRespuesta> IniciarSesionAsync(string usuario, string clave)
     {
-        var respuesta = await servicio.IniciarSesionAsync(new LoginSolicitud(usuario, clave));
+        var respuesta = await servicio.IniciarSesionAsync(new SolicitudInicioSesion(usuario, clave));
         _estado.Token = respuesta.Token;
         _estado.Usuario = respuesta.Usuario;
         return respuesta;

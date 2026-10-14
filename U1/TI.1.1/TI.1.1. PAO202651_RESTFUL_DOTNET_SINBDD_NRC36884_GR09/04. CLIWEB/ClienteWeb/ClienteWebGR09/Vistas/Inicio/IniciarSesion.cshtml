@@ -1,0 +1,29 @@
+@model ModeloInicioSesion
+@{
+    ViewData["Title"] = "Iniciar sesión";
+}
+<header class="introduccion-pagina">
+    <h1>Conversor de Unidades</h1>
+    <p class="texto-secundario">Monster · REST .NET · GR09</p>
+</header>
+<section class="tarjeta-autenticacion contenedor-inicio-sesion">
+    <div class="texto-inicio-sesion">
+    <h1>Iniciar sesión</h1>
+    <p class="texto-secundario">Ingresa tus credenciales para continuar.</p>
+    @if (TempData["Mensaje"] is string mensaje)
+    {
+        <div class="aviso">@mensaje</div>
+    }
+    <form asp-action="IniciarSesion" method="post" class="formulario-apilado">
+        <div asp-validation-summary="ModelOnly" class="error-formulario"></div>
+        <label asp-for="Usuario">Usuario</label>
+        <input asp-for="Usuario" autocomplete="username" class="campo" />
+        <span asp-validation-for="Usuario" class="error-formulario"></span>
+        <label asp-for="Clave">Contraseña</label>
+        <input asp-for="Clave" autocomplete="current-password" class="campo" />
+        <span asp-validation-for="Clave" class="error-formulario"></span>
+        <button class="boton boton-principal" type="submit">Iniciar sesión</button>
+    </form>
+    </div>
+    <img class="imagen-monster" src="~/images/imagen_inicio_sesion.jpg" alt="Monster, imagen del conversor" />
+</section>

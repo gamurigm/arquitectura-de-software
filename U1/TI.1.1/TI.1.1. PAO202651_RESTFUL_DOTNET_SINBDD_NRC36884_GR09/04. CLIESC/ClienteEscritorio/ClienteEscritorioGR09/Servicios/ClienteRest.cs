@@ -6,7 +6,7 @@ using ClienteEscritorioGR09.Modelos;
 
 namespace ClienteEscritorioGR09.Servicios;
 
-public sealed class ClienteRest(HttpClient http)
+public sealed class ClienteRest(HttpClient clienteHttp)
 {
     private static readonly JsonSerializerOptions OpcionesJson = new(JsonSerializerDefaults.Web);
 
@@ -17,7 +17,7 @@ public sealed class ClienteRest(HttpClient http)
     {
     }
 
-    public Task<TokenRespuesta> IniciarSesionAsync(LoginSolicitud solicitud) =>
+    public Task<TokenRespuesta> IniciarSesionAsync(SolicitudInicioSesion solicitud) =>
         EnviarAsync<TokenRespuesta>(HttpMethod.Post, "api/auth/login", solicitud);
 
     public Task<CatalogoRespuesta> ObtenerCatalogoAsync() =>
@@ -56,12 +56,12 @@ public sealed class ClienteRest(HttpClient http)
         HttpResponseMessage respuesta;
         try
         {
-            respuesta = await http.SendAsync(solicitud);
+            respuesta = await clienteHttp.SendAsync(solicitud);
         }
         catch (HttpRequestException ex) when (ex.StatusCode is null)
         {
             throw new InvalidOperationException(
-                $"No se pudo conectar con la API en {http.BaseAddress}. Inicie el servidor.",
+                $"No se pudo conectar con la API en {clienteHttp.BaseAddress}. Inicie el servidor.",
                 ex);
         }
 
@@ -71,7 +71,7 @@ public sealed class ClienteRest(HttpClient http)
             if (!respuesta.IsSuccessStatusCode)
             {
                 var error = JsonSerializer.Deserialize<ErrorRespuesta>(json, OpcionesJson);
-                throw new ErrorServicioException(
+                throw new ExcepcionServicio(
                     (int)respuesta.StatusCode,
                     error?.Mensaje ?? $"La API respondió HTTP {(int)respuesta.StatusCode}.");
             }

@@ -3,6 +3,8 @@
     const origen = document.getElementById("UnidadOrigen");
     const destino = document.getElementById("UnidadDestino");
     if (!magnitud || !origen || !destino) return;
+    const formulario = document.getElementById("formulario-conversion");
+    const valor = document.getElementById("Valor");
 
     const filtrar = (lista) => {
         for (const opcion of lista.options) {
@@ -20,4 +22,17 @@
     };
     magnitud.addEventListener("change", actualizar);
     actualizar();
+    valor?.addEventListener("input", () => valor.setCustomValidity(""));
+    formulario?.addEventListener("submit", evento => {
+        const texto = valor.value.trim();
+        const numero = Number(texto);
+        if (texto === "" || !Number.isFinite(numero)
+            || (magnitud.value.toLowerCase() === "masa" && numero < 0)) {
+            evento.preventDefault();
+            valor.setCustomValidity(magnitud.value.toLowerCase() === "masa" && numero < 0
+                ? "La masa no puede ser negativa."
+                : "Ingrese un número finito.");
+            valor.reportValidity();
+        }
+    });
 })();

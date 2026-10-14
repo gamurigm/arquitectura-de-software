@@ -8,16 +8,24 @@ public sealed class ServicioAutenticacion(
     IConfiguration configuracion,
     AdministradorTokens tokens)
 {
-    public TokenRespuesta IniciarSesion(LoginSolicitud solicitud)
+    public TokenRespuesta IniciarSesion(SolicitudInicioSesion solicitud)
     {
-        var usuarioValido = configuracion["Autenticacion:Usuario"] ?? "monster";
-        var claveValida = configuracion["Autenticacion:Clave"] ?? "monster9";
+        if (solicitud is null)
+        {
+            throw new ExcepcionApi(
+                StatusCodes.Status400BadRequest,
+                "Datos inválidos",
+                "La solicitud de inicio de sesión es obligatoria.");
+        }
+
+        var usuarioValido = configuracion["Autenticacion:Usuario"] ?? "Monster";
+        var claveValida = configuracion["Autenticacion:Clave"] ?? "Monster9";
         var usuario = solicitud.Usuario?.Trim();
 
         if (!string.Equals(usuario, usuarioValido, StringComparison.Ordinal)
             || !string.Equals(solicitud.Clave, claveValida, StringComparison.Ordinal))
         {
-            throw new ErrorApiException(
+            throw new ExcepcionApi(
                 StatusCodes.Status401Unauthorized,
                 "No autorizado",
                 "Credenciales incorrectas. Verifique usuario y clave.");

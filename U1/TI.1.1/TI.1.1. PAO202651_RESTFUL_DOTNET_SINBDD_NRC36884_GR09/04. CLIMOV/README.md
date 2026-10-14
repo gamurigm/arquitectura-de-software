@@ -1,6 +1,6 @@
 # Cliente Android
 
-Cliente .NET MAUI 10 con capas Modelos, Vistas, Controladores y Servicios. La pantalla está en Vistas/MainPage.xaml. En emulador Android, la API del equipo anfitrión usa http://10.0.2.2:19082.
+Cliente .NET MAUI 10 con capas Modelos, Vistas, Controladores y Servicios. La pantalla está en Vistas/PaginaPrincipal.xaml. En emulador Android, la API del equipo anfitrión usa http://10.0.2.2:19082.
 
 La compilación requiere JDK 21 y SDK Android. Configura el entorno desde la raíz y genera artefactos en D:
 

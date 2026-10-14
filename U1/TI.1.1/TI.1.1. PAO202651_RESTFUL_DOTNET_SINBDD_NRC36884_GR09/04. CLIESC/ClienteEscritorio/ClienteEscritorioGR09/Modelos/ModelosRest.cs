@@ -1,6 +1,6 @@
 namespace ClienteEscritorioGR09.Modelos;
 
-public sealed record LoginSolicitud(string Usuario, string Clave);
+public sealed record SolicitudInicioSesion(string Usuario, string Clave);
 
 public sealed record TokenRespuesta(
     bool Exito,
@@ -36,7 +36,7 @@ public sealed record ErrorRespuesta(
 
 public sealed record RespuestaOperacion(bool Exito, string Mensaje);
 
-public sealed class ErrorServicioException(int codigo, string mensaje) : InvalidOperationException(mensaje)
+public sealed class ExcepcionServicio(int codigo, string mensaje) : InvalidOperationException(mensaje)
 {
     public int Codigo { get; } = codigo;
 }

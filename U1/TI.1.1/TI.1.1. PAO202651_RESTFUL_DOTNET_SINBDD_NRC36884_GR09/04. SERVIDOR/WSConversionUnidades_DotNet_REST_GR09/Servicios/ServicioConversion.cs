@@ -14,9 +14,21 @@ public sealed class ServicioConversion(
 {
     public ConversionRespuesta Convertir(string textoMagnitud, ConversionSolicitud solicitud)
     {
-        if (!Enum.TryParse<Magnitud>(textoMagnitud, true, out var magnitud))
+        if (solicitud is null)
         {
-            throw new ErrorApiException(
+            throw new ExcepcionApi(
+                StatusCodes.Status400BadRequest,
+                "Datos inválidos",
+                "La solicitud de conversión es obligatoria.");
+        }
+
+        var nombreMagnitud = textoMagnitud?.Trim();
+        if (string.IsNullOrWhiteSpace(nombreMagnitud)
+            || !Enum.TryParse<Magnitud>(nombreMagnitud, true, out var magnitud)
+            || !Enum.IsDefined(magnitud)
+            || !Enum.GetNames<Magnitud>().Contains(nombreMagnitud, StringComparer.OrdinalIgnoreCase))
+        {
+            throw new ExcepcionApi(
                 StatusCodes.Status400BadRequest,
                 "Magnitud inválida",
                 $"La magnitud '{textoMagnitud}' no está soportada.");
@@ -24,7 +36,7 @@ public sealed class ServicioConversion(
 
         if (solicitud.Valor is null || !double.IsFinite(solicitud.Valor.Value))
         {
-            throw new ErrorApiException(
+            throw new ExcepcionApi(
                 StatusCodes.Status400BadRequest,
                 "Datos inválidos",
                 "El valor debe ser un número finito.");
@@ -32,7 +44,7 @@ public sealed class ServicioConversion(
 
         if (magnitud == Magnitud.Masa && solicitud.Valor.Value < 0)
         {
-            throw new ErrorApiException(
+            throw new ExcepcionApi(
                 StatusCodes.Status400BadRequest,
                 "Datos inválidos",
                 "La masa no puede ser negativa");
@@ -42,7 +54,7 @@ public sealed class ServicioConversion(
         var destino = solicitud.UnidadDestino?.Trim().ToLowerInvariant();
         if (string.IsNullOrWhiteSpace(origen) || string.IsNullOrWhiteSpace(destino))
         {
-            throw new ErrorApiException(
+            throw new ExcepcionApi(
                 StatusCodes.Status400BadRequest,
                 "Datos inválidos",
                 "Las unidades de origen y destino son obligatorias.");
@@ -65,13 +77,13 @@ public sealed class ServicioConversion(
 
         if (!double.IsFinite(resultado))
         {
-            throw new ErrorApiException(
+            throw new ExcepcionApi(
                 StatusCodes.Status400BadRequest,
                 "Datos inválidos",
                 "El resultado no se puede representar como un número finito.");
         }
 
-        var redondeado = Math.Floor(resultado * 1_000_000d + 0.5d) / 1_000_000d;
+        var redondeado = Math.Round(resultado, 6, MidpointRounding.AwayFromZero);
         var mensaje = $"{Formatear(valor)} {origen} equivalen a {Formatear(redondeado)} {destino}";
         return new ConversionRespuesta(true, magnitud.ToString().ToLowerInvariant(), valor, origen, destino, redondeado, mensaje);
     }
@@ -81,7 +93,7 @@ public sealed class ServicioConversion(
         if (!catalogo.EsUnidadValida(magnitud, unidad))
         {
             var disponibles = string.Join(", ", catalogo.UnidadesDe(magnitud));
-            throw new ErrorApiException(
+            throw new ExcepcionApi(
                 StatusCodes.Status400BadRequest,
                 "Unidad inválida",
                 $"La unidad '{unidad}' no es válida para {magnitud.ToString().ToLowerInvariant()}. Disponibles: {disponibles}");

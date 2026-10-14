@@ -1,6 +1,6 @@
 # Cliente de escritorio
 
-Cliente WPF sobre .NET 10. La vista MainWindow está en Vistas; ControladorConversor coordina modelos y ClienteRest.
+Cliente WPF sobre .NET 10. La vista VentanaPrincipal está en Vistas; ControladorConversor coordina modelos y ClienteRest.
 
 Desde la raíz del proyecto:
 

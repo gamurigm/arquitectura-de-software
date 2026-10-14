@@ -1,0 +1,70 @@
+@model ModeloConversion
+@{
+    ViewData["Title"] = "Conversión";
+}
+<section class="tarjeta-conversion">
+    <div class="encabezado-conversion">
+        <div>
+            <p class="antetitulo">SESIÓN ACTIVA · @ViewBag.Usuario</p>
+            <h1>Conversor de unidades</h1>
+        </div>
+        <form asp-action="Salir" method="post">
+            <button class="boton boton-secundario" type="submit">Cerrar sesión</button>
+        </form>
+    </div>
+    <p class="texto-secundario">Seleccione magnitud, unidades y valor. El servidor valida y calcula cada conversión.</p>
+    <form asp-action="Convertir" method="post" class="formulario-conversion" id="formulario-conversion">
+        <div asp-validation-summary="ModelOnly" class="error-formulario"></div>
+        <label asp-for="Magnitud">Magnitud</label>
+        <select asp-for="Magnitud" id="Magnitud" class="campo">
+            @foreach (var magnitud in Model.Catalogo.Keys)
+            {
+                <option value="@magnitud" selected="@(Model.Magnitud == magnitud ? "selected" : null)">@magnitud</option>
+            }
+        </select>
+        <span asp-validation-for="Magnitud" class="error-formulario"></span>
+        <label asp-for="Valor">Valor</label>
+        <input asp-for="Valor" type="number" step="any" class="campo" />
+        <span asp-validation-for="Valor" class="error-formulario"></span>
+        <div class="cuadricula-unidades">
+            <div>
+                <label asp-for="UnidadOrigen">Unidad de origen</label>
+                <select asp-for="UnidadOrigen" id="UnidadOrigen" class="campo">
+                    @foreach (var grupo in Model.Catalogo)
+                    {
+                        foreach (var unidad in grupo.Value)
+                        {
+                            <option value="@unidad" data-magnitud="@grupo.Key" selected="@(Model.UnidadOrigen == unidad ? "selected" : null)">@unidad</option>
+                        }
+                    }
+                </select>
+                <span asp-validation-for="UnidadOrigen" class="error-formulario"></span>
+            </div>
+            <div>
+                <label asp-for="UnidadDestino">Unidad de destino</label>
+                <select asp-for="UnidadDestino" id="UnidadDestino" class="campo">
+                    @foreach (var grupo in Model.Catalogo)
+                    {
+                        foreach (var unidad in grupo.Value)
+                        {
+                            <option value="@unidad" data-magnitud="@grupo.Key" selected="@(Model.UnidadDestino == unidad ? "selected" : null)">@unidad</option>
+                        }
+                    }
+                </select>
+                <span asp-validation-for="UnidadDestino" class="error-formulario"></span>
+            </div>
+        </div>
+        <button class="boton boton-principal" type="submit">Convertir</button>
+    </form>
+    @if (!string.IsNullOrWhiteSpace(Model.Resultado))
+    {
+        <div class="tarjeta-resultado"><span>Resultado</span><strong>@Model.Resultado</strong></div>
+    }
+    @if (!string.IsNullOrWhiteSpace(Model.MensajeError))
+    {
+        <div class="error-formulario aviso-error">@Model.MensajeError</div>
+    }
+</section>
+@section Secuencias {
+    <script src="~/js/conversor.js" asp-append-version="true"></script>
+}

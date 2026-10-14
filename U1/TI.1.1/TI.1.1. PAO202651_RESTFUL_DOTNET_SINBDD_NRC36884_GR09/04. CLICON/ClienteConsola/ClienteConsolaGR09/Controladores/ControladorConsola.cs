@@ -62,6 +62,10 @@ public sealed class ControladorConsola(ClienteRest servicio, VistaConsola vista)
             }
 
             var resultado = await servicio.ConvertirAsync(magnitud, solicitud, _estado.Token!);
+            if (!double.IsFinite(resultado.Resultado))
+            {
+                throw new InvalidOperationException("El servidor devolvió un resultado inválido.");
+            }
             vista.MostrarResultado(resultado.Mensaje);
         }
         catch (InvalidOperationException ex)

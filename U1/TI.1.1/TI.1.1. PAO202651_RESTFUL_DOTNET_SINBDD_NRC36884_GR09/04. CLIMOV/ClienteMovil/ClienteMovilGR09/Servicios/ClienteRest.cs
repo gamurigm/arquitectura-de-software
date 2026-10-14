@@ -9,16 +9,16 @@ namespace ClienteMovilGR09.Servicios;
 public sealed class ClienteRest
 {
     private static readonly JsonSerializerOptions OpcionesJson = new(JsonSerializerDefaults.Web);
-    private readonly HttpClient _http;
+    private readonly HttpClient _clienteHttp;
 
-    public ClienteRest(HttpClient? http = null)
+    public ClienteRest(HttpClient? clienteHttp = null)
     {
-        _http = http ?? new HttpClient();
-        _http.BaseAddress ??= new Uri(ObtenerUrlBase());
-        _http.Timeout = TimeSpan.FromSeconds(15);
+        _clienteHttp = clienteHttp ?? new HttpClient();
+        _clienteHttp.BaseAddress ??= new Uri(ObtenerUrlBase());
+        _clienteHttp.Timeout = TimeSpan.FromSeconds(15);
     }
 
-    public Task<TokenRespuesta> IniciarSesionAsync(LoginSolicitud solicitud) =>
+    public Task<TokenRespuesta> IniciarSesionAsync(SolicitudInicioSesion solicitud) =>
         EnviarAsync<TokenRespuesta>(HttpMethod.Post, "api/auth/login", solicitud);
 
     public Task<CatalogoRespuesta> ObtenerCatalogoAsync() =>
@@ -57,12 +57,12 @@ public sealed class ClienteRest
         HttpResponseMessage respuesta;
         try
         {
-            respuesta = await _http.SendAsync(solicitud);
+            respuesta = await _clienteHttp.SendAsync(solicitud);
         }
         catch (HttpRequestException ex) when (ex.StatusCode is null)
         {
             throw new InvalidOperationException(
-                $"No se pudo conectar con la API en {_http.BaseAddress}. Revise que el servidor esté iniciado.",
+                $"No se pudo conectar con la API en {_clienteHttp.BaseAddress}. Revise que el servidor esté iniciado.",
                 ex);
         }
 
@@ -72,7 +72,7 @@ public sealed class ClienteRest
             if (!respuesta.IsSuccessStatusCode)
             {
                 var error = JsonSerializer.Deserialize<ErrorRespuesta>(json, OpcionesJson);
-                throw new ErrorServicioException(
+                throw new ExcepcionServicio(
                     (int)respuesta.StatusCode,
                     error?.Mensaje ?? $"La API respondió HTTP {(int)respuesta.StatusCode}.");
             }

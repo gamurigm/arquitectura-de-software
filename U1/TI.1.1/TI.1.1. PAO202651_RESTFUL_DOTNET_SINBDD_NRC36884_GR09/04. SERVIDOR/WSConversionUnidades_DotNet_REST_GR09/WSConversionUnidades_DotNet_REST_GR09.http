@@ -12,7 +12,7 @@ Accept: application/json
 POST {{WSConversionUnidades_DotNet_REST_GR09_HostAddress}}/api/auth/login
 Content-Type: application/json
 
-{"usuario":"monster","clave":"monster9"}
+{"usuario":"Monster","clave":"Monster9"}
 
 ###
 POST {{WSConversionUnidades_DotNet_REST_GR09_HostAddress}}/api/conversiones/longitud

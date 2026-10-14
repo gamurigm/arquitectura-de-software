@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
@@ -10,7 +10,8 @@
     <RootNamespace>ClienteEscritorioGR09</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Resource Include="Resources\Images\monsterlogin.jpg" />
+    <ApplicationDefinition Include="Aplicacion.xaml" />
+    <Resource Include="Resources\Images\imagen_inicio_sesion.jpg" />
   </ItemGroup>
 
 </Project>

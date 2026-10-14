@@ -13,7 +13,7 @@ public sealed class MiddlewareErrores(RequestDelegate siguiente, ILogger<Middlew
         {
             await siguiente(contexto);
         }
-        catch (ErrorApiException ex)
+        catch (ExcepcionApi ex)
         {
             await EscribirError(contexto, ex.Codigo, ex.Error, ex.Message);
         }
