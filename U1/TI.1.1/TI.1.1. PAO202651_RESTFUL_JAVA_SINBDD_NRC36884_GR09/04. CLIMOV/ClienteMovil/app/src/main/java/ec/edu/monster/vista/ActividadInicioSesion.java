@@ -25,6 +25,7 @@ public class ActividadInicioSesion extends AppCompatActivity {
     private EditText campoUsuario;
     private EditText campoClave;
     private TextView textoError;
+    private Button botonLogin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,15 +36,21 @@ public class ActividadInicioSesion extends AppCompatActivity {
         campoUsuario = findViewById(R.id.campoUsuario);
         campoClave = findViewById(R.id.campoClave);
         textoError = findViewById(R.id.textoError);
-        Button botonLogin = findViewById(R.id.botonLogin);
+        botonLogin = findViewById(R.id.botonLogin);
 
         AlmacenTokens store = new AlmacenTokens(this);
         campoBaseUrl.setText(store.urlBase());
 
         botonLogin.setOnClickListener(v -> iniciarSesion());
+        campoClave.setOnEditorActionListener((v, accion, evento) -> {
+            if (accion != android.view.inputmethod.EditorInfo.IME_ACTION_GO) return false;
+            iniciarSesion();
+            return true;
+        });
     }
 
     private void iniciarSesion() {
+        if (!botonLogin.isEnabled()) return;
         String urlBase = campoBaseUrl.getText().toString().trim();
         String usuario = campoUsuario.getText().toString().trim();
         String clave = campoClave.getText().toString();
@@ -64,9 +71,13 @@ public class ActividadInicioSesion extends AppCompatActivity {
 
         ControladorCliente service = new ControladorCliente(urlBase);
         final String urlFinal = urlBase;
+        botonLogin.setEnabled(false);
+        botonLogin.setText("Conectando…");
         service.iniciarSesion(new SolicitudInicioSesion(usuario, clave)).enqueue(new Callback<RespuestaToken>() {
             @Override
             public void onResponse(Call<RespuestaToken> llamada, Response<RespuestaToken> respuesta) {
+                botonLogin.setEnabled(true);
+                botonLogin.setText("Entrar al conversor");
                 RespuestaToken cuerpo = respuesta.body();
                 if (respuesta.isSuccessful() && cuerpo != null && cuerpo.obtenerToken() != null) {
                     new AlmacenTokens(ActividadInicioSesion.this)
@@ -80,6 +91,8 @@ public class ActividadInicioSesion extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<RespuestaToken> llamada, Throwable t) {
+                botonLogin.setEnabled(true);
+                botonLogin.setText("Entrar al conversor");
                 textoError.setText("Error de conexion: " + t.getMessage());
             }
         });

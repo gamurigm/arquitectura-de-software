@@ -50,6 +50,7 @@ public class ActividadConversion extends AppCompatActivity {
     private TextView textoResultado;
     private TextView textoMensaje;
     private TextView textoUsuario;
+    private Button botonConvertir;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,13 +71,14 @@ public class ActividadConversion extends AppCompatActivity {
         textoResultado = findViewById(R.id.textoResultado);
         textoMensaje = findViewById(R.id.textoMensaje);
         textoUsuario = findViewById(R.id.textoUsuario);
+        botonConvertir = findViewById(R.id.botonConvertir);
 
-        textoUsuario.setText("Usuario: " + almacen.usuario());
+        textoUsuario.setText("Hola, " + almacen.usuario() + ". Elige qué convertir.");
 
         ArrayAdapter<String> adapterMagnitud = new ArrayAdapter<>(this,
-                android.R.layout.simple_spinner_item,
+                R.layout.elemento_opcion,
                 new String[]{"Longitud", "Masa", "Temperatura"});
-        adapterMagnitud.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        adapterMagnitud.setDropDownViewResource(R.layout.elemento_opcion_desplegable);
         spinnerMagnitud.setAdapter(adapterMagnitud);
         spinnerMagnitud.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
             @Override
@@ -89,7 +91,30 @@ public class ActividadConversion extends AppCompatActivity {
             }
         });
 
-        ((Button) findViewById(R.id.botonConvertir)).setOnClickListener(v -> convertir());
+        botonConvertir.setOnClickListener(v -> convertir());
+        findViewById(R.id.botonIntercambiar).setOnClickListener(v -> {
+            int origen = spinnerOrigen.getSelectedItemPosition();
+            spinnerOrigen.setSelection(spinnerDestino.getSelectedItemPosition());
+            spinnerDestino.setSelection(origen);
+            textoResultado.setText("");
+            textoMensaje.setText("");
+        });
+        campoValor.addTextChangedListener(new android.text.TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) { limpiarResultado(); }
+            @Override public void afterTextChanged(android.text.Editable s) { }
+        });
+        android.widget.AdapterView.OnItemSelectedListener cambioUnidad = new android.widget.AdapterView.OnItemSelectedListener() {
+            @Override public void onItemSelected(android.widget.AdapterView<?> parent, View vista, int position, long id) { limpiarResultado(); }
+            @Override public void onNothingSelected(android.widget.AdapterView<?> parent) { }
+        };
+        spinnerOrigen.setOnItemSelectedListener(cambioUnidad);
+        spinnerDestino.setOnItemSelectedListener(cambioUnidad);
+        campoValor.setOnEditorActionListener((v, accion, evento) -> {
+            if (accion != android.view.inputmethod.EditorInfo.IME_ACTION_DONE) return false;
+            convertir();
+            return true;
+        });
         ((Button) findViewById(R.id.botonSalir)).setOnClickListener(v -> {
             almacen.limpiar();
             irALogin();
@@ -108,10 +133,11 @@ public class ActividadConversion extends AppCompatActivity {
         List<String> unidades = catalogo.getOrDefault(magnitudSeleccionada(),
                 RESPALDO.getOrDefault(magnitudSeleccionada(), new ArrayList<>()));
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_spinner_item, unidades);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                R.layout.elemento_opcion, unidades);
+        adapter.setDropDownViewResource(R.layout.elemento_opcion_desplegable);
         spinnerOrigen.setAdapter(adapter);
         spinnerDestino.setAdapter(adapter);
+        if (unidades.size() > 1) spinnerDestino.setSelection(1);
         textoResultado.setText("");
         textoMensaje.setText("");
     }
@@ -136,6 +162,10 @@ public class ActividadConversion extends AppCompatActivity {
     }
 
     private void convertir() {
+        if (!botonConvertir.isEnabled()) return;
+        textoResultado.setText("");
+        textoMensaje.setText("");
+        textoMensaje.setTextColor(android.graphics.Color.parseColor("#FF8585"));
         double valor;
         try {
             valor = Double.parseDouble(campoValor.getText().toString().trim().replace(",", "."));
@@ -160,6 +190,9 @@ public class ActividadConversion extends AppCompatActivity {
         SolicitudConversion solicitud = new SolicitudConversion(valor, origen, destino);
 
         Call<RespuestaConversion> llamada = controlador.convertir(magnitud, almacen.bearer(), solicitud);
+        establecerOcupado(true);
+        ((android.view.inputmethod.InputMethodManager) getSystemService(INPUT_METHOD_SERVICE))
+                .hideSoftInputFromWindow(campoValor.getWindowToken(), 0);
 
         textoResultado.setText("");
         textoMensaje.setText("");
@@ -167,14 +200,18 @@ public class ActividadConversion extends AppCompatActivity {
         llamada.enqueue(new Callback<RespuestaConversion>() {
             @Override
             public void onResponse(Call<RespuestaConversion> llamada, Response<RespuestaConversion> respuesta) {
+                establecerOcupado(false);
                 if (respuesta.isSuccessful() && respuesta.body() != null) {
                     RespuestaConversion cuerpo = respuesta.body();
                     if (!Double.isFinite(cuerpo.obtenerResultado())) {
                         textoMensaje.setText("El servidor devolvió un resultado inválido.");
                         return;
                     }
-                    textoResultado.setText(String.valueOf(cuerpo.obtenerResultado()));
+                    textoResultado.setText(cuerpo.obtenerResultado() + " " + destino);
+                    textoMensaje.setTextColor(android.graphics.Color.parseColor("#52E0D2"));
                     textoMensaje.setText(cuerpo.obtenerMensaje());
+                    textoResultado.requestRectangleOnScreen(new android.graphics.Rect(
+                            0, 0, textoResultado.getWidth(), textoResultado.getHeight()), false);
                 } else if (respuesta.code() == 401) {
                     Toast.makeText(ActividadConversion.this, "Sesion expirada", Toast.LENGTH_SHORT).show();
                     almacen.limpiar();
@@ -186,9 +223,26 @@ public class ActividadConversion extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<RespuestaConversion> llamada, Throwable t) {
+                establecerOcupado(false);
                 textoMensaje.setText("Error de conexion: " + t.getMessage());
             }
         });
+    }
+
+    private void limpiarResultado() {
+        textoResultado.setText("");
+        textoMensaje.setText("");
+    }
+
+    private void establecerOcupado(boolean ocupado) {
+        botonConvertir.setEnabled(!ocupado);
+        botonConvertir.setText(ocupado ? "Convirtiendo…" : "Convertir ahora");
+        spinnerMagnitud.setEnabled(!ocupado);
+        spinnerOrigen.setEnabled(!ocupado);
+        spinnerDestino.setEnabled(!ocupado);
+        campoValor.setEnabled(!ocupado);
+        findViewById(R.id.botonIntercambiar).setEnabled(!ocupado);
+        findViewById(R.id.botonSalir).setEnabled(!ocupado);
     }
 
     private void irALogin() {

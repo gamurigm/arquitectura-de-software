@@ -4,7 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
+import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import ec.edu.monster.conuniclientemovil.R;
 import ec.edu.monster.controlador.ControladorAutenticacion;
@@ -18,6 +18,7 @@ public final class ActividadInicioSesion extends AppCompatActivity {
     private EditText campoUsuario;
     private EditText campoContrasenia;
     private Button botonIngreso;
+    private TextView textoError;
 
     @Override
     protected void onCreate(Bundle estado) {
@@ -26,18 +27,27 @@ public final class ActividadInicioSesion extends AppCompatActivity {
         campoUsuario = findViewById(R.id.campoUsuario);
         campoContrasenia = findViewById(R.id.campoContrasenia);
         botonIngreso = findViewById(R.id.botonInicioSesion);
+        textoError = findViewById(R.id.textoError);
         botonIngreso.setOnClickListener(v -> iniciarSesion());
+        campoContrasenia.setOnEditorActionListener((v, accion, evento) -> {
+            if (accion != android.view.inputmethod.EditorInfo.IME_ACTION_GO) return false;
+            iniciarSesion();
+            return true;
+        });
     }
 
     private void iniciarSesion() {
+        if (!botonIngreso.isEnabled()) return;
+        textoError.setText("");
         String usuario = campoUsuario.getText().toString().trim();
         String contrasenia = campoContrasenia.getText().toString();
         if (usuario.isEmpty() || contrasenia.isEmpty()) {
-            Toast.makeText(this, "Ingrese usuario y contraseña.", Toast.LENGTH_SHORT).show();
+            textoError.setText("Ingrese usuario y contraseña.");
             return;
         }
 
         botonIngreso.setEnabled(false);
+        botonIngreso.setText("Conectando…");
         ejecutor.execute(() -> {
             try {
                 String token = new ControladorAutenticacion(getApplicationContext())
@@ -51,7 +61,8 @@ public final class ActividadInicioSesion extends AppCompatActivity {
             } catch (Exception ex) {
                 runOnUiThread(() -> {
                     botonIngreso.setEnabled(true);
-                    Toast.makeText(this, mensajeError(ex), Toast.LENGTH_LONG).show();
+                    botonIngreso.setText("Entrar al conversor");
+                    textoError.setText(mensajeError(ex));
                 });
             }
         });

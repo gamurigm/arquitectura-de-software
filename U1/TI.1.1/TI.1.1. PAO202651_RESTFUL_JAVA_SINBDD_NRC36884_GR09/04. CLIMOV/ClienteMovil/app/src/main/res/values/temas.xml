@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" ?>
 <resources>
     <style name="TemaEscritorio.Monster" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="colorPrimary">@color/azul</item>
@@ -10,5 +10,11 @@
         <item name="android:navigationBarColor">@color/negro_fondo</item>
         <item name="android:windowLightStatusBar">false</item>
         <item name="android:colorAccent">@color/azul</item>
+        <item name="colorSurface">#121C30</item>
+        <item name="colorOnSurface">#F4F7FC</item>
+        <item name="android:colorBackground">#0B1020</item>
+        <item name="android:textColorSecondary">#A9B7CB</item>
+        <item name="android:windowLightNavigationBar">false</item>
+        <item name="android:forceDarkAllowed">false</item>
     </style>
 </resources>

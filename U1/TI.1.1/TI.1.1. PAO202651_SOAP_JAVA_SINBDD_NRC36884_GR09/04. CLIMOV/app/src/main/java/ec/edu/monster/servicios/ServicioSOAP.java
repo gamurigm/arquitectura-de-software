@@ -7,6 +7,7 @@ import org.ksoap2.SoapFault;
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
+import org.ksoap2.serialization.MarshalFloat;
 import org.ksoap2.transport.HttpTransportSE;
 import org.kxml2.kdom.Element;
 import org.kxml2.kdom.Node;
@@ -55,6 +56,7 @@ public final class ServicioSOAP {
 
     private String invocar(SoapObject solicitud, boolean requiereToken) throws IOException {
         SoapSerializationEnvelope sobre = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+        new MarshalFloat().register(sobre);
         sobre.dotNet = false;
         sobre.setOutputSoapObject(solicitud);
         if (requiereToken) {

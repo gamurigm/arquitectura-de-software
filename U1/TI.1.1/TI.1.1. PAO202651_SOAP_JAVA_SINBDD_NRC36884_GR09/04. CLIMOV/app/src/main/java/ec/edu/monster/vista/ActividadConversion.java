@@ -65,6 +65,7 @@ public final class ActividadConversion extends AppCompatActivity {
             public void onItemSelected(AdapterView<?> parent, View vista, int position, long id) {
                 selectorOrigen.setAdapter(adaptador(UNIDADES[position]));
                 selectorDestino.setAdapter(adaptador(UNIDADES[position]));
+                selectorDestino.setSelection(1);
                 campoResultado.setText("");
             }
 
@@ -73,17 +74,43 @@ public final class ActividadConversion extends AppCompatActivity {
             }
         });
         botonConvertir.setOnClickListener(v -> convertir());
+        findViewById(R.id.botonIntercambiar).setOnClickListener(v -> {
+            int origen = selectorOrigen.getSelectedItemPosition();
+            selectorOrigen.setSelection(selectorDestino.getSelectedItemPosition());
+            selectorDestino.setSelection(origen);
+            campoResultado.setText("");
+            textoEstado.setText("");
+        });
+        campoValor.addTextChangedListener(new android.text.TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) { limpiarResultado(); }
+            @Override public void afterTextChanged(android.text.Editable s) { }
+        });
+        android.widget.AdapterView.OnItemSelectedListener cambioUnidad = new android.widget.AdapterView.OnItemSelectedListener() {
+            @Override public void onItemSelected(android.widget.AdapterView<?> parent, View vista, int position, long id) { limpiarResultado(); }
+            @Override public void onNothingSelected(android.widget.AdapterView<?> parent) { }
+        };
+        selectorOrigen.setOnItemSelectedListener(cambioUnidad);
+        selectorDestino.setOnItemSelectedListener(cambioUnidad);
+        campoValor.setOnEditorActionListener((v, accion, evento) -> {
+            if (accion != android.view.inputmethod.EditorInfo.IME_ACTION_DONE) return false;
+            convertir();
+            return true;
+        });
         findViewById(R.id.botonCerrarSesion).setOnClickListener(v -> volverAlLogin(null));
     }
 
     private ArrayAdapter<String> adaptador(String[] opciones) {
         ArrayAdapter<String> adaptador = new ArrayAdapter<>(
-                this, android.R.layout.simple_spinner_item, opciones);
-        adaptador.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                this, R.layout.elemento_opcion, opciones);
+        adaptador.setDropDownViewResource(R.layout.elemento_opcion_desplegable);
         return adaptador;
     }
 
     private void convertir() {
+        if (!botonConvertir.isEnabled()) return;
+        textoEstado.setTextColor(android.graphics.Color.parseColor("#FF8585"));
+        campoResultado.setText("");
         String valorTexto = campoValor.getText().toString().trim().replace(',', '.');
         if (valorTexto.isEmpty()) {
             textoEstado.setText("Ingrese el valor que desea convertir.");
@@ -113,7 +140,9 @@ public final class ActividadConversion extends AppCompatActivity {
         String tipo = TIPOS_SERVICIO[selectorTipo.getSelectedItemPosition()];
         String origen = selectorOrigen.getSelectedItem().toString();
         String destino = selectorDestino.getSelectedItem().toString();
-        botonConvertir.setEnabled(false);
+        establecerOcupado(true);
+        ((android.view.inputmethod.InputMethodManager) getSystemService(INPUT_METHOD_SERVICE))
+                .hideSoftInputFromWindow(campoValor.getWindowToken(), 0);
         textoEstado.setText("Convirtiendo…");
 
         ejecutor.execute(() -> {
@@ -123,13 +152,16 @@ public final class ActividadConversion extends AppCompatActivity {
                     throw new IllegalArgumentException("El resultado excede el rango permitido.");
                 }
                 runOnUiThread(() -> {
-                    campoResultado.setText(formatear(resultado));
+                    campoResultado.setText(formatear(resultado) + " " + destino);
+                    textoEstado.setTextColor(android.graphics.Color.parseColor("#52E0D2"));
                     textoEstado.setText("Conversión completada.");
-                    botonConvertir.setEnabled(true);
+                    establecerOcupado(false);
+                    campoResultado.requestRectangleOnScreen(new android.graphics.Rect(
+                            0, 0, campoResultado.getWidth(), campoResultado.getHeight()), false);
                 });
             } catch (Exception ex) {
                 runOnUiThread(() -> {
-                    botonConvertir.setEnabled(true);
+                    establecerOcupado(false);
                     if (tokenVencido(ex)) {
                         volverAlLogin("La sesión venció. Inicie sesión nuevamente.");
                     } else {
@@ -138,6 +170,22 @@ public final class ActividadConversion extends AppCompatActivity {
                 });
             }
         });
+    }
+
+    private void limpiarResultado() {
+        campoResultado.setText("");
+        textoEstado.setText("");
+    }
+
+    private void establecerOcupado(boolean ocupado) {
+        botonConvertir.setEnabled(!ocupado);
+        botonConvertir.setText(ocupado ? "Convirtiendo…" : "Convertir ahora");
+        selectorTipo.setEnabled(!ocupado);
+        selectorOrigen.setEnabled(!ocupado);
+        selectorDestino.setEnabled(!ocupado);
+        campoValor.setEnabled(!ocupado);
+        findViewById(R.id.botonIntercambiar).setEnabled(!ocupado);
+        findViewById(R.id.botonCerrarSesion).setEnabled(!ocupado);
     }
 
     private static String formatear(double valor) {
