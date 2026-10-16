@@ -9,6 +9,7 @@ public partial class PaginaPrincipal : ContentPage
 {
     private readonly ControladorConversor _controlador = new(new ClienteRest());
     private CatalogoRespuesta? _catalogo;
+    private bool _ocupado;
 
     public PaginaPrincipal()
     {
@@ -17,6 +18,7 @@ public partial class PaginaPrincipal : ContentPage
 
     private async void IniciarSesion_Clicked(object? sender, EventArgs e)
     {
+        if (_ocupado) return;
         lblMensajeLogin.Text = "";
         if (string.IsNullOrWhiteSpace(txtUsuario.Text) || string.IsNullOrWhiteSpace(txtClave.Text))
         {
@@ -26,17 +28,27 @@ public partial class PaginaPrincipal : ContentPage
 
         try
         {
+            EstablecerOcupado(true, BotonIngresar, "Conectando…");
+            txtClave.Unfocus();
             var sesion = await _controlador.IniciarSesionAsync(txtUsuario.Text ?? "", txtClave.Text ?? "");
             _catalogo = await _controlador.ObtenerCatalogoAsync();
             pickerMagnitud.ItemsSource = _catalogo.Magnitudes.Keys.ToList();
             pickerMagnitud.SelectedIndex = 0;
-            lblSesion.Text = $"Sesión de {sesion.Usuario}. Token válido por 10 minutos.";
+            lblSesion.Text = $"Hola, {sesion.Usuario}. Elige qué convertir.";
+            txtClave.Text = "";
+            VerContrasenia.IsChecked = false;
             panelLogin.IsVisible = false;
             panelConversion.IsVisible = true;
+            Presentacion.IsVisible = false;
+            await Desplazamiento.ScrollToAsync(0, 0, false);
         }
         catch (InvalidOperationException ex)
         {
             lblMensajeLogin.Text = ex.Message;
+        }
+        finally
+        {
+            EstablecerOcupado(false, BotonIngresar, "Entrar al conversor");
         }
     }
 
@@ -56,7 +68,8 @@ public partial class PaginaPrincipal : ContentPage
 
     private async void Convertir_Clicked(object? sender, EventArgs e)
     {
-        lblMensaje.Text = "";
+        if (_ocupado || !panelConversion.IsVisible) return;
+        AlCambiarEntrada(sender, e);
         if (pickerMagnitud.SelectedItem is not string magnitud
             || pickerOrigen.SelectedItem is not string origen
             || pickerDestino.SelectedItem is not string destino
@@ -74,12 +87,15 @@ public partial class PaginaPrincipal : ContentPage
 
         try
         {
+            EstablecerOcupado(true, BotonConvertir, "Convirtiendo…");
+            txtValor.Unfocus();
             var resultado = await _controlador.ConvertirAsync(magnitud, valor, origen, destino);
             if (!double.IsFinite(resultado.Resultado))
             {
                 throw new InvalidOperationException("El servidor devolvió un resultado inválido.");
             }
-            lblResultado.Text = resultado.Mensaje;
+            lblResultado.Text = $"{resultado.Resultado.ToString("G", CultureInfo.CurrentCulture)} {destino}";
+            await Desplazamiento.ScrollToAsync(TarjetaResultado, ScrollToPosition.MakeVisible, true);
         }
         catch (ExcepcionServicio ex)
         {
@@ -88,12 +104,17 @@ public partial class PaginaPrincipal : ContentPage
             {
                 panelConversion.IsVisible = false;
                 panelLogin.IsVisible = true;
+                Presentacion.IsVisible = true;
                 lblMensajeLogin.Text = "La sesión venció. Inicie sesión nuevamente.";
             }
         }
         catch (InvalidOperationException ex)
         {
             lblMensaje.Text = ex.Message;
+        }
+        finally
+        {
+            EstablecerOcupado(false, BotonConvertir, "Convertir ahora");
         }
     }
 
@@ -110,6 +131,32 @@ public partial class PaginaPrincipal : ContentPage
 
         panelConversion.IsVisible = false;
         panelLogin.IsVisible = true;
+        Presentacion.IsVisible = true;
         txtClave.Text = "";
+        AlCambiarEntrada(sender, e);
+    }
+
+    private void AlMostrarContrasenia(object? sender, CheckedChangedEventArgs e) =>
+        txtClave.IsPassword = !e.Value;
+
+    private void AlIntercambiarUnidades(object? sender, EventArgs e)
+    {
+        var origen = pickerOrigen.SelectedIndex;
+        pickerOrigen.SelectedIndex = pickerDestino.SelectedIndex;
+        pickerDestino.SelectedIndex = origen;
+    }
+
+    private void AlCambiarEntrada(object? sender, EventArgs e)
+    {
+        lblResultado.Text = "Tu resultado aparecerá aquí";
+        lblMensaje.Text = "";
+    }
+
+    private void EstablecerOcupado(bool ocupado, Button boton, string texto)
+    {
+        _ocupado = ocupado;
+        panelLogin.IsEnabled = !ocupado;
+        panelConversion.IsEnabled = !ocupado;
+        boton.Text = texto;
     }
 }

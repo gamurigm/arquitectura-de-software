@@ -7,6 +7,7 @@ namespace ClienteMovilGR09.Vistas;
 public partial class PaginaPrincipal : ContentPage
 {
     private readonly ControladorConversor _controlador = new();
+    private bool _ocupado;
 
     public PaginaPrincipal()
     {
@@ -16,6 +17,7 @@ public partial class PaginaPrincipal : ContentPage
 
     private async void AlPulsarIniciarSesion(object? sender, EventArgs e)
     {
+        if (_ocupado) return;
         if (string.IsNullOrWhiteSpace(UsuarioEntry.Text) || string.IsNullOrWhiteSpace(ContraseniaEntry.Text))
         {
             MostrarMensaje("Ingresa usuario y contraseña.", true);
@@ -24,21 +26,33 @@ public partial class PaginaPrincipal : ContentPage
 
         try
         {
+            EstablecerOcupado(true, BotonIngresar, "Conectando…");
+            ContraseniaEntry.Unfocus();
             await _controlador.IniciarSesionAsync(UsuarioEntry.Text.Trim(), ContraseniaEntry.Text);
             ContraseniaEntry.Text = string.Empty;
             PanelInicioSesion.IsVisible = false;
             TarjetaInicioSesion.IsVisible = false;
             PanelConversor.IsVisible = true;
+            Presentacion.IsVisible = false;
+            VerContrasenia.IsChecked = false;
+            ResumenSesion.Text = $"Hola, {UsuarioEntry.Text.Trim()}. Elige qué convertir.";
             MostrarMensaje("Sesión iniciada.", false);
+            await Desplazamiento.ScrollToAsync(0, 0, false);
         }
         catch (Exception excepcion)
         {
             MostrarMensaje(excepcion.Message, true);
         }
+        finally
+        {
+            EstablecerOcupado(false, BotonIngresar, "Entrar al conversor");
+        }
     }
 
     private async void AlPulsarConvertir(object? sender, EventArgs e)
     {
+        if (_ocupado || !PanelConversor.IsVisible) return;
+        AlCambiarEntrada(sender, e);
         if (!double.TryParse(ValorEntry.Text, NumberStyles.Float, CultureInfo.CurrentCulture, out var valor)
             || !double.IsFinite(valor))
         {
@@ -62,22 +76,30 @@ public partial class PaginaPrincipal : ContentPage
 
         try
         {
+            EstablecerOcupado(true, BotonConvertir, "Convirtiendo…");
+            ValorEntry.Unfocus();
             var resultado = await _controlador.ConvertirAsync(tipo, valor, inicial.Codigo, final.Codigo);
             if (!double.IsFinite(resultado))
             {
                 throw new InvalidOperationException("El resultado excede el rango permitido.");
             }
-            ResultadoLabel.Text = $"Resultado: {resultado.ToString("G", CultureInfo.CurrentCulture)} {final.Etiqueta}";
+            ResultadoLabel.Text = $"{resultado.ToString("G", CultureInfo.CurrentCulture)} {final.Etiqueta}";
             MostrarMensaje("Conversión completada.", false);
+            await Desplazamiento.ScrollToAsync(TarjetaResultado, ScrollToPosition.MakeVisible, true);
         }
         catch (Exception excepcion)
         {
             MostrarMensaje(excepcion.Message, true);
         }
+        finally
+        {
+            EstablecerOcupado(false, BotonConvertir, "Convertir ahora");
+        }
     }
 
     private async void AlPulsarCambiarContrasenia(object? sender, EventArgs e)
     {
+        if (_ocupado) return;
         if (string.IsNullOrWhiteSpace(ContraseniaActualEntry.Text) || string.IsNullOrWhiteSpace(ContraseniaNuevaEntry.Text))
         {
             MostrarMensaje("Ingresa ambas contraseñas.", true);
@@ -85,14 +107,20 @@ public partial class PaginaPrincipal : ContentPage
         }
         try
         {
+            EstablecerOcupado(true, BotonCambiarContrasenia, "Actualizando…");
             var respuesta = await _controlador.CambiarContraseniaAsync(ContraseniaActualEntry.Text, ContraseniaNuevaEntry.Text);
             ContraseniaActualEntry.Text = string.Empty;
             ContraseniaNuevaEntry.Text = string.Empty;
+            PanelContrasenia.IsVisible = false;
             MostrarMensaje(respuesta, false);
         }
         catch (Exception excepcion)
         {
             MostrarMensaje(excepcion.Message, true);
+        }
+        finally
+        {
+            EstablecerOcupado(false, BotonCambiarContrasenia, "Actualizar contraseña");
         }
     }
 
@@ -102,7 +130,11 @@ public partial class PaginaPrincipal : ContentPage
         PanelConversor.IsVisible = false;
         PanelInicioSesion.IsVisible = true;
         TarjetaInicioSesion.IsVisible = true;
-        ResultadoLabel.Text = string.Empty;
+        Presentacion.IsVisible = true;
+        PanelContrasenia.IsVisible = false;
+        ContraseniaActualEntry.Text = string.Empty;
+        ContraseniaNuevaEntry.Text = string.Empty;
+        AlCambiarEntrada(sender, e);
         UsuarioEntry.Text = string.Empty;
         MostrarMensaje("Sesión cerrada.", false);
     }
@@ -118,6 +150,33 @@ public partial class PaginaPrincipal : ContentPage
         UnidadFinalPicker.SelectedIndex = Math.Min(1, opciones.Count - 1);
     }
 
+    private void AlMostrarContrasenia(object? sender, CheckedChangedEventArgs e) =>
+        ContraseniaEntry.IsPassword = !e.Value;
+
+    private void AlAlternarContrasenia(object? sender, EventArgs e) =>
+        PanelContrasenia.IsVisible = !PanelContrasenia.IsVisible;
+
+    private void AlIntercambiarUnidades(object? sender, EventArgs e)
+    {
+        var origen = UnidadInicialPicker.SelectedIndex;
+        UnidadInicialPicker.SelectedIndex = UnidadFinalPicker.SelectedIndex;
+        UnidadFinalPicker.SelectedIndex = origen;
+    }
+
+    private void AlCambiarEntrada(object? sender, EventArgs e)
+    {
+        ResultadoLabel.Text = "Tu resultado aparecerá aquí";
+        MensajeLabel.IsVisible = false;
+    }
+
+    private void EstablecerOcupado(bool ocupado, Button boton, string texto)
+    {
+        _ocupado = ocupado;
+        TarjetaInicioSesion.IsEnabled = !ocupado;
+        PanelConversor.IsEnabled = !ocupado;
+        boton.Text = texto;
+    }
+
     private TipoConversion TipoSeleccionado() => TipoPicker.SelectedIndex switch
     {
         1 => TipoConversion.Masa,
@@ -128,8 +187,8 @@ public partial class PaginaPrincipal : ContentPage
     private void MostrarMensaje(string mensaje, bool esError)
     {
         MensajeLabel.Text = mensaje;
-        MensajeLabel.TextColor = esError ? Color.FromArgb("#B42318") : Color.FromArgb("#067647");
-        MensajeLabel.BackgroundColor = esError ? Color.FromArgb("#FEF3F2") : Color.FromArgb("#ECFDF3");
+        MensajeLabel.TextColor = Color.FromArgb(esError ? "#FF8585" : "#52E0D2");
+        MensajeLabel.BackgroundColor = Color.FromArgb(esError ? "#302034" : "#132E3A");
         MensajeLabel.IsVisible = true;
     }
 }

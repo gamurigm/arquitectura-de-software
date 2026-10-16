@@ -13,6 +13,7 @@
 		<OutputType>Exe</OutputType>
 		<RootNamespace>ClienteMovilGR09</RootNamespace>
 		<UseMaui>true</UseMaui>
+        <MauiEnableXamlCBindingWithSourceCompilation>true</MauiEnableXamlCBindingWithSourceCompilation>
 		<EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
 		<AndroidStoreUncompressedFileExtensions>.so</AndroidStoreUncompressedFileExtensions>
 		<SingleProject>true</SingleProject>
@@ -41,10 +42,10 @@
 
 	<ItemGroup>
 		<!-- App Icon -->
-		<MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4" />
+		<MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#0B1020" />
 
 		<!-- Splash Screen -->
-		<MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#512BD4" BaseSize="128,128" />
+		<MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#0B1020" BaseSize="128,128" />
 
 		<!-- Images -->
 		<MauiImage Include="Resources\Images\*" />
