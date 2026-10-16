@@ -1,0 +1,1 @@
+<%@ ServiceHost Service="ec.edu.monster.controlador.ServicioMonster" %>

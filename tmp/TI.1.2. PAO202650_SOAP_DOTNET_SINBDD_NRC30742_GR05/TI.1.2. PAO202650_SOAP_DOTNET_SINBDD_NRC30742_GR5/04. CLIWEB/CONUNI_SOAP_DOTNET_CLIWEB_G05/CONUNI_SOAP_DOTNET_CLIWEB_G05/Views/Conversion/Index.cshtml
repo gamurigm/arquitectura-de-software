@@ -1,0 +1,1071 @@
+MONSTERS@{
+    ViewData["Title"] = "Monsters Inc. Converter - Sistema de Conversiones Empresarial";
+    Layout = null;
+    
+    // Verificar si hay sesión activa
+    var usuario = Context.Session.GetString("Usuario");
+    if (usuario == null)
+    {
+        Context.Response.Redirect(Url.Action("Index", "Login"));
+        return;
+    }
+}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monsters Inc. Converter - Sistema de Conversiones Empresarial</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --monster-blue: #21a9da;
+            --monster-purple: #8c6bcd;
+            --monster-pink: #f66971;
+            --monster-yellow: #f5d880;
+            --monster-light-blue: #9fdcfa;
+            --monster-dark: #2c3e50;
+            --monster-gray: #ecf0f1;
+            --monster-white: #ffffff;
+            --monster-dark-gray: #7f8c8d;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--monster-gray);
+            color: var(--monster-dark);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--monster-blue) 0%, var(--monster-light-blue) 100%);
+            padding: 20px 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+            z-index: 2;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(45deg, var(--monster-yellow), var(--monster-white));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            color: var(--monster-dark);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .header-title {
+            color: var(--monster-white);
+            font-size: 2rem;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header-subtitle {
+            color: var(--monster-white);
+            font-size: 1.2rem;
+            font-weight: 300;
+            opacity: 0.9;
+            text-align: center;
+            flex: 1;
+        }
+
+        .user-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: var(--monster-white);
+        }
+
+        .user-info {
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .logout-btn {
+            background-color: var(--monster-pink);
+            color: var(--monster-white);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+
+        .logout-btn:hover {
+            background-color: #e55a61;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(246, 105, 113, 0.3);
+        }
+
+        /* Main Content */
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        /* Category Selection */
+        .category-section {
+            background-color: var(--monster-white);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .category-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--monster-dark);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .category-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+        }
+
+        .category-btn {
+            padding: 15px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            text-transform: uppercase;
+            color: var(--monster-white);
+        }
+
+        .category-btn.temperatura {
+            background-color: var(--monster-dark-gray);
+        }
+
+        .category-btn.longitud {
+            background-color: var(--monster-purple);
+        }
+
+        .category-btn.peso {
+            background-color: var(--monster-pink);
+        }
+
+        .category-btn.volumen {
+            background-color: var(--monster-yellow);
+            color: var(--monster-dark);
+        }
+
+        .category-btn.area {
+            background-color: var(--monster-light-blue);
+            color: var(--monster-dark);
+        }
+
+        .category-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .category-btn.active {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Conversion Form */
+        .conversion-section {
+            background-color: var(--monster-white);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            margin-bottom: 25px;
+        }
+
+        .conversion-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--monster-dark);
+            text-align: center;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--monster-dark);
+            margin-bottom: 10px;
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 15px 20px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background-color: var(--monster-white);
+            color: var(--monster-dark);
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--monster-blue);
+            box-shadow: 0 0 0 3px rgba(33, 169, 218, 0.1);
+        }
+
+        .convert-btn {
+            width: 100%;
+            padding: 18px 30px;
+            background: linear-gradient(135deg, var(--monster-blue) 0%, var(--monster-light-blue) 100%);
+            color: var(--monster-white);
+            border: none;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            margin-bottom: 25px;
+        }
+
+        .convert-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(33, 169, 218, 0.3);
+        }
+
+        .convert-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Results Section */
+        .results-section {
+            background-color: var(--monster-gray);
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            min-height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px dashed #bdc3c7;
+        }
+
+        .results-section.has-result {
+            background-color: #e8f5e8;
+            border-color: #4caf50;
+            border-style: solid;
+        }
+
+        .results-section.has-error {
+            background-color: #ffebee;
+            border-color: #f44336;
+            border-style: solid;
+        }
+
+        .result-text {
+            font-size: 1.1rem;
+            color: var(--monster-dark);
+            font-weight: 500;
+        }
+
+        .result-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--monster-blue);
+            margin-top: 10px;
+        }
+
+        .error-text {
+            color: #f44336;
+            font-weight: 600;
+        }
+
+        .error-icon {
+            display: inline-block;
+            margin-right: 8px;
+            font-size: 1.2rem;
+        }
+
+
+        /* Modales */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background-color: var(--monster-white);
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease;
+            position: relative;
+        }
+
+        @@keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @@keyframes slideUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--monster-gray);
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--monster-dark);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--monster-dark-gray);
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .modal-close:hover {
+            background-color: var(--monster-gray);
+            color: var(--monster-dark);
+        }
+
+        .modal-body {
+            color: var(--monster-dark);
+            line-height: 1.8;
+            margin-bottom: 25px;
+        }
+
+        .modal-body p {
+            margin-bottom: 15px;
+        }
+
+        .modal-body ul {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        .modal-body li {
+            margin-bottom: 8px;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            padding-top: 20px;
+            border-top: 2px solid var(--monster-gray);
+        }
+
+        .modal-btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+
+        .modal-btn-primary {
+            background-color: var(--monster-blue);
+            color: var(--monster-white);
+        }
+
+        .modal-btn-primary:hover {
+            background-color: #1a8bc4;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(33, 169, 218, 0.3);
+        }
+
+        .modal-btn-secondary {
+            background-color: var(--monster-pink);
+            color: var(--monster-white);
+        }
+
+        .modal-btn-secondary:hover {
+            background-color: #e55a61;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(246, 105, 113, 0.3);
+        }
+
+        .modal-btn-cancel {
+            background-color: var(--monster-dark-gray);
+            color: var(--monster-white);
+        }
+
+        .modal-btn-cancel:hover {
+            background-color: #6c7a7b;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(127, 140, 141, 0.3);
+        }
+
+        .footer-right {
+            cursor: pointer;
+            transition: color 0.3s ease;
+            text-decoration: underline;
+        }
+
+        .footer-right:hover {
+            color: var(--monster-light-blue);
+        }
+
+        /* Footer */
+        .footer {
+            background-color: var(--monster-dark-gray);
+            color: var(--monster-white);
+            padding: 20px 0;
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-left {
+            font-size: 0.9rem;
+        }
+
+        .footer-right {
+            font-size: 0.9rem;
+            font-style: italic;
+        }
+
+        /* Hidden sections */
+        .conversion-content {
+            display: none;
+        }
+
+        .conversion-content.active {
+            display: block;
+        }
+
+        /* Responsive Design */
+        @@media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .header-title {
+                font-size: 1.5rem;
+            }
+
+            .header-subtitle {
+                font-size: 1rem;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .category-buttons {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .footer-content {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .modal {
+                padding: 20px;
+                max-width: 95%;
+            }
+
+            .modal-title {
+                font-size: 1.2rem;
+            }
+
+            .modal-footer {
+                flex-direction: column;
+            }
+
+            .modal-btn {
+                width: 100%;
+            }
+
+        }
+
+        @@media (max-width: 480px) {
+            .category-buttons {
+                grid-template-columns: 1fr;
+            }
+
+            .modal {
+                padding: 15px;
+                max-height: 90vh;
+            }
+
+            .modal-title {
+                font-size: 1.1rem;
+            }
+
+            .modal-body {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-content">
+            <div class="logo-section">
+                <h1 class="header-title">MONSTERS INC.</h1>
+            </div>
+            <h2 class="header-subtitle">Sistema de Conversiones</h2>
+            <div class="user-section">
+                <span class="user-info">Usuario: @usuario</span>
+                <button class="logout-btn" onclick="cerrarSesion()">
+                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <!-- Category Selection -->
+        <div class="category-section">
+            <h3 class="category-title">
+                <i class="fas fa-list"></i>
+                SELECCIONE EL TIPO DE CONVERSIÓN
+            </h3>
+            <div class="category-buttons">
+                <button class="category-btn temperatura active" data-category="temperatura">
+                    <i class="fas fa-thermometer-half"></i>
+                    Temperatura
+                </button>
+                <button class="category-btn longitud" data-category="longitud">
+                    <i class="fas fa-ruler"></i>
+                    Longitud
+                </button>
+                <button class="category-btn peso" data-category="peso">
+                    <i class="fas fa-weight"></i>
+                    Peso
+                </button>
+            </div>
+        </div>
+
+        <!-- Conversion Forms -->
+        <!-- TEMPERATURA -->
+        <div class="conversion-section conversion-content active" id="temperatura">
+            <h3 class="conversion-title">CONVERSIONES DE TEMPERATURA</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="tempValue">Valor a convertir:</label>
+                    <input type="number" id="tempValue" step="0.01" placeholder="Ingrese la temperatura">
+                </div>
+                <div class="form-group">
+                    <label for="tempConversion">Tipo de conversión:</label>
+                    <select id="tempConversion">
+                        <option value="celsiusAFahrenheit">Celsius → Fahrenheit</option>
+                        <option value="fahrenheitACelsius">Fahrenheit → Celsius</option>
+                        <option value="celsiusAKelvin">Celsius → Kelvin</option>
+                        <option value="kelvinACelsius">Kelvin → Celsius</option>
+                        <option value="fahrenheitAKelvin">Fahrenheit → Kelvin</option>
+                        <option value="kelvinAFahrenheit">Kelvin → Fahrenheit</option>
+                    </select>
+                </div>
+            </div>
+            <button class="convert-btn" onclick="convertirTemperatura()">
+                <i class="fas fa-exchange-alt"></i> CONVERTIR
+            </button>
+            <div class="results-section" id="tempResults">
+                <div class="result-text">Resultado aparecerá aquí</div>
+            </div>
+        </div>
+
+        <!-- LONGITUD -->
+        <div class="conversion-section conversion-content" id="longitud">
+            <h3 class="conversion-title">CONVERSIONES DE LONGITUD</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="lengthValue">Valor a convertir:</label>
+                    <input type="number" id="lengthValue" step="0.01" placeholder="Ingrese la longitud">
+                </div>
+                <div class="form-group">
+                    <label for="lengthConversion">Tipo de conversión:</label>
+                    <select id="lengthConversion">
+                        <option value="metrosAPies">Metros → Pies</option>
+                        <option value="piesAMetros">Pies → Metros</option>
+                        <option value="metrosAPulgadas">Metros → Pulgadas</option>
+                        <option value="pulgadasAMetros">Pulgadas → Metros</option>
+                        <option value="kilometrosAMillas">Kilómetros → Millas</option>
+                        <option value="millasAKilometros">Millas → Kilómetros</option>
+                    </select>
+                </div>
+            </div>
+            <button class="convert-btn" onclick="convertirLongitud()">
+                <i class="fas fa-exchange-alt"></i> CONVERTIR
+            </button>
+            <div class="results-section" id="lengthResults">
+                <div class="result-text">Resultado aparecerá aquí</div>
+            </div>
+        </div>
+
+        <!-- PESO -->
+        <div class="conversion-section conversion-content" id="peso">
+            <h3 class="conversion-title">CONVERSIONES DE PESO/MASA</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="weightValue">Valor a convertir:</label>
+                    <input type="number" id="weightValue" step="0.01" placeholder="Ingrese el peso">
+                </div>
+                <div class="form-group">
+                    <label for="weightConversion">Tipo de conversión:</label>
+                    <select id="weightConversion">
+                        <option value="kilogramosALibras">Kilogramos → Libras</option>
+                        <option value="librasAKilogramos">Libras → Kilogramos</option>
+                        <option value="gramosAOnzas">Gramos → Onzas</option>
+                        <option value="onzasAGramos">Onzas → Gramos</option>
+                    </select>
+                </div>
+            </div>
+            <button class="convert-btn" onclick="convertirPeso()">
+                <i class="fas fa-exchange-alt"></i> CONVERTIR
+            </button>
+            <div class="results-section" id="weightResults">
+                <div class="result-text">Resultado aparecerá aquí</div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <div class="footer-content">
+            <div class="footer-left">
+                Monsters Inc. Converter Enterprise Edition v1.0 - © 2024
+            </div>
+            <div class="footer-right" onclick="abrirModalDudas()">
+                <i class="fas fa-question-circle"></i> ¿Tienes alguna duda?
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Dudas -->
+    <div class="modal-overlay" id="modalDudas" onclick="cerrarModalSiFuera(event, 'modalDudas')">
+        <div class="modal" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <i class="fas fa-info-circle" style="color: var(--monster-purple);"></i>
+                    ¡Bienvenido al Sistema de Conversiones de Monsters Inc.!
+                </h3>
+                <button class="modal-close" onclick="cerrarModal('modalDudas')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Esta aplicación te permite realizar conversiones entre diferentes unidades de medida:</p>
+                
+                <ul style="margin-top: 15px; margin-bottom: 15px;">
+                    <li><strong>TEMPERATURA:</strong> Celsius, Fahrenheit, Kelvin</li>
+                    <li><strong>LONGITUD:</strong> Metros, Pies, Pulgadas, Yardas</li>
+                    <li><strong>PESO:</strong> Kilogramos, Libras, Onzas</li>
+                </ul>
+                
+                <p style="margin-top: 15px;">Simplemente selecciona el tipo de conversión, ingresa el valor y elige las unidades para obtener el resultado al instante.</p>
+            </div>
+            <div class="modal-footer" style="justify-content: center;">
+                <button class="modal-btn modal-btn-primary" onclick="cerrarModal('modalDudas')">
+                    OK
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmación de Cerrar Sesión -->
+    <div class="modal-overlay" id="modalCerrarSesion" onclick="cerrarModalSiFuera(event, 'modalCerrarSesion')">
+        <div class="modal" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <i class="fas fa-sign-out-alt" style="color: var(--monster-pink);"></i>
+                    Cerrar Sesión
+                </h3>
+                <button class="modal-close" onclick="cerrarModal('modalCerrarSesion')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p style="font-size: 1.1rem; text-align: center;">
+                    ¿Está seguro que desea cerrar sesión?
+                </p>
+                <p style="text-align: center; color: var(--monster-dark-gray); margin-top: 10px;">
+                    Será redirigido a la página de inicio de sesión.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn modal-btn-cancel" onclick="cerrarModal('modalCerrarSesion')">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+                <button class="modal-btn modal-btn-secondary" onclick="confirmarCerrarSesion()">
+                    <i class="fas fa-sign-out-alt"></i> Sí, Cerrar Sesión
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '@Url.Action("Convertir", "Conversion")';
+        
+        // Mapeo de operaciones a unidades de origen y destino
+        const operationMap = {
+            // Temperatura
+            'celsiusAFahrenheit': { from: 'celsius', to: 'fahrenheit', categoria: 'temperatura' },
+            'fahrenheitACelsius': { from: 'fahrenheit', to: 'celsius', categoria: 'temperatura' },
+            'celsiusAKelvin': { from: 'celsius', to: 'kelvin', categoria: 'temperatura' },
+            'kelvinACelsius': { from: 'kelvin', to: 'celsius', categoria: 'temperatura' },
+            'fahrenheitAKelvin': { from: 'fahrenheit', to: 'kelvin', categoria: 'temperatura' },
+            'kelvinAFahrenheit': { from: 'kelvin', to: 'fahrenheit', categoria: 'temperatura' },
+            // Longitud
+            'metrosAPies': { from: 'metros', to: 'pies', categoria: 'longitud' },
+            'piesAMetros': { from: 'pies', to: 'metros', categoria: 'longitud' },
+            'metrosAPulgadas': { from: 'metros', to: 'pulgadas', categoria: 'longitud' },
+            'pulgadasAMetros': { from: 'pulgadas', to: 'metros', categoria: 'longitud' },
+            'kilometrosAMillas': { from: 'kilometros', to: 'millas', categoria: 'longitud' },
+            'millasAKilometros': { from: 'millas', to: 'kilometros', categoria: 'longitud' },
+            // Peso
+            'kilogramosALibras': { from: 'kilogramos', to: 'libras', categoria: 'peso' },
+            'librasAKilogramos': { from: 'libras', to: 'kilogramos', categoria: 'peso' },
+            'gramosAOnzas': { from: 'gramos', to: 'onzas', categoria: 'peso' },
+            'onzasAGramos': { from: 'onzas', to: 'gramos', categoria: 'peso' }
+        };
+
+        // Category switching
+        document.querySelectorAll('.category-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const category = e.currentTarget.dataset.category;
+                switchCategory(category);
+            });
+        });
+
+        function switchCategory(category) {
+            // Update category buttons
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector('[data-category="' + category + '"]').classList.add('active');
+
+            // Update content
+            document.querySelectorAll('.conversion-content').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(category).classList.add('active');
+        }
+
+        // Conversion functions
+        function convertirTemperatura() {
+            const valor = document.getElementById('tempValue').value;
+            const operacion = document.getElementById('tempConversion').value;
+            realizarConversion(operacion, valor, 'tempResults');
+        }
+
+        function convertirLongitud() {
+            const valor = document.getElementById('lengthValue').value;
+            const operacion = document.getElementById('lengthConversion').value;
+            realizarConversion(operacion, valor, 'lengthResults');
+        }
+
+        function convertirPeso() {
+            const valor = document.getElementById('weightValue').value;
+            const operacion = document.getElementById('weightConversion').value;
+            realizarConversion(operacion, valor, 'weightResults');
+        }
+
+        function realizarConversion(operacion, valor, resultId) {
+            if (!valor || valor === '') {
+                mostrarError('Por favor, ingrese un valor numérico válido', resultId);
+                return;
+            }
+            
+            // Show loading
+            mostrarLoading(resultId);
+            
+            // Obtener información de la operación
+            const opInfo = operationMap[operacion];
+            if (!opInfo) {
+                mostrarError('Operación no válida', resultId);
+                return;
+            }
+            
+            // Disable buttons
+            const botones = document.querySelectorAll('.convert-btn');
+            botones.forEach(boton => boton.disabled = true);
+            
+            // Crear timeout para la petición (15 segundos)
+            const timeoutId = setTimeout(() => {
+                mostrarError('¡Ups! Espera a que arreglemos la conexión...', resultId);
+                botones.forEach(boton => boton.disabled = false);
+            }, 15000);
+            
+            // Crear AbortController para cancelar la petición si es necesario
+            const controller = new AbortController();
+            
+            // Preparar datos para el endpoint de ASP.NET
+            const requestData = {
+                valor: parseFloat(valor),
+                unidadOrigen: opInfo.from,
+                unidadDestino: opInfo.to,
+                categoria: opInfo.categoria
+            };
+            
+            fetch(API_BASE, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(requestData),
+                signal: controller.signal
+            })
+            .then(response => {
+                clearTimeout(timeoutId);
+                
+                if (!response.ok) {
+                    throw new Error('Error en la petición');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.exito) {
+                    const resultado = parseFloat(data.valorConvertido);
+                    if (!isNaN(resultado)) {
+                        mostrarResultado(valor, operacion, resultado, resultId);
+                    } else {
+                        mostrarError('¡Ups! Espera a que arreglemos la conexión...', resultId);
+                    }
+                } else {
+                    mostrarError(data.mensaje || '¡Ups! Espera a que arreglemos la conexión...', resultId);
+                }
+            })
+            .catch(error => {
+                clearTimeout(timeoutId);
+                console.error('Error:', error);
+                mostrarError('¡Ups! Espera a que arreglemos la conexión...', resultId);
+            })
+            .finally(() => {
+                clearTimeout(timeoutId);
+                botones.forEach(boton => boton.disabled = false);
+            });
+        }
+
+        function mostrarLoading(resultId) {
+            const resultsDiv = document.getElementById(resultId);
+            resultsDiv.innerHTML = '<div class="result-text">Procesando conversión...</div>';
+            resultsDiv.className = 'results-section';
+        }
+
+        function mostrarResultado(valorOriginal, operacion, resultado, resultId) {
+            const simbolos = getSymbols();
+            const resultsDiv = document.getElementById(resultId);
+            
+            resultsDiv.innerHTML = 
+                '<div class="result-value">' + valorOriginal + ' ' + simbolos[operacion] + ' = ' + resultado.toFixed(4) + '</div>';
+            resultsDiv.className = 'results-section has-result';
+        }
+        
+        function mostrarError(mensaje, resultId) {
+            const resultsDiv = document.getElementById(resultId);
+            
+            resultsDiv.innerHTML = 
+                '<div class="result-text error-text">' +
+                '<i class="fas fa-exclamation-triangle error-icon"></i>' +
+                mensaje +
+                '</div>';
+            resultsDiv.className = 'results-section has-error';
+        }
+
+        function cerrarSesion() {
+            abrirModal('modalCerrarSesion');
+        }
+
+        function confirmarCerrarSesion() {
+            cerrarModal('modalCerrarSesion');
+            
+            // Crear formulario y enviarlo
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '@Url.Action("Logout", "Login")';
+            document.body.appendChild(form);
+            form.submit();
+        }
+
+        function abrirModalDudas() {
+            abrirModal('modalDudas');
+        }
+
+        function abrirModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function cerrarModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        }
+
+        function cerrarModalSiFuera(event, modalId) {
+            if (event.target.classList.contains('modal-overlay')) {
+                cerrarModal(modalId);
+            }
+        }
+
+        // Cerrar modales con la tecla ESC
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                cerrarModal('modalDudas');
+                cerrarModal('modalCerrarSesion');
+            }
+        });
+
+        function getSymbols() {
+            return {
+                'celsiusAFahrenheit': '°C → °F',
+                'fahrenheitACelsius': '°F → °C',
+                'celsiusAKelvin': '°C → K',
+                'kelvinACelsius': 'K → °C',
+                'fahrenheitAKelvin': '°F → K',
+                'kelvinAFahrenheit': 'K → °F',
+                'metrosAPies': 'm → ft',
+                'piesAMetros': 'ft → m',
+                'metrosAPulgadas': 'm → in',
+                'pulgadasAMetros': 'in → m',
+                'kilometrosAMillas': 'km → mi',
+                'millasAKilometros': 'mi → km',
+                'kilogramosALibras': 'kg → lb',
+                'librasAKilogramos': 'lb → kg',
+                'gramosAOnzas': 'g → oz',
+                'onzasAGramos': 'oz → g'
+            };
+        }
+
+        // Asegurar que la página funcione incluso si hay errores de JavaScript
+        window.addEventListener('error', function(event) {
+            console.log('Error capturado (no bloqueante):', event.message);
+            event.preventDefault();
+            return true;
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ClienteMovilMonster.LoginPagina"
+             BackgroundColor="#AEE7F8"
+             Title="Ingreso al Sistema">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="30" Spacing="20" VerticalOptions="Center">
+
+            <Image Source="https://compote.slate.com/images/aead9b4c-c925-4175-b797-5ee15e74f5c1.jpg"
+                   HeightRequest="150"
+                   HorizontalOptions="Center" />
+
+            <Label Text="ACCESO MÓVIL MONSTER"
+                   FontSize="22"
+                   FontAttributes="Bold"
+                   HorizontalTextAlignment="Center"
+                   TextColor="#333333" />
+
+            <Entry x:Name="txtUser"
+                   Placeholder="Usuario institucional"
+                   BackgroundColor="White"
+                   TextColor="Black" />
+
+            <Entry x:Name="txtPass"
+                   Placeholder="Clave de acceso"
+                   IsPassword="True"
+                   BackgroundColor="White"
+                   TextColor="Black" />
+
+            <Button Text="INGRESAR"
+                    BackgroundColor="#ABF1BC"
+                    TextColor="Black"
+                    FontAttributes="Bold"
+                    HeightRequest="50"
+                    Clicked="OnLoginClicked" />
+
+            <Label x:Name="lblError"
+                   TextColor="Red"
+                   HorizontalTextAlignment="Center" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

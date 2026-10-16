@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 
+    Este archivo usa tu imagen como ícono.
+    La imagen mi_icono.png ya está en drawable y se usa aquí.
+    -->
+    <item>
+        <bitmap
+            android:src="@drawable/mi_icono"
+            android:gravity="center"
+            android:scaleType="centerCrop" />
+    </item>
+</layer-list>
+

@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ClienteMovilMonster.MainPage"
+             BackgroundColor="#AEE7F8">
+    <ScrollView>
+        <VerticalStackLayout Padding="30" Spacing="20" VerticalOptions="Center">
+
+            <Image Source="https://compote.slate.com/images/aead9b4c-c925-4175-b797-5ee15e74f5c1.jpg"
+                   WidthRequest="150"
+                   HorizontalOptions="Center" />
+
+            <Label Text="SISTEMA MONSTER MÓVIL"
+                   FontSize="22"
+                   FontAttributes="Bold"
+                   HorizontalTextAlignment="Center"
+                   TextColor="#333" />
+
+            <Picker x:Name="pckOperacion"
+                    Title="Selecciona una conversión"
+                    BackgroundColor="White"
+                    TextColor="Black" />
+
+            <Entry x:Name="txtValor"
+                   Placeholder="Ingrese el valor"
+                   Keyboard="Numeric"
+                   BackgroundColor="White"
+                   TextColor="Black" />
+
+            <Button Text="CALCULAR"
+                    BackgroundColor="#ABF1BC"
+                    TextColor="Black"
+                    FontAttributes="Bold"
+                    HeightRequest="50"
+                    Clicked="OnCalcularClicked" />
+
+            <Border BackgroundColor="White" Padding="15" StrokeThickness="0">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="10"/>
+                </Border.StrokeShape>
+                <Label x:Name="lblResultado" Text="Resultado" HorizontalTextAlignment="Center" TextColor="Black" />
+            </Border>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

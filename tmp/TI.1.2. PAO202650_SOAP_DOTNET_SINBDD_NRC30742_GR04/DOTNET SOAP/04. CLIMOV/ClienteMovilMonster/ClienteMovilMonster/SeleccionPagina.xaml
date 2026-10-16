@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ClienteMovilMonster.SeleccionPagina"
+             BackgroundColor="#AEE7F8"
+             Title="Menú Principal">
+
+    <VerticalStackLayout Padding="30" Spacing="20" VerticalOptions="Center">
+
+        <Label Text="¿QUÉ DESEAS CALCULAR?" 
+               FontSize="22" 
+               FontAttributes="Bold" 
+               HorizontalTextAlignment="Center" 
+               TextColor="#333" />
+
+        <Button Text="MASA" 
+                BackgroundColor="#ABF1BC" 
+                TextColor="Black" 
+                FontAttributes="Bold" 
+                HeightRequest="60" 
+                Clicked="OnMasaClicked" />
+
+        <Button Text="TEMPERATURA" 
+                BackgroundColor="#ABF1BC" 
+                TextColor="Black" 
+                FontAttributes="Bold" 
+                HeightRequest="60" 
+                Clicked="OnTempClicked" />
+
+        <Button Text="LONGITUD" 
+                BackgroundColor="#ABF1BC" 
+                TextColor="Black" 
+                FontAttributes="Bold" 
+                HeightRequest="60" 
+                Clicked="OnLongClicked" />
+
+    </VerticalStackLayout>
+</ContentPage>

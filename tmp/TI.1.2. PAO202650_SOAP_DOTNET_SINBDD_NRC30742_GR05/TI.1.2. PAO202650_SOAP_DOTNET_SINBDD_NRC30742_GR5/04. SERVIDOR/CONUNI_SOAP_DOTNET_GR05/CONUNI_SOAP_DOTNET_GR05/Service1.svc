@@ -1,0 +1,1 @@
+﻿<%@ ServiceHost Language="C#" Debug="true" Service="CONUNI_SOAP_DOTNET_GR09.WSConversion" CodeBehind="Service1.svc.cs" %>

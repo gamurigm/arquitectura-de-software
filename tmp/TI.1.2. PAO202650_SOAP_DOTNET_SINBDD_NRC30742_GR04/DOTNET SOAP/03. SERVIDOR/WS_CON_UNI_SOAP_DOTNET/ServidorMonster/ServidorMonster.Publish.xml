@@ -1,0 +1,35 @@
+<publishData>
+  <publishTarget publishUrl="C:\inetpub\wwwroot\monsterService\">
+    <file relUrl="bin/ServidorMonster.pdb" publishTime="05/10/2026 22:13:36" />
+    <file relUrl="ServidorMonster.Service1.svc" publishTime="05/10/2026 22:19:44" />
+    <file relUrl="Web.config" publishTime="05/10/2026 21:46:48" />
+    <file relUrl="ec.edu.monster.controlador.ServicioMonster.svc" publishTime="05/10/2026 22:19:44" />
+    <file relUrl="bin/ServidorMonster.dll.config" publishTime="05/10/2026 21:46:48" />
+    <file relUrl="bin/ServidorMonster.dll" publishTime="05/10/2026 22:13:36" />
+  </publishTarget>
+  <publishTarget publishUrl="C:\inetpub\wwwroot\">
+    <file relUrl="bin/ServidorMonster.pdb" publishTime="05/10/2026 22:13:36" />
+    <file relUrl="ServidorMonster.Service1.svc" publishTime="05/10/2026 22:13:47" />
+    <file relUrl="Web.config" publishTime="05/10/2026 21:46:48" />
+    <file relUrl="ec.edu.monster.controlador.ServicioMonster.svc" publishTime="05/10/2026 22:13:47" />
+    <file relUrl="bin/ServidorMonster.dll.config" publishTime="05/10/2026 21:46:48" />
+    <file relUrl="bin/ServidorMonster.dll" publishTime="05/10/2026 22:13:36" />
+  </publishTarget>
+  <publishTarget publishUrl="C:\Users\cgran\Documents\Publicacion_Monster\">
+    <file relUrl="bin/ServidorMonster.pdb" publishTime="05/10/2026 22:05:01" />
+    <file relUrl="ServidorMonster.Service1.svc" publishTime="05/10/2026 22:05:02" />
+    <file relUrl="Web.config" publishTime="05/10/2026 21:46:48" />
+    <file relUrl="ec.edu.monster.controlador.ServicioMonster.svc" publishTime="05/10/2026 22:05:02" />
+    <file relUrl="bin/ServidorMonster.dll.config" publishTime="05/10/2026 21:46:48" />
+    <file relUrl="bin/ServidorMonster.dll" publishTime="05/10/2026 22:05:01" />
+  </publishTarget>
+  <publishTarget publishUrl="C:\inetpub\wwwroot\monsterSOAP\" />
+  <publishTarget publishUrl="D:\9NO\ARQUITECTURA\1PARCIAL\CONVERSION_UNIDADES_DOTNET_SOAP_REST_GR04\DOTNET SOAP\07. SERVIDOR\">
+    <file relUrl="bin/ServidorMonster.pdb" publishTime="05/10/2026 21:49:31" />
+    <file relUrl="ServidorMonster.Service1.svc" publishTime="05/10/2026 21:56:46" />
+    <file relUrl="Web.config" publishTime="05/10/2026 21:46:48" />
+    <file relUrl="ec.edu.monster.controlador.ServicioMonster.svc" publishTime="05/10/2026 21:56:46" />
+    <file relUrl="bin/ServidorMonster.dll.config" publishTime="05/10/2026 21:46:48" />
+    <file relUrl="bin/ServidorMonster.dll" publishTime="05/10/2026 21:49:31" />
+  </publishTarget>
+</publishData>

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/LoginFragment">
+
+    <!-- Fragmento de Login -->
+    <fragment
+        android:id="@+id/LoginFragment"
+        android:name="ec.edu.monster.vista.LoginFragment"
+        android:label="Login"
+        tools:layout="@layout/fragment_login">
+
+        <action
+            android:id="@+id/action_login_to_inicio"
+            app:destination="@id/InicioFragment" />
+    </fragment>
+
+    <!-- Fragmento de Inicio -->
+    <fragment
+        android:id="@+id/InicioFragment"
+        android:name="ec.edu.monster.vista.InicioFragment"
+        android:label="Inicio"
+        tools:layout="@layout/fragment_inicio">
+
+        <action
+            android:id="@+id/action_InicioFragment_to_TemperaturaFragment"
+            app:destination="@id/TemperaturaFragment" />
+        <action
+            android:id="@+id/action_InicioFragment_to_LongitudFragment"
+            app:destination="@id/LongitudFragment" />
+        <action
+            android:id="@+id/action_InicioFragment_to_PesoFragment"
+            app:destination="@id/PesoFragment" />
+    </fragment>
+
+    <!-- Fragmento de Temperatura -->
+    <fragment
+        android:id="@+id/TemperaturaFragment"
+        android:name="ec.edu.monster.vista.TemperaturaFragment"
+        android:label="Temperatura"
+        tools:layout="@layout/fragment_temperatura">
+
+        <action
+            android:id="@+id/action_TemperaturaFragment_to_LongitudFragment"
+            app:destination="@id/LongitudFragment" />
+        <action
+            android:id="@+id/action_TemperaturaFragment_to_PesoFragment"
+            app:destination="@id/PesoFragment" />
+    </fragment>
+
+    <!-- Fragmento de Longitud -->
+    <fragment
+        android:id="@+id/LongitudFragment"
+        android:name="ec.edu.monster.vista.LongitudFragment"
+        android:label="Longitud"
+        tools:layout="@layout/fragment_longitud">
+
+        <action
+            android:id="@+id/action_LongitudFragment_to_TemperaturaFragment"
+            app:destination="@id/TemperaturaFragment" />
+        <action
+            android:id="@+id/action_LongitudFragment_to_PesoFragment"
+            app:destination="@id/PesoFragment" />
+    </fragment>
+
+    <!-- Fragmento de Peso -->
+    <fragment
+        android:id="@+id/PesoFragment"
+        android:name="ec.edu.monster.vista.PesoFragment"
+        android:label="Peso"
+        tools:layout="@layout/fragment_peso">
+
+        <action
+            android:id="@+id/action_PesoFragment_to_TemperaturaFragment"
+            app:destination="@id/TemperaturaFragment" />
+        <action
+            android:id="@+id/action_PesoFragment_to_LongitudFragment"
+            app:destination="@id/LongitudFragment" />
+    </fragment>
+
+</navigation>
+
+

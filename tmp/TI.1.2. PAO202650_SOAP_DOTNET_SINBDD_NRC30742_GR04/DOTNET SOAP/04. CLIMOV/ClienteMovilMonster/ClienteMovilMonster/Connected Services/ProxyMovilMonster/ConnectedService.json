@@ -1,0 +1,16 @@
+{
+  "ExtendedData": {
+    "inputs": [
+      "http://192.168.3.13/ServicioMonster/ServicioMonster.svc"
+    ],
+    "collectionTypes": [
+      "System.Array",
+      "System.Collections.Generic.Dictionary`2"
+    ],
+    "namespaceMappings": [
+      "*, ProxyMovilMonster"
+    ],
+    "targetFramework": "net10.0-windows10.0.19041.0",
+    "typeReuseMode": "All"
+  }
+}

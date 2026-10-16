@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex" xmlns:wsap="http://schemas.xmlsoap.org/ws/2004/08/addressing/policy" xmlns:msc="http://schemas.microsoft.com/ws/2005/12/wsdl/contract" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:tns="http://tempuri.org/" xmlns:wsa10="http://www.w3.org/2005/08/addressing" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing" name="ServicioMonster" targetNamespace="http://tempuri.org/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <xsd:schema targetNamespace="http://tempuri.org/Imports">
+      <xsd:import schemaLocation="http://carlos/ServicioMonster/ServicioMonster.svc?xsd=xsd0" namespace="http://tempuri.org/" />
+      <xsd:import schemaLocation="http://carlos/ServicioMonster/ServicioMonster.svc?xsd=xsd1" namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="IServicioMonster_ValidarAcceso_InputMessage">
+    <wsdl:part name="parameters" element="tns:ValidarAcceso" />
+  </wsdl:message>
+  <wsdl:message name="IServicioMonster_ValidarAcceso_OutputMessage">
+    <wsdl:part name="parameters" element="tns:ValidarAccesoResponse" />
+  </wsdl:message>
+  <wsdl:message name="IServicioMonster_GramosAKilogramos_InputMessage">
+    <wsdl:part name="parameters" element="tns:GramosAKilogramos" />
+  </wsdl:message>
+  <wsdl:message name="IServicioMonster_GramosAKilogramos_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GramosAKilogramosResponse" />
+  </wsdl:message>
+  <wsdl:message name="IServicioMonster_KilogramosALibras_InputMessage">
+    <wsdl:part name="parameters" element="tns:KilogramosALibras" />
+  </wsdl:message>
+  <wsdl:message name="IServicioMonster_KilogramosALibras_OutputMessage">
+    <wsdl:part name="parameters" element="tns:KilogramosALibrasResponse" />
+  </wsdl:message>
+  <wsdl:message name="IServicioMonster_LibrasAOnzas_InputMessage">
+    <wsdl:part name="parameters" element="tns:LibrasAOnzas" />
+  </wsdl:message>
+  <wsdl:message name="IServicioMonster_LibrasAOnzas_OutputMessage">
+    <wsdl:part name="parameters" element="tns:LibrasAOnzasResponse" />
+  </wsdl:message>
+  <wsdl:message name="IServicioMonster_ToneladasAKilogramos_InputMessage">
+    <wsdl:part name="parameters" element="tns:ToneladasAKilogramos" />
+  </wsdl:message>
+  <wsdl:message name="IServicioMonster_ToneladasAKilogramos_OutputMessage">
+    <wsdl:part name="parameters" element="tns:ToneladasAKilogramosResponse" />
+  </wsdl:message>
+  <wsdl:message name="IServicioMonster_OnzasAGramos_InputMessage">
+    <wsdl:part name="parameters" element="tns:OnzasAGramos" />
+  </wsdl:message>
+  <wsdl:message name="IServicioMonster_OnzasAGramos_OutputMessage">
+    <wsdl:part name="parameters" element="tns:OnzasAGramosResponse" />
+  </wsdl:message>
+  <wsdl:message name="IServicioMonster_CelsiusAFahrenheit_InputMessage">
+    <wsdl:part name="parameters" element="tns:CelsiusAFahrenheit" />
+  </wsdl:message>
+  <wsdl:message name="IServicioMonster_CelsiusAFahrenheit_OutputMessage">
+    <wsdl:part name="parameters" element="tns:CelsiusAFahrenheitResponse" />
+  </wsdl:message>
+  <wsdl:message name="IServicioMonster_FahrenheitACelsius_InputMessage">
+    <wsdl:part name="parameters" element="tns:FahrenheitACelsius" />
+  </wsdl:message>
+  <wsdl:message name="IServicioMonster_FahrenheitACelsius_OutputMessage">
+    <wsdl:part name="parameters" element="tns:FahrenheitACelsiusResponse" />
+  </wsdl:message>
+  <wsdl:message name="IServicioMonster_CelsiusAKelvin_InputMessage">
+    <wsdl:part name="parameters" element="tns:CelsiusAKelvin" />
+  </wsdl:message>
+  <wsdl:message name="IServicioMonster_CelsiusAKelvin_OutputMessage">
+    <wsdl:part name="parameters" element="tns:CelsiusAKelvinResponse" />
+  </wsdl:message>
+  <wsdl:message name="IServicioMonster_KelvinACelsius_InputMessage">
+    <wsdl:part name="parameters" element="tns:KelvinACelsius" />
+  </wsdl:message>
+  <wsdl:message name="IServicioMonster_KelvinACelsius_OutputMessage">
+    <wsdl:part name="parameters" element="tns:KelvinACelsiusResponse" />
+  </wsdl:message>
+  <wsdl:message name="IServicioMonster_FahrenheitAKelvin_InputMessage">
+    <wsdl:part name="parameters" element="tns:FahrenheitAKelvin" />
+  </wsdl:message>
+  <wsdl:message name="IServicioMonster_FahrenheitAKelvin_OutputMessage">
+    <wsdl:part name="parameters" element="tns:FahrenheitAKelvinResponse" />
+  </wsdl:message>
+  <wsdl:message name="IServicioMonster_MetrosAKilometros_InputMessage">
+    <wsdl:part name="parameters" element="tns:MetrosAKilometros" />
+  </wsdl:message>
+  <wsdl:message name="IServicioMonster_MetrosAKilometros_OutputMessage">
+    <wsdl:part name="parameters" element="tns:MetrosAKilometrosResponse" />
+  </wsdl:message>
+  <wsdl:message name="IServicioMonster_KilometrosAMillas_InputMessage">
+    <wsdl:part name="parameters" element="tns:KilometrosAMillas" />
+  </wsdl:message>
+  <wsdl:message name="IServicioMonster_KilometrosAMillas_OutputMessage">
+    <wsdl:part name="parameters" element="tns:KilometrosAMillasResponse" />
+  </wsdl:message>
+  <wsdl:message name="IServicioMonster_MetrosAPies_InputMessage">
+    <wsdl:part name="parameters" element="tns:MetrosAPies" />
+  </wsdl:message>
+  <wsdl:message name="IServicioMonster_MetrosAPies_OutputMessage">
+    <wsdl:part name="parameters" element="tns:MetrosAPiesResponse" />
+  </wsdl:message>
+  <wsdl:message name="IServicioMonster_PiesAPulgadas_InputMessage">
+    <wsdl:part name="parameters" element="tns:PiesAPulgadas" />
+  </wsdl:message>
+  <wsdl:message name="IServicioMonster_PiesAPulgadas_OutputMessage">
+    <wsdl:part name="parameters" element="tns:PiesAPulgadasResponse" />
+  </wsdl:message>
+  <wsdl:message name="IServicioMonster_CentimetrosAMetros_InputMessage">
+    <wsdl:part name="parameters" element="tns:CentimetrosAMetros" />
+  </wsdl:message>
+  <wsdl:message name="IServicioMonster_CentimetrosAMetros_OutputMessage">
+    <wsdl:part name="parameters" element="tns:CentimetrosAMetrosResponse" />
+  </wsdl:message>
+  <wsdl:portType name="IServicioMonster">
+    <wsdl:operation name="ValidarAcceso">
+      <wsdl:input wsaw:Action="http://tempuri.org/IServicioMonster/ValidarAcceso" message="tns:IServicioMonster_ValidarAcceso_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IServicioMonster/ValidarAccesoResponse" message="tns:IServicioMonster_ValidarAcceso_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GramosAKilogramos">
+      <wsdl:input wsaw:Action="http://tempuri.org/IServicioMonster/GramosAKilogramos" message="tns:IServicioMonster_GramosAKilogramos_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IServicioMonster/GramosAKilogramosResponse" message="tns:IServicioMonster_GramosAKilogramos_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="KilogramosALibras">
+      <wsdl:input wsaw:Action="http://tempuri.org/IServicioMonster/KilogramosALibras" message="tns:IServicioMonster_KilogramosALibras_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IServicioMonster/KilogramosALibrasResponse" message="tns:IServicioMonster_KilogramosALibras_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="LibrasAOnzas">
+      <wsdl:input wsaw:Action="http://tempuri.org/IServicioMonster/LibrasAOnzas" message="tns:IServicioMonster_LibrasAOnzas_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IServicioMonster/LibrasAOnzasResponse" message="tns:IServicioMonster_LibrasAOnzas_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="ToneladasAKilogramos">
+      <wsdl:input wsaw:Action="http://tempuri.org/IServicioMonster/ToneladasAKilogramos" message="tns:IServicioMonster_ToneladasAKilogramos_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IServicioMonster/ToneladasAKilogramosResponse" message="tns:IServicioMonster_ToneladasAKilogramos_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="OnzasAGramos">
+      <wsdl:input wsaw:Action="http://tempuri.org/IServicioMonster/OnzasAGramos" message="tns:IServicioMonster_OnzasAGramos_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IServicioMonster/OnzasAGramosResponse" message="tns:IServicioMonster_OnzasAGramos_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="CelsiusAFahrenheit">
+      <wsdl:input wsaw:Action="http://tempuri.org/IServicioMonster/CelsiusAFahrenheit" message="tns:IServicioMonster_CelsiusAFahrenheit_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IServicioMonster/CelsiusAFahrenheitResponse" message="tns:IServicioMonster_CelsiusAFahrenheit_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="FahrenheitACelsius">
+      <wsdl:input wsaw:Action="http://tempuri.org/IServicioMonster/FahrenheitACelsius" message="tns:IServicioMonster_FahrenheitACelsius_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IServicioMonster/FahrenheitACelsiusResponse" message="tns:IServicioMonster_FahrenheitACelsius_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="CelsiusAKelvin">
+      <wsdl:input wsaw:Action="http://tempuri.org/IServicioMonster/CelsiusAKelvin" message="tns:IServicioMonster_CelsiusAKelvin_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IServicioMonster/CelsiusAKelvinResponse" message="tns:IServicioMonster_CelsiusAKelvin_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="KelvinACelsius">
+      <wsdl:input wsaw:Action="http://tempuri.org/IServicioMonster/KelvinACelsius" message="tns:IServicioMonster_KelvinACelsius_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IServicioMonster/KelvinACelsiusResponse" message="tns:IServicioMonster_KelvinACelsius_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="FahrenheitAKelvin">
+      <wsdl:input wsaw:Action="http://tempuri.org/IServicioMonster/FahrenheitAKelvin" message="tns:IServicioMonster_FahrenheitAKelvin_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IServicioMonster/FahrenheitAKelvinResponse" message="tns:IServicioMonster_FahrenheitAKelvin_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="MetrosAKilometros">
+      <wsdl:input wsaw:Action="http://tempuri.org/IServicioMonster/MetrosAKilometros" message="tns:IServicioMonster_MetrosAKilometros_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IServicioMonster/MetrosAKilometrosResponse" message="tns:IServicioMonster_MetrosAKilometros_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="KilometrosAMillas">
+      <wsdl:input wsaw:Action="http://tempuri.org/IServicioMonster/KilometrosAMillas" message="tns:IServicioMonster_KilometrosAMillas_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IServicioMonster/KilometrosAMillasResponse" message="tns:IServicioMonster_KilometrosAMillas_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="MetrosAPies">
+      <wsdl:input wsaw:Action="http://tempuri.org/IServicioMonster/MetrosAPies" message="tns:IServicioMonster_MetrosAPies_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IServicioMonster/MetrosAPiesResponse" message="tns:IServicioMonster_MetrosAPies_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="PiesAPulgadas">
+      <wsdl:input wsaw:Action="http://tempuri.org/IServicioMonster/PiesAPulgadas" message="tns:IServicioMonster_PiesAPulgadas_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IServicioMonster/PiesAPulgadasResponse" message="tns:IServicioMonster_PiesAPulgadas_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="CentimetrosAMetros">
+      <wsdl:input wsaw:Action="http://tempuri.org/IServicioMonster/CentimetrosAMetros" message="tns:IServicioMonster_CentimetrosAMetros_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IServicioMonster/CentimetrosAMetrosResponse" message="tns:IServicioMonster_CentimetrosAMetros_OutputMessage" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="BasicHttpBinding_IServicioMonster" type="tns:IServicioMonster">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="ValidarAcceso">
+      <soap:operation soapAction="http://tempuri.org/IServicioMonster/ValidarAcceso" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GramosAKilogramos">
+      <soap:operation soapAction="http://tempuri.org/IServicioMonster/GramosAKilogramos" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="KilogramosALibras">
+      <soap:operation soapAction="http://tempuri.org/IServicioMonster/KilogramosALibras" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="LibrasAOnzas">
+      <soap:operation soapAction="http://tempuri.org/IServicioMonster/LibrasAOnzas" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ToneladasAKilogramos">
+      <soap:operation soapAction="http://tempuri.org/IServicioMonster/ToneladasAKilogramos" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="OnzasAGramos">
+      <soap:operation soapAction="http://tempuri.org/IServicioMonster/OnzasAGramos" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="CelsiusAFahrenheit">
+      <soap:operation soapAction="http://tempuri.org/IServicioMonster/CelsiusAFahrenheit" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="FahrenheitACelsius">
+      <soap:operation soapAction="http://tempuri.org/IServicioMonster/FahrenheitACelsius" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="CelsiusAKelvin">
+      <soap:operation soapAction="http://tempuri.org/IServicioMonster/CelsiusAKelvin" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="KelvinACelsius">
+      <soap:operation soapAction="http://tempuri.org/IServicioMonster/KelvinACelsius" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="FahrenheitAKelvin">
+      <soap:operation soapAction="http://tempuri.org/IServicioMonster/FahrenheitAKelvin" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="MetrosAKilometros">
+      <soap:operation soapAction="http://tempuri.org/IServicioMonster/MetrosAKilometros" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="KilometrosAMillas">
+      <soap:operation soapAction="http://tempuri.org/IServicioMonster/KilometrosAMillas" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="MetrosAPies">
+      <soap:operation soapAction="http://tempuri.org/IServicioMonster/MetrosAPies" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="PiesAPulgadas">
+      <soap:operation soapAction="http://tempuri.org/IServicioMonster/PiesAPulgadas" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="CentimetrosAMetros">
+      <soap:operation soapAction="http://tempuri.org/IServicioMonster/CentimetrosAMetros" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="ServicioMonster">
+    <wsdl:port name="BasicHttpBinding_IServicioMonster" binding="tns:BasicHttpBinding_IServicioMonster">
+      <soap:address location="http://carlos/ServicioMonster/ServicioMonster.svc" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

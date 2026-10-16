@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@android:color/white"
+    android:padding="24dp">
+
+    <!-- Header del Modal -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="16dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Información de Ayuda"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@color/monster_dark" />
+
+        <ImageView
+            android:id="@+id/btnClose"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@android:drawable/ic_menu_close_clear_cancel"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:padding="2dp" />
+
+    </LinearLayout>
+
+    <!-- Contenido del Modal -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Bienvenido al Sistema de Conversiones Universales de Monsters Inc."
+                android:textSize="16sp"
+                android:textColor="@color/monster_dark"
+                android:layout_marginBottom="12dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Para comenzar, simplemente seleccione una de las categorías de conversión del menú principal."
+                android:textSize="16sp"
+                android:textColor="@color/monster_dark"
+                android:layout_marginBottom="16dp" />
+
+            <!-- Lista de conversiones -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginBottom="16dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="• Temperatura: Convierte entre Celsius, Fahrenheit y Kelvin."
+                    android:textSize="14sp"
+                    android:textColor="@color/monster_dark"
+                    android:layout_marginBottom="4dp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="• Longitud: Convierte entre metros, pies, pulgadas, etc."
+                    android:textSize="14sp"
+                    android:textColor="@color/monster_dark"
+                    android:layout_marginBottom="4dp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="• Peso: Convierte entre kilogramos, libras, onzas, etc."
+                    android:textSize="14sp"
+                    android:textColor="@color/monster_dark"
+                    android:layout_marginBottom="4dp" />
+
+
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Si tiene más preguntas, contacte al soporte técnico de Monsters Inc."
+                android:textSize="16sp"
+                android:textColor="@color/monster_dark" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+    <!-- Botón de cerrar -->
+    <Button
+        android:id="@+id/btnEntendido"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:text="Entendido"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="@android:color/white"
+        android:background="@drawable/button_blue_modern"
+        android:layout_gravity="end" />
+
+</LinearLayout>
+
+
+
+

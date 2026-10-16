@@ -1,0 +1,56 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="EC.EDU.MONSTER.MainActivity">
+    
+    <item
+        android:id="@+id/action_inicio"
+        android:orderInCategory="0"
+        android:title="🏠 Inicio"
+        android:icon="@android:drawable/ic_menu_edit"
+        app:showAsAction="ifRoom" />
+    
+    <item
+        android:id="@+id/action_temperatura"
+        android:orderInCategory="1"
+        android:title="🌡️ Temperatura"
+        android:icon="@android:drawable/ic_menu_edit"
+        app:showAsAction="ifRoom" />
+    
+    <item
+        android:id="@+id/action_longitud"
+        android:orderInCategory="2"
+        android:title="📏 Longitud"
+        android:icon="@android:drawable/ic_menu_edit"
+        app:showAsAction="ifRoom" />
+    
+    <item
+        android:id="@+id/action_peso"
+        android:orderInCategory="3"
+        android:title="⚖️ Peso"
+        android:icon="@android:drawable/ic_menu_edit"
+        app:showAsAction="ifRoom" />
+    
+    <item
+        android:id="@+id/action_volumen"
+        android:orderInCategory="4"
+        android:title="🧪 Volumen"
+        android:icon="@android:drawable/ic_menu_edit"
+        app:showAsAction="ifRoom" />
+    
+    <item
+        android:id="@+id/action_area"
+        android:orderInCategory="5"
+        android:title="📐 Área"
+        android:icon="@android:drawable/ic_menu_edit"
+        app:showAsAction="ifRoom" />
+    
+    <item
+        android:id="@+id/action_settings"
+        android:orderInCategory="100"
+        android:title="@string/action_settings"
+        app:showAsAction="never" />
+        
+</menu>
+
+

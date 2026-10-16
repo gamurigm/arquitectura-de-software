@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<configuration>
+
+  <appSettings>
+    <add key="aspnet:UseTaskFriendlySynchronizationContext" value="true" />
+  </appSettings>
+  <system.web>
+    <compilation debug="true" targetFramework="4.7.2" />
+    <httpRuntime targetFramework="4.7.2"/>
+  </system.web>
+  <system.serviceModel>
+    <behaviors>
+      <serviceBehaviors>
+        <behavior>
+          <!-- Para evitar revelar información de los metadatos, establezca los valores siguientes en false antes de la implementación -->
+          <serviceMetadata httpGetEnabled="true" httpsGetEnabled="true"/>
+          <!-- Para recibir detalles de las excepciones en los errores para la depuración, establezca el siguiente valor en true. Para no revelar información sobre las excepciones establézcalo en false antes de la implementación -->
+          <serviceDebug includeExceptionDetailInFaults="false"/>
+        </behavior>
+      </serviceBehaviors>
+    </behaviors>
+    <protocolMapping>
+        <add binding="basicHttpsBinding" scheme="https" />
+    </protocolMapping>    
+    <serviceHostingEnvironment aspNetCompatibilityEnabled="true" multipleSiteBindingsEnabled="true" />
+    
+    <!-- Configuración específica para el servicio WSConversion -->
+    <services>
+      <service name="CONUNI_SOAP_DOTNET_GR09.WSConversion" behaviorConfiguration="">
+        <endpoint address="" binding="basicHttpBinding" contract="CONUNI_SOAP_DOTNET_GR09.IWSConversion" />
+        <endpoint address="mex" binding="mexHttpBinding" contract="IMetadataExchange" />
+      </service>
+    </services>
+  </system.serviceModel>
+  <!-- 
+  NOTA: La sección system.webServer se ha eliminado porque está bloqueada en IIS.
+  Configura los handlers y defaultDocument directamente en IIS Manager.
+  -->
+
+</configuration>
+
+
