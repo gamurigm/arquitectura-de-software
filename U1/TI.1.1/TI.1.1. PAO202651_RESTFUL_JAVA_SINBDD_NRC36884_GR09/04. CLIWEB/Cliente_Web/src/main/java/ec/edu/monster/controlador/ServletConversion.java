@@ -105,7 +105,7 @@ public class ServletConversion extends HttpServlet {
             ClienteApi api = new ClienteApi((String) sesion.getAttribute("urlBase"));
             JsonNode magnitudes = api.obtenerCatalogo().path("magnitudes");
             Map<String, java.util.List<String>> catalogo = new LinkedHashMap<>();
-            magnitudes.fields().forEachRemaining(entrada -> {
+            magnitudes.properties().forEach(entrada -> {
                 java.util.List<String> unidades = new java.util.ArrayList<>();
                 entrada.getValue().forEach(n -> unidades.add(n.asText()));
                 catalogo.put(entrada.getKey(), unidades);

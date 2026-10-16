@@ -152,7 +152,7 @@ public class ControladorConsola {
         JsonNode respuesta = api.obtenerCatalogo();
         JsonNode magnitudes = respuesta.path("magnitudes");
         ConsolaVista.mostrar("\n-- Catalogo de unidades --");
-        magnitudes.fields().forEachRemaining(entrada ->
+        magnitudes.properties().forEach(entrada ->
                 ConsolaVista.mostrar("  " + entrada.getKey() + ": " + entrada.getValue()));
     }
 }

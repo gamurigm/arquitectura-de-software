@@ -40,8 +40,6 @@ public class VentanaConversion extends JFrame {
 
     private final ControladorCliente api;
     private final String token;
-    private final String usuario;
-    private final String url;
 
     private final JComboBox<String> magnitudCombo =
             TemaEscritorio.estilo(new JComboBox<>(new String[]{"Longitud", "Masa", "Temperatura"}));
@@ -59,8 +57,6 @@ public class VentanaConversion extends JFrame {
         super("Conversor Monster - " + usuario);
         this.api = api;
         this.token = token;
-        this.usuario = usuario;
-        this.url = url;
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setSize(720, 560);
         setLocationRelativeTo(null);
@@ -204,7 +200,7 @@ public class VentanaConversion extends JFrame {
                 try {
                     JsonNode magnitudes = get().path("magnitudes");
                     Map<String, List<String>> nuevo = new LinkedHashMap<>();
-                    magnitudes.fields().forEachRemaining(entrada -> {
+                    magnitudes.properties().forEach(entrada -> {
                         List<String> unidades = new java.util.ArrayList<>();
                         entrada.getValue().forEach(n -> unidades.add(n.asText()));
                         nuevo.put(entrada.getKey(), unidades);

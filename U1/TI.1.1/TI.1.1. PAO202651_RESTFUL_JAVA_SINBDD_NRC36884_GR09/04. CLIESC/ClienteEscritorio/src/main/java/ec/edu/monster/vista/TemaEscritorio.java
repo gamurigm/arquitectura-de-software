@@ -32,7 +32,6 @@ public final class TemaEscritorio {
         }
     }
 
-    @SuppressWarnings("unchecked")
     public static <T extends JComponent> T estilo(T componente) {
         componente.setBackground(CAMPO);
         componente.setForeground(TEXTO);
