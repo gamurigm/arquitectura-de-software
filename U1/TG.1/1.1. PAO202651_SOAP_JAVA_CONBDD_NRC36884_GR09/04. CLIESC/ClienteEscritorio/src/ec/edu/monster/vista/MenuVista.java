@@ -17,23 +17,26 @@ public final class MenuVista extends JFrame {
 
     public MenuVista(String usuario) {
         super("EurekaBank GR09 · Menú");
-        JPanel contenido = new JPanel(new BorderLayout(16, 20));
-        contenido.setBorder(BorderFactory.createEmptyBorder(28, 32, 28, 32));
-        contenido.setBackground(new Color(215, 191, 220));
+        TemaEureka.Tarjeta contenido = new TemaEureka.Tarjeta(new BorderLayout(16, 20));
         JLabel titulo = new JLabel("EUREKABANK", JLabel.CENTER);
-        titulo.setFont(titulo.getFont().deriveFont(Font.BOLD, 24f));
+        TemaEureka.titulo(titulo, 27f);
         contenido.add(titulo, BorderLayout.NORTH);
         JPanel opciones = new JPanel(new GridLayout(0, 1, 8, 12));
         opciones.setOpaque(false);
-        opciones.add(new JLabel("Sesión: " + usuario));
+        JLabel sesion = new JLabel("Hola, " + usuario);
+        TemaEureka.titulo(sesion, 17f);
+        opciones.add(sesion);
         movimientos.setName("verMovimientos");
         depositos.setName("verDepositos");
         salir.setName("cerrarSesion");
+        TemaEureka.boton(movimientos, true);
+        TemaEureka.boton(depositos, false);
+        TemaEureka.boton(salir, false);
         opciones.add(movimientos);
         opciones.add(depositos);
         opciones.add(salir);
         contenido.add(opciones, BorderLayout.CENTER);
-        setContentPane(contenido);
+        TemaEureka.ventana(this, contenido, 430);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         pack();
         setMinimumSize(getSize());

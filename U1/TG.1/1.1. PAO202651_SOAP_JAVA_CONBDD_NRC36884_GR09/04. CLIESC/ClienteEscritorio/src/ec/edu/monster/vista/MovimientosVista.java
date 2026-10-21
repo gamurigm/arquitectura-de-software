@@ -29,17 +29,25 @@ public final class MovimientosVista extends JDialog {
 
     public MovimientosVista(JFrame propietario) {
         super(propietario, "EurekaBank GR09 · Movimientos", true);
-        JPanel contenido = new JPanel(new BorderLayout(12, 16));
-        contenido.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        TemaEureka.Tarjeta contenido = new TemaEureka.Tarjeta(new BorderLayout(12, 16));
         JPanel filtro = new JPanel();
+        filtro.setOpaque(false);
         JLabel etiqueta = new JLabel("Número de cuenta");
         etiqueta.setLabelFor(cuenta);
+        TemaEureka.etiqueta(etiqueta);
+        TemaEureka.campo(cuenta);
+        TemaEureka.boton(buscar, true);
         cuenta.setName("cuenta");
         buscar.setName("buscar");
         filtro.add(etiqueta);
         filtro.add(cuenta);
         filtro.add(buscar);
         JTable tabla = new JTable(datos);
+        tabla.setFont(tabla.getFont().deriveFont(13f));
+        tabla.setForeground(TemaEureka.TINTA);
+        tabla.setBackground(new java.awt.Color(255, 255, 255, 240));
+        tabla.getTableHeader().setBackground(new java.awt.Color(231, 240, 251));
+        tabla.getTableHeader().setForeground(TemaEureka.TINTA);
         tabla.setName("movimientos");
         tabla.setFillsViewportHeight(true);
         tabla.setRowHeight(26);
@@ -49,7 +57,7 @@ public final class MovimientosVista extends JDialog {
         contenido.add(filtro, BorderLayout.NORTH);
         contenido.add(desplazamiento, BorderLayout.CENTER);
         contenido.add(estado, BorderLayout.SOUTH);
-        setContentPane(contenido);
+        TemaEureka.ventana(this, contenido, 820);
         getRootPane().setDefaultButton(buscar);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         pack();

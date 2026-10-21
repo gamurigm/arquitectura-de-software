@@ -18,13 +18,18 @@ public final class DepositosVista extends JDialog {
 
     public DepositosVista(JFrame propietario) {
         super(propietario, "EurekaBank GR09 · Depósitos", true);
-        JPanel contenido = new JPanel(new BorderLayout(16, 20));
-        contenido.setBorder(BorderFactory.createEmptyBorder(24, 28, 24, 28));
+        TemaEureka.Tarjeta contenido = new TemaEureka.Tarjeta(new BorderLayout(16, 20));
         JPanel campos = new JPanel(new GridLayout(0, 1, 6, 8));
+        campos.setOpaque(false);
         JLabel etiquetaCuenta = new JLabel("Número de cuenta");
         etiquetaCuenta.setLabelFor(cuenta);
         JLabel etiquetaImporte = new JLabel("Importe (hasta dos decimales)");
         etiquetaImporte.setLabelFor(importe);
+        TemaEureka.etiqueta(etiquetaCuenta);
+        TemaEureka.etiqueta(etiquetaImporte);
+        TemaEureka.campo(cuenta);
+        TemaEureka.campo(importe);
+        TemaEureka.boton(depositar, true);
         cuenta.setName("cuenta");
         importe.setName("importe");
         depositar.setName("depositar");
@@ -36,7 +41,7 @@ public final class DepositosVista extends JDialog {
         campos.add(depositar);
         contenido.add(campos, BorderLayout.CENTER);
         contenido.add(estado, BorderLayout.SOUTH);
-        setContentPane(contenido);
+        TemaEureka.ventana(this, contenido, 420);
         getRootPane().setDefaultButton(depositar);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         pack();

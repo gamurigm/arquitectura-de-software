@@ -20,11 +20,9 @@ public final class LoginVista extends JFrame {
 
     public LoginVista() {
         super("EurekaBank GR09 · Iniciar sesión");
-        JPanel contenido = new JPanel(new BorderLayout(16, 20));
-        contenido.setBorder(BorderFactory.createEmptyBorder(28, 32, 28, 32));
-        contenido.setBackground(new Color(215, 191, 220));
+        TemaEureka.Tarjeta contenido = new TemaEureka.Tarjeta(new BorderLayout(16, 20));
         JLabel titulo = new JLabel("EUREKABANK", JLabel.CENTER);
-        titulo.setFont(titulo.getFont().deriveFont(Font.BOLD, 24f));
+        TemaEureka.titulo(titulo, 27f);
         contenido.add(titulo, BorderLayout.NORTH);
         JPanel campos = new JPanel(new GridLayout(0, 1, 6, 8));
         campos.setOpaque(false);
@@ -32,6 +30,11 @@ public final class LoginVista extends JFrame {
         etiquetaUsuario.setLabelFor(usuario);
         JLabel etiquetaClave = new JLabel("Contraseña");
         etiquetaClave.setLabelFor(contrasena);
+        TemaEureka.etiqueta(etiquetaUsuario);
+        TemaEureka.etiqueta(etiquetaClave);
+        TemaEureka.campo(usuario);
+        TemaEureka.campo(contrasena);
+        TemaEureka.boton(entrar, true);
         usuario.setName("usuario");
         contrasena.setName("contrasena");
         entrar.setName("iniciarSesion");
@@ -42,7 +45,7 @@ public final class LoginVista extends JFrame {
         campos.add(entrar);
         contenido.add(campos, BorderLayout.CENTER);
         contenido.add(estado, BorderLayout.SOUTH);
-        setContentPane(contenido);
+        TemaEureka.ventana(this, contenido, 410);
         getRootPane().setDefaultButton(entrar);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         pack();

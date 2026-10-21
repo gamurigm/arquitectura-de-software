@@ -1,6 +1,6 @@
 # Cliente de escritorio EurekaBank
 
-Cliente SOAP con Java Swing y arquitectura MVC. Consume el servicio desplegado en Payara 7; no se conecta directamente a MySQL.
+Cliente SOAP con Java Swing y arquitectura MVC. Su interfaz usa una paleta azul noche, paneles translúcidos y controles de alto contraste. Consume el servicio desplegado en Payara 7; no se conecta directamente a MySQL.
 
 ## Requisitos
 

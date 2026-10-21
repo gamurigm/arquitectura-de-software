@@ -13,8 +13,10 @@ import java.util.Scanner;
 
 public final class MenuPrincipal {
     private static final DateTimeFormatter FORMATO_FECHA = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+    private static final String REINICIO = "\u001B[0m";
     private final Login login;
     private final EurekaController controlador;
+    private boolean colores;
 
     public MenuPrincipal(Login login, EurekaController controlador) {
         this.login = login;
@@ -24,6 +26,7 @@ public final class MenuPrincipal {
     public void iniciar() {
         try (Scanner entrada = new Scanner(System.in)) {
             Console consola = System.console();
+            colores = consola != null;
             if (!autenticar(entrada, consola)) {
                 return;
             }
@@ -56,10 +59,10 @@ public final class MenuPrincipal {
 
         try {
             if (login.iniciarSesion(usuario.strip(), new String(contrasena))) {
-                System.out.println("Sesión iniciada.");
+                System.out.println(estilo("  Sesión iniciada.", "32"));
                 return true;
             }
-            System.out.println("Usuario o contraseña incorrectos.");
+                System.out.println(estilo("  Usuario o contraseña incorrectos.", "31"));
             return false;
         } finally {
             Arrays.fill(contrasena, '\0');
@@ -68,10 +71,11 @@ public final class MenuPrincipal {
 
     private void mostrarMenu(Scanner entrada, Console consola) {
         while (true) {
-            System.out.println("\nEUREKABANK");
-            System.out.println("1. Consultar movimientos");
-            System.out.println("2. Registrar depósito");
-            System.out.println("3. Salir");
+            System.out.println("\n" + estilo("  EUREKABANK  /  BANCA PERSONAL", "1;96"));
+            System.out.println(estilo("  ──────────────────────────────────", "36"));
+            System.out.println("  " + estilo("1", "96") + "  Consultar movimientos");
+            System.out.println("  " + estilo("2", "96") + "  Registrar depósito");
+            System.out.println("  " + estilo("3", "96") + "  Cerrar sesión");
             String opcion = leerLinea(entrada, consola, "Opción: ");
             if (opcion == null || "3".equals(opcion.strip())) {
                 return;
@@ -98,6 +102,7 @@ public final class MenuPrincipal {
             return;
         }
 
+        System.out.println(estilo("Movimientos de la cuenta " + cuenta.strip(), "1;96"));
         System.out.printf("%-12s %-8s %-18s %-12s %-12s %12s%n",
                 "CUENTA", "N°", "FECHA", "TIPO", "ACCIÓN", "IMPORTE");
         for (Movimiento movimiento : movimientos) {
@@ -129,14 +134,19 @@ public final class MenuPrincipal {
         }
 
         System.out.println(controlador.registrarDeposito(cuenta.strip(), importe)
-                ? "Depósito registrado." : "No se pudo registrar el depósito.");
+                ? estilo("  Depósito registrado.", "32")
+                : estilo("  No se pudo registrar el depósito.", "31"));
     }
 
     private String leerLinea(Scanner entrada, Console consola, String mensaje) {
         if (consola != null) {
-            return consola.readLine(mensaje);
+            return consola.readLine(estilo(mensaje, "96"));
         }
         System.out.print(mensaje);
         return entrada.hasNextLine() ? entrada.nextLine() : null;
+    }
+
+    private String estilo(String texto, String codigo) {
+        return colores ? "\u001B[" + codigo + "m" + texto + REINICIO : texto;
     }
 }
