@@ -3,7 +3,7 @@ package ec.edu.monster.servicios;
 import jakarta.xml.ws.BindingProvider;
 import jakarta.xml.ws.Service;
 import jakarta.xml.ws.handler.Handler;
-import java.net.URL;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import javax.xml.namespace.QName;
@@ -29,10 +29,11 @@ public final class ClienteSOAP {
         direccionServicio = direccionServicio.trim().replaceAll("/+$", "");
 
         try {
-            Service servicio = Service.create(new URL(direccionServicio + "?WSDL"), SERVICIO);
+            Service servicio = Service.create(new URI(direccionServicio + "?WSDL").toURL(), SERVICIO);
             puerto = servicio.getPort(PUERTO, ContratoWSConversor.class);
             BindingProvider proveedor = (BindingProvider) puerto;
             proveedor.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, direccionServicio);
+            @SuppressWarnings("rawtypes")
             List<Handler> manejadores = new ArrayList<>(proveedor.getBinding().getHandlerChain());
             manejadores.add(new ManejadorTokenSOAP(token));
             proveedor.getBinding().setHandlerChain(manejadores);

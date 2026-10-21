@@ -1,0 +1,65 @@
+<?xml version='1.0' encoding='UTF-8'?><!-- Published by JAX-WS RI (http://jax-ws.java.net). RI's version is Metro/2.3.2-b608 (trunk-7979; 2015-01-21T12:50:19+0000) JAXWS-RI/2.2.11-b150120.1832 JAXWS-API/2.2.12 JAXB-RI/2.2.12-b141219.1637 JAXB-API/2.2.13-b141020.1521 svn-revision#unknown. --><xs:schema xmlns:tns="http://ws.monster.edu.ec/" xmlns:xs="http://www.w3.org/2001/XMLSchema" version="1.0" targetNamespace="http://ws.monster.edu.ec/">
+
+<xs:element name="login" type="tns:login"/>
+
+<xs:element name="loginResponse" type="tns:loginResponse"/>
+
+<xs:element name="movimiento" type="tns:movimiento"/>
+
+<xs:element name="regDeposito" type="tns:regDeposito"/>
+
+<xs:element name="regDepositoResponse" type="tns:regDepositoResponse"/>
+
+<xs:element name="traerMovimientos" type="tns:traerMovimientos"/>
+
+<xs:element name="traerMovimientosResponse" type="tns:traerMovimientosResponse"/>
+
+<xs:complexType name="regDeposito">
+<xs:sequence>
+<xs:element name="cuenta" type="xs:string" minOccurs="0"/>
+<xs:element name="importe" type="xs:double"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="regDepositoResponse">
+<xs:sequence>
+<xs:element name="resultado" type="xs:int"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="login">
+<xs:sequence>
+<xs:element name="usuario" type="xs:string" minOccurs="0"/>
+<xs:element name="contrasena" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="loginResponse">
+<xs:sequence>
+<xs:element name="login" type="xs:int"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="traerMovimientos">
+<xs:sequence>
+<xs:element name="cuenta" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="traerMovimientosResponse">
+<xs:sequence>
+<xs:element name="movimiento" type="tns:movimiento" minOccurs="0" maxOccurs="unbounded"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="movimiento">
+<xs:sequence>
+<xs:element name="accion" type="xs:string" minOccurs="0"/>
+<xs:element name="cuenta" type="xs:string" minOccurs="0"/>
+<xs:element name="fecha" type="xs:dateTime" minOccurs="0"/>
+<xs:element name="importe" type="xs:double"/>
+<xs:element name="nromov" type="xs:int"/>
+<xs:element name="tipo" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+</xs:schema>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Eureka Bank - Opciones</title>
+     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #000;
+            font-family: 'Open Sans', sans-serif; /* Cambiar tipo de letra aquí */
+        }
+        .options-container {
+            text-align: center;
+        }
+        .options-container button {
+            width: 200px;
+            padding: 20px;
+            margin: 20px;
+            background-color: #9b59b6;
+            color: #000000;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .options-container button:hover {
+            background-color: #8e44ad;
+        }
+    </style>
+</head>
+<body>
+    <div class="options-container">
+        <button onclick="deposito()"><b>Insertar movimiento</b></button>
+        <button onclick="movimientos()"><b>Movimientos</b></button>
+    </div>
+    <script>
+        function deposito() {
+            window.location.href = './Depositos.html';
+        }
+
+        function movimientos() {
+            window.location.href = './Movimientos.html';
+        }
+    </script>
+</body>
+</html>

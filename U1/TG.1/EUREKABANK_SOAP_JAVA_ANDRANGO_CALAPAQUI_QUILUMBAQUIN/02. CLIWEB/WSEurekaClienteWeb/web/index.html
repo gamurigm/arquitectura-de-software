@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Eureka Bank - Login</title>
+     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #e5d4f4;
+            font-family: 'Open Sans', sans-serif; /* Cambiar tipo de letra aquí */
+        }
+        .login-container {
+            text-align: center;
+            background-color: #e5d4f4;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .login-container img {
+            width: 100px;
+        }
+        .login-container input[type="text"],
+        .login-container input[type="password"] {
+            width: 80%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .login-container input[type="submit"] {
+            padding: 10px 20px;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .login-container input[type="submit"]:hover {
+            background-color: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <img src="./fondo.png" alt="Monster">
+        <h1><b>EUREKABANK</b></h1>
+        <form id="loginForm">
+            <label for="username"><b>Usuario:</b></label><br>
+            <input type="text" id="username" name="username" required><br>
+            <label for="password"><b>Contraseña:</b></label><br>
+            <input type="password" id="password" name="password" required><br>
+            <input type="submit" value="Iniciar Sesión">
+        </form>
+    </div>
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            login();
+        });
+
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            const xml = `
+                <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ws="http://ws.monster.edu.ec/">
+                    <soapenv:Header/>
+                    <soapenv:Body>
+                        <ws:login>
+                            <usuario>${username}</usuario>
+                            <contrasena>${password}</contrasena>
+                        </ws:login>
+                    </soapenv:Body>
+                </soapenv:Envelope>
+            `;
+
+            fetch('http://10.244.172.53:8080/WSEureka', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'text/xml',
+                    'SOAPAction': ''
+                },
+                body: xml
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error en la respuesta del servidor');
+                }
+                return response.text();
+            })
+            .then(data => {
+                console.log('Respuesta del servicio:', data);
+
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(data, "text/xml");
+
+                console.log('XML parseado:', xmlDoc);
+
+                const loginResult = xmlDoc.getElementsByTagName("login")[0]?.childNodes[0]?.nodeValue;
+                console.log('Resultado del login:', loginResult);
+
+                if (loginResult === "1") {
+                    alert('¡Bienvenido!');
+                    window.location.href = './Menu.html';
+                } else {
+                    alert('Credenciales incorrectas');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error en el proceso de inicio de sesión. Por favor, inténtelo de nuevo.');
+            });
+        }
+    </script>
+</body>
+</html>

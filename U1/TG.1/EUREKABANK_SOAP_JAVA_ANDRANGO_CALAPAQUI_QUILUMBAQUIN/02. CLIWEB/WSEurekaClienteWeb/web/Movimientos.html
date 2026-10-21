@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eureka Bank - Movimientos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Open Sans', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #000000; /* Fondo oscuro general */
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            height: 100vh;
+            font-family: 'Open Sans', sans-serif; /* Cambiar tipo de letra aquí */
+        }
+
+        .movimientos-container {
+            width: 90%;
+            max-width: 900px;
+            background-color: #000000; /* Fondo oscuro de la caja */
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            color: #f4f4f4; /* Color de texto claro */
+            overflow: hidden; /* Asegura que los bordes no se desborden */
+        }
+
+        h1 {
+            font-size: 24px;
+            color: #D1A7FF; /* Título en color lila */
+            text-align: center;
+        }
+
+        .buscar-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+
+        .buscar-container input[type="text"] {
+            width: 100%; /* Ajusta el ancho para que ocupe todo el espacio disponible */
+            max-width: 100%; /* El ancho del input ahora ocupa todo el espacio */
+            padding: 10px 15px; /* Ajuste de padding */
+            margin-right: 10px; /* Agrega un margen a la derecha para que el botón no toque el input */
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background-color: #000000; /* Fondo oscuro para el campo de texto */
+            color: #f4f4f4; /* Texto claro */
+            text-align: left; /* Alinea el texto a la izquierda */
+        }
+
+        .buscar-container input[type="text"]::placeholder {
+            color: #808080;
+            text-align: left;
+        }
+
+        .buscar-btn {
+            padding: 10px 20px;
+            background-color: #D1A7FF;
+            color: #6F2FA8;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .buscar-btn:hover {
+            background-color: #C08BFF;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: #ffffff; /* Fondo blanco para las celdas */
+        }
+
+        table th, table td {
+            padding: 10px;
+            text-align: center;
+            border: 1px solid #000000; /* Bordes negros */
+        }
+
+        table th {
+            background-color: #808080; /* Fondo gris de los encabezados */
+            color: #000000; /* Texto negro */
+        }
+
+        table td {
+            color: #000000; /* Texto negro para las celdas */
+        }
+
+        table tr:nth-child(even) {
+            background-color: #f2f2f2; /* Alternancia para filas pares */
+        }
+
+        /* Área desplazable para los datos de la tabla */
+        .tabla-container {
+            max-height: 400px; /* Ajusta la altura según tu diseño */
+            overflow-y: auto;
+            display: block;
+            margin-top: 20px;
+        }
+
+        /* Hacer que los títulos de la tabla se queden fijos al hacer scroll */
+        table th {
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="movimientos-container">
+        <!-- Campo de búsqueda -->
+        <div class="buscar-container">
+            <input type="text" id="numeroCuenta" placeholder="Ingrese el número de cuenta" />
+            <button class="buscar-btn" id="buscarBtn">Buscar</button>
+        </div>
+
+        <!-- Contenedor con área desplazable para los datos de la tabla -->
+        <div class="tabla-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>CUENTA</th>
+                        <th>N° MOVIMIENTO</th>
+                        <th>FECHA</th>
+                        <th>TIPO</th>
+                        <th>ACCIÓN</th>
+                        <th>IMPORTE</th>
+                    </tr>
+                </thead>
+                <tbody id="movimientosList">
+                    <!-- Los datos se generarán dinámicamente -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Evento cuando se haga clic en el botón Buscar
+        document.getElementById('buscarBtn').addEventListener('click', function() {
+            const numeroCuenta = document.getElementById('numeroCuenta').value;
+
+            if (numeroCuenta) {
+                // Llamada a la función para cargar los movimientos filtrados por número de cuenta
+                cargarMovimientos(numeroCuenta);
+            } else {
+                alert('Por favor, ingrese un número de cuenta.');
+            }
+        });
+
+        // Función para cargar los movimientos, recibiendo el número de cuenta como parámetro
+        function cargarMovimientos(numeroCuenta) {
+            const soapRequest = `
+                <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ws="http://ws.monster.edu.ec/">
+                    <soapenv:Header/>
+                    <soapenv:Body>
+                        <ws:traerMovimientos>
+                            <cuenta>${numeroCuenta}</cuenta>
+                        </ws:traerMovimientos>
+                    </soapenv:Body>
+                </soapenv:Envelope>
+            `;
+
+            fetch('http://10.244.172.53:8080/WSEureka', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'text/xml',
+                    'SOAPAction': 'http://ws.monster.edu.ec/WSEureka/traerMovimientosRequest'
+                },
+                body: soapRequest
+            })
+            .then(response => response.text())
+            .then(data => {
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(data, "text/xml");
+                const movimientos = xmlDoc.getElementsByTagName("movimiento");
+
+                const tbody = document.getElementById('movimientosList');
+                tbody.innerHTML = ''; // Limpia la tabla
+
+                if (movimientos.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6">No se encontraron movimientos para esta cuenta.</td></tr>';
+                    return;
+                }
+
+                for (let movimiento of movimientos) {
+                    const cuenta = movimiento.getElementsByTagName("cuenta")[0].textContent;
+                    const numero = movimiento.getElementsByTagName("nromov")[0].textContent;
+                    const fecha = movimiento.getElementsByTagName("fecha")[0].textContent;
+                    const tipo = movimiento.getElementsByTagName("tipo")[0].textContent;
+                    const accion = movimiento.getElementsByTagName("accion")[0].textContent;
+                    const importe = movimiento.getElementsByTagName("importe")[0].textContent;
+
+                    // Convertir la fecha al formato YYYY-MM-DD
+                    const fechaObj = new Date(fecha);
+                    const fechaFormateada = fechaObj.toISOString().split('T')[0];  // Esto da la fecha en formato 'YYYY-MM-DD'
+
+                    const row = `<tr>
+                        <td>${cuenta}</td>
+                        <td>${numero}</td>
+                        <td>${fechaFormateada}</td>
+                        <td>${tipo}</td>
+                        <td>${accion}</td>
+                        <td>${importe}</td>
+                    </tr>`;
+                    tbody.innerHTML += row;
+                }
+            })
+            .catch(error => console.error('Error al cargar movimientos:', error));
+        }
+    </script>
+</body>
+</html>

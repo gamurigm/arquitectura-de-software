@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Eureka Bank - Depósito</title>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #8F00FF;
+            font-family: 'Open Sans', sans-serif;
+        }
+        .deposito-container {
+            text-align: center;
+            background-color: #FFFFFF;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .deposito-container input[type="text"],
+        .deposito-container input[type="number"] {
+            width: 80%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #CCCCCC;
+            border-radius: 4px;
+            background-color: #F9F9F9;
+            color: #000000;
+        }
+        .deposito-container input[type="submit"] {
+            padding: 10px 70px;
+            background-color: #6F2FA8;
+            color: #FFFFFF;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .deposito-container input[type="submit"]:hover {
+            background-color: #571F85;
+        }
+    </style>
+</head>
+<body>
+    <div class="deposito-container">
+        <h1>Realizar Movimientos</h1>
+        <form id="depositoForm">
+            <input type="number" id="account" name="account" placeholder="Número de Cuenta" required><br>
+            <input type="number" id="amount" name="amount" placeholder="Monto del Depósito" step="0.01" required><br>
+            <input type="text" id="codigo" name="codigo" placeholder="Tipo de Movimiento" required><br>
+            <input type="submit" value="Realizar Depósito">
+        </form>
+    </div>
+    <script>
+        document.getElementById('depositoForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            realizarDeposito();
+        });
+
+        function realizarDeposito() {
+            const account = document.getElementById('account').value.trim();
+            const amount = parseFloat(document.getElementById('amount').value);
+            const codigo = document.getElementById('codigo').value.trim();
+
+            if (!account || isNaN(amount) || !codigo) {
+                alert('Por favor, complete todos los campos correctamente.');
+                return;
+            }
+
+            const xml = `
+                <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ws="http://ws.monster.edu.ec/">
+                    <soapenv:Header/>
+                    <soapenv:Body>
+                        <ws:regDeposito>
+                            <cuenta>${account}</cuenta>
+                            <importe>${amount.toFixed(2)}</importe>
+                            <tipoCodigo>${codigo}</tipoCodigo>
+                        </ws:regDeposito>
+                    </soapenv:Body>
+                </soapenv:Envelope>
+            `;
+
+            fetch('http://10.244.172.53:8080/WSEureka', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'text/xml',
+                    'SOAPAction': 'http://ws.monster.edu.ec/WSEureka/regDepositoRequest'
+                },
+                body: xml
+            })
+            .then(response => response.text())
+            .then(data => {
+                console.log('Respuesta completa del servicio:', data);
+
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(data, "text/xml");
+
+                const resultado = xmlDoc.getElementsByTagName("resultado")[0]?.textContent;
+
+                if (resultado === "1") {
+                    alert('Depósito realizado con éxito.');
+                } else if (resultado === "-1") {
+                    alert('Error en el depósito. Los datos proporcionados son incorrectos.');
+                } else {
+                    alert('Error desconocido en el depósito. Por favor, inténtelo nuevamente.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error en el proceso de depósito. Por favor, inténtelo de nuevo.');
+            });
+        }
+    </script>
+</body>
+</html>

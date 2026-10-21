@@ -1,0 +1,33 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package ec.edu.monster.controlador;
+
+import ec.edu.monster.service.EurekaService;
+import ec.edu.monster.ws.Movimiento;
+import java.util.List;
+
+/**
+ *
+ * @author chris
+ */
+public class EurekaControlador {
+
+    public List<Movimiento> traerMoviminetos(String cuenta) {
+        EurekaService service = new EurekaService();
+        return service.traerMovimientos(cuenta);
+    }
+    
+    public int regDeposito (String cuenta, double deposito){
+        EurekaService service = new EurekaService();
+        return service.regDeposito(cuenta, deposito);
+    }
+
+    public int login(String usuario, String contraseña) {
+        EurekaService service = new EurekaService();
+        return service.login(usuario, contraseña);
+    }
+    
+}

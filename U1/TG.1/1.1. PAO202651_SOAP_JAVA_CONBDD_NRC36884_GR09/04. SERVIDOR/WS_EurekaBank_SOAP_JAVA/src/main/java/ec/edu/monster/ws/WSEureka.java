@@ -1,0 +1,57 @@
+package ec.edu.monster.ws;
+
+import ec.edu.monster.modelo.Movimiento;
+import ec.edu.monster.servicios.EurekaService;
+import jakarta.jws.WebMethod;
+import jakarta.jws.WebParam;
+import jakarta.jws.WebResult;
+import jakarta.jws.WebService;
+import jakarta.xml.ws.WebServiceException;
+import java.math.BigDecimal;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+@WebService(serviceName = "WSEureka", targetNamespace = "http://ws.monster.edu.ec/")
+public class WSEureka {
+    private static final Logger LOGGER = Logger.getLogger(WSEureka.class.getName());
+    private final EurekaService service = new EurekaService();
+
+    @WebMethod(operationName = "login")
+    @WebResult(name = "login")
+    public int iniciarSesion(
+            @WebParam(name = "usuario") String usuario,
+            @WebParam(name = "contrasena") String contrasena) {
+        try {
+            return service.iniciarSesion(usuario, contrasena) ? 1 : -1;
+        } catch (SQLException | RuntimeException e) {
+            LOGGER.log(Level.SEVERE, "Error al iniciar sesión.", e);
+            return -1;
+        }
+    }
+
+    @WebMethod(operationName = "traerMovimientos")
+    @WebResult(name = "movimiento")
+    public List<Movimiento> traerMovimientos(@WebParam(name = "cuenta") String cuenta) {
+        try {
+            return service.traerMovimientos(cuenta);
+        } catch (SQLException | RuntimeException e) {
+            LOGGER.log(Level.SEVERE, "Error al consultar movimientos.", e);
+            throw new WebServiceException("No se pudieron consultar los movimientos.", e);
+        }
+    }
+
+    @WebMethod(operationName = "regDeposito")
+    @WebResult(name = "resultado")
+    public int regDeposito(
+            @WebParam(name = "cuenta") String cuenta,
+            @WebParam(name = "importe") BigDecimal importe) {
+        try {
+            return service.registrarDeposito(cuenta, importe);
+        } catch (SQLException | RuntimeException e) {
+            LOGGER.log(Level.SEVERE, "Error al registrar el depósito.", e);
+            return -1;
+        }
+    }
+}
