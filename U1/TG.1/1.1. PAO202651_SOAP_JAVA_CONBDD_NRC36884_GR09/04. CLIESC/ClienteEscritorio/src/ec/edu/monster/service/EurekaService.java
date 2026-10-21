@@ -1,0 +1,62 @@
+package ec.edu.monster.service;
+
+import ec.edu.monster.modelo.Movimiento;
+import ec.edu.monster.ws.WSEureka;
+import ec.edu.monster.ws.WSEureka_Service;
+import com.sun.xml.ws.developer.JAXWSProperties;
+import jakarta.xml.ws.BindingProvider;
+import jakarta.xml.ws.WebServiceException;
+import java.math.BigDecimal;
+import java.net.URI;
+import java.net.URL;
+import java.util.List;
+
+public final class EurekaService {
+    private static final String ENDPOINT_PREDETERMINADO =
+            "http://127.0.0.1:8080/WS_EurekaBank_SOAP_JAVA_GR09/WSEureka";
+    private final WSEureka puerto;
+
+    public EurekaService() {
+        this(System.getenv().getOrDefault("EUREKABANK_SOAP_URL", ENDPOINT_PREDETERMINADO));
+    }
+
+    public EurekaService(String endpoint) {
+        URI uri = URI.create(endpoint.strip());
+        if (uri.getHost() == null || uri.getUserInfo() != null
+                || !("http".equalsIgnoreCase(uri.getScheme())
+                || "https".equalsIgnoreCase(uri.getScheme()))) {
+            throw new IllegalArgumentException("EUREKABANK_SOAP_URL debe ser una URL HTTP o HTTPS.");
+        }
+        URL wsdl = WSEureka_Service.class.getResource("/META-INF/wsdl/WSEureka.wsdl");
+        if (wsdl == null) {
+            throw new WebServiceException("No se encontró el WSDL local.");
+        }
+
+        puerto = new WSEureka_Service(wsdl).getWSEurekaPort();
+        ((BindingProvider) puerto).getRequestContext().put(
+                BindingProvider.ENDPOINT_ADDRESS_PROPERTY, uri.toString());
+        ((BindingProvider) puerto).getRequestContext().put(JAXWSProperties.CONNECT_TIMEOUT, 5000);
+        ((BindingProvider) puerto).getRequestContext().put(JAXWSProperties.REQUEST_TIMEOUT, 15000);
+    }
+
+    public int login(String usuario, String contrasena) {
+        return puerto.login(usuario, contrasena);
+    }
+
+    public List<Movimiento> traerMovimientos(String cuenta) {
+        return puerto.traerMovimientos(cuenta).stream()
+                .map(movimiento -> new Movimiento(
+                        movimiento.getCuenta(),
+                        movimiento.getNromov(),
+                        movimiento.getFecha() == null ? null
+                                : movimiento.getFecha().toGregorianCalendar().toZonedDateTime().toLocalDateTime(),
+                        movimiento.getTipo(),
+                        movimiento.getAccion(),
+                        movimiento.getImporte()))
+                .toList();
+    }
+
+    public int regDeposito(String cuenta, BigDecimal importe) {
+        return puerto.regDeposito(cuenta, importe);
+    }
+}
