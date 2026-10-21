@@ -1,20 +1,30 @@
 # WS_ConUni_Java_REST
 
-Servidor REST (Spring Boot 3 + Java 21, **sin base de datos**) para conversión de unidades.
+Servidor REST (Spring Boot 3.5.x, compilado con JDK 25 y bytecode Java 21, desplegado en Payara, **sin base de datos**) para conversión de unidades.
 Primero se obtiene un **token** con el login y luego se usa en cada conversión mediante el header
 `Authorization: Bearer <token>`.
 
 ## Requisitos
 
-- JDK 21
-- Maven 3.9+
+- JDK 25 para IDE, compilación y runtime
+- Maven 3.10.0
+- Payara Server Community 7
 
-## Compilar y ejecutar
+## Compilar y desplegar en Payara
 
 ```bash
-mvn clean package
-java -jar target/WS_ConUni_Java_REST.jar
+$repoRoot = (& git rev-parse --show-toplevel).Trim()
+$toolsDir = Join-Path (Split-Path $repoRoot -Parent) 'tools'
+$env:JAVA_HOME = Join-Path $toolsDir 'mise\installs\java\temurin-25.0.4+101.0.LTS'
+$mvn = Join-Path $toolsDir 'mise\installs\maven\3.10.0\apache-maven-3.10.0\bin\mvn.cmd'
+& $mvn "-Dmaven.repo.local=$(Join-Path $toolsDir 'm2')" test package
 ```
+
+El artefacto es `target/WS_ConUni_Java_REST.war`; se despliega en el contexto raíz `/` para conservar las rutas `/api/...`. Desde la raíz del repositorio, el operador local se consulta con `scripts/payara-gr09.ps1 -Action Status` y despliega con `scripts/payara-gr09.ps1 -Action Deploy -Target Rest`.
+
+Para recuperación local, el WAR mantiene el lanzador ejecutable de Spring Boot (`java -jar target/WS_ConUni_Java_REST.war`). El despliegue web activo usa Payara.
+
+La dependencia `spring-boot-starter-tomcat` tiene alcance `provided`: queda disponible para el lanzador y las pruebas del WAR, mientras que Payara atiende el despliegue web.
 
 - URL base: `http://localhost:8080`
 - Pagina del servidor: `http://localhost:8080/`

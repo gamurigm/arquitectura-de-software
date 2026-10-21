@@ -24,7 +24,7 @@ public class ConfiguracionOpenApi {
                         .title("API REST Conversion de Unidades Monster")
                         .version("1.0.0")
                         .description("Servicios REST para autenticacion con token y conversion de unidades "
-                                + "de longitud, masa y temperatura. Java 21 + Spring Boot, sin base de datos.")
+                                + "de longitud, masa y temperatura. JDK 25, bytecode Java 21 + Spring Boot, sin base de datos.")
                         .contact(new Contact().name("Grupo 10 - NRC 36884").email("monster@espe.edu.ec")))
                 .addSecurityItem(new SecurityRequirement().addList(ESQUEMA))
                 .components(new Components().addSecuritySchemes(ESQUEMA,

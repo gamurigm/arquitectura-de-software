@@ -14,9 +14,9 @@
     <groupId>ec.edu.monster</groupId>
     <artifactId>WS_ConUni_Java_REST</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <packaging>jar</packaging>
+    <packaging>war</packaging>
     <name>WS_ConUni_Java_REST</name>
-    <description>API REST de conversion de unidades (Monster) - Java 21 + Spring Boot sin base de datos</description>
+    <description>API REST de conversion de unidades (Monster) - JDK 25, bytecode Java 21 + Spring Boot sin base de datos</description>
 
     <properties>
         <java.version>21</java.version>
@@ -28,6 +28,11 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-tomcat</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

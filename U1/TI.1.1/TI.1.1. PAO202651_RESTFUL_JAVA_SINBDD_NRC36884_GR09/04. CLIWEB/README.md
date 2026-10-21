@@ -1,43 +1,35 @@
 # 04. CLIWEB
 
-Cliente **web** (JSP/Servlet, Jakarta EE 10) que consume la API REST mediante `HttpClient`.
-
-## Proyecto
-
-`Cliente_Web` - Maven, Java 21, empaquetado **WAR**. El token se guarda en la `HttpSession`.
+Cliente web JSP/Servlet que consume la API REST GR09 mediante `HttpClient`. Payara sirve esta interfaz WAR en el contexto `/rest-web`.
 
 ## Compilar
 
-```bash
-cd Cliente_Web
-mvn clean package
+Usa JDK 25 con bytecode Java 21. Desde la carpeta `Cliente_Web` ejecuta:
+
+```powershell
+$repoRoot = (& git rev-parse --show-toplevel).Trim()
+$toolsDir = Join-Path (Split-Path $repoRoot -Parent) 'tools'
+$env:JAVA_HOME = Join-Path $toolsDir 'mise\installs\java\temurin-25.0.4+101.0.LTS'
+$mvn = Join-Path $toolsDir 'mise\installs\maven\3.10.0\apache-maven-3.10.0\bin\mvn.cmd'
+& $mvn "-Dmaven.repo.local=$(Join-Path $toolsDir 'm2')" test package
 ```
 
-Genera `target/Cliente_Web.war`.
+El artefacto generado es `target/Cliente_Web.war`.
 
-## Desplegar
+## URLs en Payara
 
-Copia el WAR en un contenedor **Jakarta EE 10** (Tomcat 10+, Payara, GlassFish) y arráncalo.
-Con el servidor REST en `8080`, configura Tomcat en `8081` y despliega el contexto `/Cliente_Web`:
+- Inicio de sesión: `http://localhost:19080/rest-web/inicio.jsp`
+- Backend REST: `http://localhost:8080/api`
+- Salud: `http://localhost:8080/api/salud`
 
+Durante la preparación del despliegue, el formulario de inicio permite indicar `http://localhost:18080` como dirección temporal de la API. En operación estable se usa `http://localhost:8080`.
+
+## Despliegue
+
+Desde la raíz del repositorio, usa el operador local:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\payara-gr09.ps1 -Action Deploy -Target Rest
 ```
-http://localhost:8081/Cliente_Web/login
-```
 
-## Uso
-
-1. En la pantalla de login indique servidor (por defecto `http://localhost:8080`), usuario y clave.
-2. Elija magnitud, unidades de origen/destino e ingrese el valor.
-3. Presione **CONVERTIR**. El resultado se muestra en pantalla.
-4. **Cerrar sesión** invalida la sesión local.
-
-## Notas
-
-- El servidor REST debe ser accesible desde el contenedor donde se despliega el WAR.
-- Si el token expira (`401`), la sesión se invalida y se redirige al login.
-
-## Unidades
-
-- **Longitud:** `centimetros`, `metros`, `pies`, `yardas`, `millas`
-- **Masa:** `gramos`, `kilogramos`, `onzas`, `libras`, `quintales`
-- **Temperatura:** `fahrenheit`, `kelvin`, `celsius`, `newton`, `reaumur`
+La sesión web conserva el token en `HttpSession`; el backend guarda los tokens en memoria y los invalida al reiniciarse.

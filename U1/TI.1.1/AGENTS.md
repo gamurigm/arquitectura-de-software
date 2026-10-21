@@ -13,4 +13,4 @@
 - Mantén en todos los clientes los mismos nombres y significados para magnitudes, unidades, valor, resultado, sesión y errores. Separa presentación, controlador, modelo y transporte según MVC; adapta los tipos al lenguaje y plataforma.
 - Mantén una sola identidad visual en todos los clientes GR09, sin depender del lenguaje, protocolo o plataforma. Las pantallas equivalentes deben compartir paleta, tipografía, recursos gráficos de marca, jerarquía, disposición, textos y tamaños de controles.
 - Adapta la interfaz solo a los tamaños de pantalla y controles nativos. Usa campos de altura estándar, etiquetas claras, contraseña oculta, foco visible y contraste legible.
-- Para pruebas locales, no uses Docker. Instala dependencias y guarda paquetes, temporales y artefactos nuevos en `D:\tools`; conserva la estructura numerada y los recursos propios de cada plataforma.
+- Para pruebas locales, no uses Docker. Este equipo solo dispone de `C:`; guarda dependencias, paquetes, temporales y artefactos nuevos en `C:\Users\GABI\Documents\ESPE VIII SII2026\tools`. Conserva la estructura numerada y los recursos propios de cada plataforma.
