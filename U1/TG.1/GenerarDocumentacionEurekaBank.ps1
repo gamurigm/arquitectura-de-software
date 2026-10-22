@@ -108,12 +108,20 @@ function Add-Paragraph {
     $range = $Document.Range($position, $position)
     $range.InsertAfter($Text + "`r")
     $paragraph = $Document.Range($position, $position + $Text.Length + 1).Paragraphs.Item(1)
-    $paragraph.Style = $Style
+    $paragraph.Style = if ($Style -eq -63) { -1 } elseif ($Style -eq -64) { -2 } else { $Style }
     if ($Style -eq -1) { $paragraph.Range.Font.Name = 'Arial'; $paragraph.Range.Font.Size = 12; $paragraph.Range.Font.Bold = 0; $paragraph.Range.Font.Italic = 0 }
     if ($Style -eq -2) { $paragraph.Range.Font.Name = 'Arial'; $paragraph.Range.Font.Size = 16; $paragraph.Range.Font.Bold = 1; $paragraph.Range.Font.Italic = 0 }
     if ($Style -eq -3) { $paragraph.Range.Font.Name = 'Arial'; $paragraph.Range.Font.Size = 12; $paragraph.Range.Font.Bold = 1; $paragraph.Range.Font.Italic = 0 }
     if ($Style -eq -35) { $paragraph.Range.Font.Name = 'Arial'; $paragraph.Range.Font.Size = 11; $paragraph.Range.Font.Bold = 0; $paragraph.Range.Font.Italic = 1 }
-    if ($Style -eq -63) { $paragraph.Range.Font.Name = 'Cambria'; $paragraph.Range.Font.Size = 16; $paragraph.Range.Font.Bold = 1; $paragraph.Range.Font.Italic = 0; $paragraph.Format.Alignment = 1 }
+    if ($Style -eq -63 -or $Style -eq -64) {
+        $paragraph.Range.Font.Name = 'Cambria'
+        $paragraph.Range.Font.Size = 16
+        $paragraph.Range.Font.Bold = 0
+        $paragraph.Range.Font.Italic = 0
+        $paragraph.Range.Font.Color = 9527350
+        $paragraph.Format.Alignment = 0
+        $paragraph.Format.SpaceBefore = 12
+    }
     $paragraph.Format.SpaceAfter = 6
     if ($PageBreakBefore) { $paragraph.Format.PageBreakBefore = $true }
     return $paragraph
@@ -199,19 +207,21 @@ function Add-Picture {
 }
 
 function Add-TocFrontMatter {
-    param($Document, [string[]]$Illustrations, [string[]]$Tables)
+    param($Document, [string]$ReportTitle, [string[]]$Illustrations, [string[]]$Tables)
     $script:FrontMatterEntries = [System.Collections.ArrayList]::new()
     $script:BodyContentStart = 0
+    Add-Paragraph $Document $ReportTitle -2 | Out-Null
     Add-Paragraph $Document 'ÍNDICE DE CONTENIDOS' -63 | Out-Null
-    Add-Field $Document 'TOC \o "1-2" \h \z \u'
-    Add-PageBreak $Document
+    Add-Field $Document 'TOC \o "1-3" \h \z \u'
+    $position = [int]$Document.Content.End - 1
+    $Document.Range($position, $position).InsertBreak(2)
+    Set-BodyPageLayout $Document
     Add-Paragraph $Document 'ÍNDICE DE ILUSTRACIONES' -63 | Out-Null
     foreach ($item in $Illustrations) {
         $p = Add-Paragraph $Document $item -1
         $p.Format.TabStops.Add(420, 2, 1) | Out-Null
         [void]$script:FrontMatterEntries.Add([pscustomobject]@{ Caption = $item; Paragraph = $p })
     }
-    Add-PageBreak $Document
     Add-Paragraph $Document 'ÍNDICE DE TABLAS' -63 | Out-Null
     foreach ($item in $Tables) {
         $p = Add-Paragraph $Document $item -1
@@ -301,49 +311,103 @@ function Update-Cover {
     } catch { }
 }
 
-function Set-CoverImage {
-    param($Document, [string]$Path)
+function Replace-CoverImage {
+    param([string]$DocumentPath, [string]$Path)
     if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) { throw "Falta la captura de portada: $Path" }
-    $picture = $null
-    for ($index = $Document.Shapes.Count; $index -ge 1; $index--) {
-        $shape = $Document.Shapes.Item($index)
-        if ($shape.Type -eq 13) { $picture = $shape; break }
-    }
-    if ($null -eq $picture) { throw 'La plantilla no contiene una imagen de portada.' }
-    $left = [double]$picture.Left; $top = [double]$picture.Top
-    $width = [double]$picture.Width; $height = [double]$picture.Height
-    $picture.Delete()
     Add-Type -AssemblyName System.Drawing
-    $sourceImage = [System.Drawing.Image]::FromFile($Path)
+    Add-Type -AssemblyName System.IO.Compression
+    Add-Type -AssemblyName System.IO.Compression.FileSystem
+    $archive = [System.IO.Compression.ZipFile]::Open($DocumentPath, [System.IO.Compression.ZipArchiveMode]::Update)
+    $sourceImage = $null
+    $canvas = $null
+    $graphics = $null
+    $gradient = $null
+    $memory = $null
     try {
-        $imageRatio = $sourceImage.Width / $sourceImage.Height
-        $frameRatio = $width / $height
-        if ($imageRatio -gt $frameRatio) {
-            $newHeight = $width / $imageRatio
-            $top += ($height - $newHeight) / 2
-            $height = $newHeight
-        } else {
-            $newWidth = $height * $imageRatio
-            $left += ($width - $newWidth) / 2
-            $width = $newWidth
-        }
-    } finally { $sourceImage.Dispose() }
-    $anchor = $Document.Range(0, 0)
-    $newPicture = $Document.Shapes.AddPicture($Path, $false, $true, $left, $top, $width, $height, $anchor)
-    $newPicture.WrapFormat.Type = 3
+        $documentEntry = $archive.GetEntry('word/document.xml')
+        $reader = [System.IO.StreamReader]::new($documentEntry.Open())
+        try { [xml]$documentXml = $reader.ReadToEnd() } finally { $reader.Dispose() }
+        $documentNamespaces = [System.Xml.XmlNamespaceManager]::new($documentXml.NameTable)
+        $documentNamespaces.AddNamespace('w', 'http://schemas.openxmlformats.org/wordprocessingml/2006/main')
+        $documentNamespaces.AddNamespace('a', 'http://schemas.openxmlformats.org/drawingml/2006/main')
+        $relationshipNamespace = 'http://schemas.openxmlformats.org/officeDocument/2006/relationships'
+        $coverBlip = $documentXml.SelectSingleNode('//w:drawing[1]//a:blip', $documentNamespaces)
+        if ($null -eq $coverBlip) { throw 'La plantilla ERS no contiene una imagen de portada.' }
+        $relationshipId = $coverBlip.GetAttribute('embed', $relationshipNamespace)
+
+        $relationshipsEntry = $archive.GetEntry('word/_rels/document.xml.rels')
+        $reader = [System.IO.StreamReader]::new($relationshipsEntry.Open())
+        try { [xml]$relationshipsXml = $reader.ReadToEnd() } finally { $reader.Dispose() }
+        $relationshipNamespaces = [System.Xml.XmlNamespaceManager]::new($relationshipsXml.NameTable)
+        $relationshipNamespaces.AddNamespace('rel', 'http://schemas.openxmlformats.org/package/2006/relationships')
+        $relationship = $relationshipsXml.SelectSingleNode("//rel:Relationship[@Id='$relationshipId']", $relationshipNamespaces)
+        if ($null -eq $relationship -or $relationship.Target -notlike 'media/*') { throw 'No se pudo resolver la imagen de portada de la plantilla.' }
+        $mediaPath = 'word/' + $relationship.Target.Replace('\', '/')
+        $mediaEntry = $archive.GetEntry($mediaPath)
+        if ($null -eq $mediaEntry) { throw "No se encontró el recurso de portada: $mediaPath" }
+
+        $mediaStream = $mediaEntry.Open()
+        try {
+            $originalImage = [System.Drawing.Image]::FromStream($mediaStream)
+            $width = $originalImage.Width
+            $height = $originalImage.Height
+            $originalImage.Dispose()
+        } finally { $mediaStream.Dispose() }
+
+        $sourceImage = [System.Drawing.Image]::FromFile($Path)
+        $canvas = [System.Drawing.Bitmap]::new($width, $height)
+        $graphics = [System.Drawing.Graphics]::FromImage($canvas)
+        $graphics.InterpolationMode = [System.Drawing.Drawing2D.InterpolationMode]::HighQualityBicubic
+        $graphics.SmoothingMode = [System.Drawing.Drawing2D.SmoothingMode]::HighQuality
+        $gradient = [System.Drawing.Drawing2D.LinearGradientBrush]::new(
+            [System.Drawing.Rectangle]::new(0, 0, $width, $height),
+            [System.Drawing.Color]::FromArgb(11, 33, 59),
+            [System.Drawing.Color]::FromArgb(25, 103, 139),
+            [System.Drawing.Drawing2D.LinearGradientMode]::Horizontal
+        )
+        $graphics.FillRectangle($gradient, 0, 0, $width, $height)
+        $drawHeight = $height
+        $drawWidth = [int][Math]::Round($sourceImage.Width * ($drawHeight / $sourceImage.Height))
+        $drawLeft = [int](($width - $drawWidth) / 2)
+        $graphics.DrawImage($sourceImage, $drawLeft, 0, $drawWidth, $drawHeight)
+        $memory = [System.IO.MemoryStream]::new()
+        $canvas.Save($memory, [System.Drawing.Imaging.ImageFormat]::Jpeg)
+
+        $mediaEntry.Delete()
+        $replacement = $archive.CreateEntry($mediaPath, [System.IO.Compression.CompressionLevel]::Optimal)
+        $output = $replacement.Open()
+        try { $memory.Position = 0; $memory.CopyTo($output) } finally { $output.Dispose() }
+    } finally {
+        if ($memory) { $memory.Dispose() }
+        if ($gradient) { $gradient.Dispose() }
+        if ($graphics) { $graphics.Dispose() }
+        if ($canvas) { $canvas.Dispose() }
+        if ($sourceImage) { $sourceImage.Dispose() }
+        $archive.Dispose()
+    }
 }
 
 function Set-BodyPageLayout {
     param($Document)
-    for ($index = 2; $index -le $Document.Sections.Count; $index++) {
-        $page = $Document.Sections.Item($index).PageSetup
-        $page.PaperSize = 7
-        $page.Orientation = 0
-        $page.TopMargin = 70.9
-        $page.BottomMargin = 70.9
-        $page.LeftMargin = 85.05
-        $page.RightMargin = 85.05
-    }
+    if ($Document.Sections.Count -lt 3) { throw 'La plantilla requiere secciones separadas para portada, índices y contenido.' }
+    $indexPage = $Document.Sections.Item(2).PageSetup
+    $indexPage.PaperSize = 7
+    $indexPage.Orientation = 0
+    $indexPage.TopMargin = 72
+    $indexPage.BottomMargin = 72
+    $indexPage.LeftMargin = 72
+    $indexPage.RightMargin = 72
+    $indexNumbers = $Document.Sections.Item(2).Footers.Item(1).PageNumbers
+    $indexNumbers.RestartNumberingAtSection = $true
+    $indexNumbers.StartingNumber = 1
+    $section = $Document.Sections.Item(3)
+    $page = $section.PageSetup
+    $page.PaperSize = 7
+    $page.Orientation = 0
+    $page.TopMargin = 37
+    $page.BottomMargin = 59
+    $page.LeftMargin = 58
+    $page.RightMargin = 66
 }
 
 function Reset-BodyAfterCover {
@@ -368,10 +432,11 @@ function Add-ErsBody {
         'Tabla 22. Requisito no funcional: seguridad', 'Tabla 23. Requisito no funcional: plataforma',
         'Tabla 24. Requisito no funcional: accesibilidad', 'Tabla 25. Requisito no funcional: mantenimiento'
     )
-    Add-TocFrontMatter $Document @('Ilustración 1. Diagrama de arquitectura de EurekaBank', 'Ilustración 2. Diagrama de casos de uso de EurekaBank') $tableCaptions
+    $reportTitle = 'ESPECIFICACIÓN DE REQUERIMIENTOS DEL PROYECTO EUREKABANK CON ' + $Profile.Protocolo + ' EN ' + $Profile.Lenguaje.ToUpperInvariant()
+    Add-TocFrontMatter $Document $reportTitle @('Ilustración 1. Diagrama de arquitectura de EurekaBank', 'Ilustración 2. Diagrama de casos de uso de EurekaBank') $tableCaptions
     $script:BodyContentStart = [int]$Document.Content.End - 1
 
-    Add-Paragraph $Document 'CASO DE ESTUDIO' -2 | Out-Null
+    Add-Paragraph $Document 'CASO DE ESTUDIO' -64 | Out-Null
     Add-Paragraph $Document 'EurekaBank integra cuatro canales de cliente con un servicio bancario central. El usuario puede autenticarse, consultar movimientos, registrar depósitos, transferir fondos entre cuentas propias o de terceros y cerrar su sesión.' | Out-Null
     Add-Paragraph $Document ('La variante documentada usa ' + $Profile.Tecnologia + ' La persistencia del servidor utiliza ' + $Profile.BaseDatos + '. El cliente consume el servicio por ' + $Profile.Protocolo + ' y no se conecta directamente a la base de datos.') | Out-Null
     Add-Paragraph $Document 'Las operaciones de dinero se confirman únicamente cuando el servicio devuelve un resultado exitoso. Una transferencia debita la cuenta de origen y acredita la cuenta de destino dentro de la misma transacción.' | Out-Null
@@ -481,9 +546,9 @@ function Add-ErsBody {
     Add-Paragraph $Document '8. Especificación de Requerimientos' -2 | Out-Null
     Add-Paragraph $Document '8.1 Requisitos comunes de las interfaces' -3 | Out-Null
     Add-Paragraph $Document 'Todos los canales comunican el estado de la operación y muestran mensajes comprensibles para validaciones, resultados y fallos de conexión.' | Out-Null
-    Add-Paragraph $Document '8.1.1 Interfaces de usuario' -3 | Out-Null
+    Add-Paragraph $Document '8.1.1 Interfaces de usuario' -4 | Out-Null
     Add-Paragraph $Document 'La consola usa menús textuales. Escritorio, web y móvil presentan formularios para credenciales, cuentas e importes, y solicitan confirmación antes de depósitos o transferencias.' | Out-Null
-    Add-Paragraph $Document '8.1.2 Interfaces de hardware' -3 | Out-Null
+    Add-Paragraph $Document '8.1.2 Interfaces de hardware' -4 | Out-Null
     $hardware = @(
         @('Componente', 'Uso', 'Perfil', 'Procesador', 'Memoria', 'Red / almacenamiento'),
         @('Servidor', 'Ejecuta servicio y lógica bancaria.', 'Equipo o máquina virtual.', '2 núcleos o más.', '4 GB o más.', 'Red local; SSD recomendado.'),
@@ -496,7 +561,7 @@ function Add-ErsBody {
     )
     Add-GridTable $Document $hardware 'Tabla 5. Requisitos de interfaces de hardware' -BoldRows @(1) | Out-Null
 
-    Add-Paragraph $Document '8.1.3 Interfaces de software' -3 | Out-Null
+    Add-Paragraph $Document '8.1.3 Interfaces de software' -4 | Out-Null
     $software = @(
         @('Componente', 'Tecnología / versión', 'Interfaz', 'Propósito'),
         @('Servidor', $Profile.Tecnologia, $Profile.Protocolo, 'Valida sesiones y ejecuta operaciones bancarias.'),
@@ -512,7 +577,7 @@ function Add-ErsBody {
     )
     Add-GridTable $Document $software 'Tabla 6. Interfaces de software' -BoldRows @(1) | Out-Null
 
-    Add-Paragraph $Document '8.1.4 Interfaces de comunicación' -3 | Out-Null
+    Add-Paragraph $Document '8.1.4 Interfaces de comunicación' -4 | Out-Null
     if ($Profile.Protocolo -eq 'SOAP') {
         Add-Paragraph $Document 'El cliente envía solicitudes SOAP con contenido XML al servicio y procesa la respuesta definida por el contrato. El token se transmite de acuerdo con la operación protegida y no se registra en texto claro.' | Out-Null
     } else {
@@ -521,9 +586,9 @@ function Add-ErsBody {
     Add-Paragraph $Document ('Endpoint predeterminado de referencia: ' + $Profile.Endpoint + '. Configuración del cliente: ' + $Profile.EndpointVar + '. El valor puede cambiar por entorno; la documentación no afirma que el servicio esté en ejecución.') | Out-Null
 
     Add-Paragraph $Document '8.2 Requisitos Funcionales' -3 | Out-Null
-    Add-Paragraph $Document '8.2.1. Objetivo General' -3 | Out-Null
+    Add-Paragraph $Document '8.2.1. Objetivo General' -4 | Out-Null
     Add-Paragraph $Document 'Proteger la información bancaria y permitir operaciones coherentes mediante un servicio que centraliza autenticación, reglas de negocio y persistencia.' | Out-Null
-    Add-Paragraph $Document '8.2.2. Objetivos Específicos' -3 | Out-Null
+    Add-Paragraph $Document '8.2.2. Objetivos Específicos' -4 | Out-Null
     $objectives = @(
         @('OBJ-001', 'Autenticar al usuario', 'Validar credenciales y emitir un token temporal para la sesión.', 'Alta'),
         @('OBJ-002', 'Consultar movimientos', 'Presentar los movimientos de una cuenta sin alterar su saldo.', 'Alta'),
@@ -542,7 +607,7 @@ function Add-ErsBody {
         Add-GridTable $Document $row $tableCaptions[$n - 1] | Out-Null
     }
 
-    Add-Paragraph $Document '8.2.3. Actores' -3 | Out-Null
+    Add-Paragraph $Document '8.2.3. Actores' -4 | Out-Null
     $actors = @(
         @('ACT-001', 'Usuario bancario autenticado'),
         @('Descripción', 'Persona que utiliza cualquiera de los cuatro clientes para consultar o ejecutar operaciones sobre cuentas autorizadas.'),
@@ -550,7 +615,7 @@ function Add-ErsBody {
     )
     Add-GridTable $Document $actors 'Tabla 12. Actor: Usuario bancario' | Out-Null
 
-    Add-Paragraph $Document '8.2.4. Lista de requisitos funcionales' -3 | Out-Null
+    Add-Paragraph $Document '8.2.4. Lista de requisitos funcionales' -4 | Out-Null
     Add-Paragraph $Document 'La lista consolida las funciones obligatorias y su relación con el actor principal.' | Out-Null
     Add-Paragraph $Document 'El diagrama siguiente presenta las cinco operaciones y el actor bancario.' | Out-Null
     Add-Picture $Document $DiagramPath 420 | Out-Null
@@ -567,7 +632,7 @@ function Add-ErsBody {
     )
     Add-GridTable $Document $requirements 'Tabla 13. Lista de requisitos funcionales' -MergeAllColumnsRows @(1, 2) -BoldRows @(1, 2, 3) | Out-Null
 
-    Add-Paragraph $Document '8.2.5 Requisitos Funcionales' -3 | Out-Null
+    Add-Paragraph $Document '8.2.5 Requisitos Funcionales' -4 | Out-Null
     $functional = @(
         @('RQF-001', 'Gestionar inicio de sesión', 'El servicio debe validar usuario y contraseña. Ante éxito debe emitir un token temporal. El cliente no guarda la contraseña después de autenticar.', 'OBJ-001'),
         @('RQF-002', 'Consultar movimientos', 'El servicio debe validar el token y el acceso a la cuenta, y devolver movimientos ordenados por fecha descendente. Una cuenta sin movimientos debe producir una respuesta vacía válida.', 'OBJ-002'),
@@ -590,7 +655,7 @@ function Add-ErsBody {
     }
 
     Add-Paragraph $Document '8.3 Requisitos No Funcionales' -3 | Out-Null
-    Add-Paragraph $Document '8.3.1 Objetivo General' -3 | Out-Null
+    Add-Paragraph $Document '8.3.1 Objetivo General' -4 | Out-Null
     Add-Paragraph $Document 'Proteger datos, conservar integridad financiera y ofrecer respuestas comprensibles en todos los canales.' | Out-Null
     $quality = @(
         @('RNF-001', 'Tiempo de respuesta', 'En condiciones normales de red y carga de prueba, las consultas deben responder en hasta 3 segundos y las operaciones de escritura en hasta 5 segundos. El cliente debe mostrar espera cuando se supera el primer segundo.', 'Alta'),
@@ -613,23 +678,23 @@ function Add-ErsBody {
     }
 
     Add-Paragraph $Document '8.4 Otros Requerimientos' -3 | Out-Null
-    Add-Paragraph $Document '8.4.1 Restricciones de Diseño' -3 | Out-Null
+    Add-Paragraph $Document '8.4.1 Restricciones de Diseño' -4 | Out-Null
     Add-Paragraph $Document 'Las vistas no contienen reglas de persistencia. El acceso a datos se limita al servidor y se encapsula en repositorios. La creación y cierre de conexiones se controlan con recursos autocerrables o bloques finally.' | Out-Null
-    Add-Paragraph $Document '8.4.2 Restricciones de Hardware' -3 | Out-Null
+    Add-Paragraph $Document '8.4.2 Restricciones de Hardware' -4 | Out-Null
     Add-Paragraph $Document 'El cliente requiere un dispositivo compatible con su sistema operativo y conectividad IP. El servidor y la base de datos deben disponer de recursos para atender solicitudes concurrentes.' | Out-Null
-    Add-Paragraph $Document '8.4.3 Atributos de calidad' -3 | Out-Null
+    Add-Paragraph $Document '8.4.3 Atributos de calidad' -4 | Out-Null
     Add-Paragraph $Document 'La integridad requiere transacciones atómicas para depósitos y transferencias. La seguridad exige validación en el servidor, expiración o revocación del token y protección de credenciales. La interoperabilidad exige respuestas consistentes en los canales.' | Out-Null
 
     Add-Paragraph $Document '9. Requisitos de Rendimiento' -2 | Out-Null
     Add-Paragraph $Document 'El servicio debe aceptar solicitudes concurrentes sin confirmar saldos parciales. Las pruebas de rendimiento deben medir consultas y escrituras con datos representativos y registrar latencia sin incluir secretos ni tokens.' | Out-Null
     Add-Paragraph $Document '9.1. Requisitos de Interfaces Externas' -3 | Out-Null
-    Add-Paragraph $Document '9.1.1. Interfaces de Usuario' -3 | Out-Null
+    Add-Paragraph $Document '9.1.1. Interfaces de Usuario' -4 | Out-Null
     Add-Paragraph $Document 'Los clientes deben mantener disponibles las acciones de consulta y operación, comunicar resultados y permitir recuperación de errores de validación.' | Out-Null
-    Add-Paragraph $Document '9.1.2. Interfaces de Hardware' -3 | Out-Null
+    Add-Paragraph $Document '9.1.2. Interfaces de Hardware' -4 | Out-Null
     Add-Paragraph $Document 'El servidor debe disponer de almacenamiento persistente y conectividad con la base de datos. Los clientes requieren conexión al endpoint configurado.' | Out-Null
-    Add-Paragraph $Document '9.1.3. Interfaces de Software' -3 | Out-Null
+    Add-Paragraph $Document '9.1.3. Interfaces de Software' -4 | Out-Null
     Add-Paragraph $Document ('La variante integra ' + $Profile.Lenguaje + ', ' + $Profile.Protocolo + ' y ' + $Profile.BaseDatos + '. La versión exacta queda fijada en la configuración de construcción y despliegue.') | Out-Null
-    Add-Paragraph $Document '9.1.4. Interfaces de Comunicación' -3 | Out-Null
+    Add-Paragraph $Document '9.1.4. Interfaces de Comunicación' -4 | Out-Null
     Add-Paragraph $Document 'Los errores de transporte no deben presentarse como confirmaciones de operación. Ante resultado incierto, el cliente debe consultar o reintentar con la misma clave idempotente cuando la operación lo permita.' | Out-Null
 
     Add-Paragraph $Document 'RECOMENDACIONES' -2 | Out-Null
@@ -870,7 +935,8 @@ function Add-EcudBody {
         $figureNames += 'Ilustración ' + ($figureNames.Count + 1) + '. Secuencia ' + $case.Nombre
         $tableNames += 'Tabla ' + ($tableNames.Count + 1) + '. ECUD ' + $case.Nombre
     }
-    Add-TocFrontMatter $Document $figureNames $tableNames
+    $reportTitle = 'ESPECIFICACIÓN DE CASOS DE USO DETALLADO PARA EUREKABANK CON ' + $Profile.Protocolo + ' EN ' + $Profile.Lenguaje.ToUpperInvariant()
+    Add-TocFrontMatter $Document $reportTitle $figureNames $tableNames
     $script:BodyContentStart = [int]$Document.Content.End - 1
     $sectionHeading = Add-Paragraph $Document 'ESPECIFICACIÓN DE CASOS DE USO DETALLADO' -2
     $sectionHeading.Range.Font.Name = 'Arial'
@@ -912,24 +978,27 @@ try {
         $profile.ActivityDiagramDirectory = Join-Path $diagramRoot '02_ACTIVIDAD'
         $profile.SequenceDiagramDirectory = Join-Path $diagramRoot '03_SECUENCIA'
         $profile.ArchitectureDiagram = Join-Path (Join-Path $diagramRoot '05_ARQUITECTURA') 'GR09_Arquitectura_Arquitectura EurekaBank.png'
-        $coverImage = Join-Path (Join-Path $projectPath '05. DOCUMENTACION\02. MANUAL TECNICO\Capturas') 'InterfazInicioSesion.png'
+        $coverImage = Join-Path (Join-Path $projectPath '05. DOCUMENTACION\01. MANUAL TECNICO\Capturas') 'InterfazInicioSesion.png'
         Copy-Item -LiteralPath $ersTemplate -Destination $ersPath -Force
         Copy-Item -LiteralPath $ecudTemplate -Destination $ecudPath -Force
         if (-not (Test-Path -LiteralPath $coverImage -PathType Leaf)) { throw "Falta la captura de portada para $($profile.Clave): $coverImage" }
+        Replace-CoverImage $ersPath $coverImage
+        Replace-CoverImage $ecudPath $coverImage
         $coverTitleErs = ('ESPECIFICACIÓN DE REQUERIMIENTOS DE SOFTWARE PARA EUREKABANK CON ' + $profile.Protocolo + ' EN ' + $profile.Lenguaje.ToUpperInvariant())
         $coverTitleEcud = ('ESPECIFICACIÓN DE CASOS DE USO DETALLADA PARA EUREKABANK CON ' + $profile.Protocolo + ' EN ' + $profile.Lenguaje.ToUpperInvariant())
 
         $document = $word.Documents.Open($ersPath, $false, $false, $false)
         try {
             Update-Cover $document $coverTitleErs $false
-            Set-CoverImage $document $coverImage
             Reset-BodyAfterCover $document
-            Set-BodyPageLayout $document
             Add-ErsBody $document $profile (Join-Path $caseDiagramDir 'GR09_CasosUso_CU_Resumen.png')
+            $document.Repaginate()
+            $document.TablesOfContents.Item(1).Update() | Out-Null
             $document.Fields.Update() | Out-Null
             $document.Repaginate()
             Update-FrontMatterPages $document
             $document.Repaginate()
+            $document.TablesOfContents.Item(1).Update() | Out-Null
             $document.Fields.Update() | Out-Null
             $document.Repaginate()
             Update-FrontMatterPages $document
@@ -939,14 +1008,15 @@ try {
         $document = $word.Documents.Open($ecudPath, $false, $false, $false)
         try {
             Update-Cover $document $coverTitleEcud $true
-            Set-CoverImage $document $coverImage
             Reset-BodyAfterCover $document
-            Set-BodyPageLayout $document
             Add-EcudBody $document $profile $caseDiagramDir
+            $document.Repaginate()
+            $document.TablesOfContents.Item(1).Update() | Out-Null
             $document.Fields.Update() | Out-Null
             $document.Repaginate()
             Update-FrontMatterPages $document
             $document.Repaginate()
+            $document.TablesOfContents.Item(1).Update() | Out-Null
             $document.Fields.Update() | Out-Null
             $document.Repaginate()
             Update-FrontMatterPages $document

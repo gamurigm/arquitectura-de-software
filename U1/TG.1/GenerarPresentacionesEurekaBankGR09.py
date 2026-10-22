@@ -114,7 +114,7 @@ def diagram_assets(project: Path) -> dict[str, Path]:
         "physical_transfer": one(physical, "GR09_EurekaBank_Physical_*_02_Transferencia_Origen.png"),
         "physical_destination": one(physical, "GR09_EurekaBank_Physical_*_03_Transferencia_Destino.png"),
         "physical_movements": one(physical, "GR09_EurekaBank_Physical_*_04_Movimientos.png"),
-        "interface": one(project / "05. DOCUMENTACION" / "02. MANUAL TECNICO" / "Capturas", "InterfazInicioSesion.png"),
+        "interface": one(project / "05. DOCUMENTACION" / "01. MANUAL TECNICO" / "Capturas", "InterfazInicioSesion.png"),
     }
 
 
@@ -377,7 +377,7 @@ def prune_unused_media(path: Path) -> None:
 
 def update_deck(root: Path, profile: dict, template: Path) -> Path:
     project = root / profile["folder"]
-    output = project / "05. DOCUMENTACION" / "03. PRESENTACION" / f"PRESENTACION_EUREKABANK_{profile['key']}_GR09.pptx"
+    output = project / "05. DOCUMENTACION" / "02. PRESENTACION" / f"PRESENTACION_EUREKABANK_{profile['key']}_GR09.pptx"
     output.parent.mkdir(parents=True, exist_ok=True)
     deck = Presentation(str(template))
     if len(deck.slides) != 44 or deck.slide_width != SLIDE_W or deck.slide_height != SLIDE_H:

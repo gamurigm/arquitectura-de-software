@@ -524,23 +524,6 @@ Las fichas separan los resultados requeridos y sus condiciones de aceptación. L
 
 : Tabla 26. Reglas de negocio del servicio
 
-### Diccionario de datos intercambiados
-
-| Dato | Significado y restricciones |
-|---|---|
-| usuario | Identificador de credencial; hasta 30 caracteres recibidos, sin entrada blanca |
-| contrasena | Secreto recibido por login; de uno a 1024 caracteres en la validación de servicio |
-| cuenta | Identificador textual de hasta ocho caracteres; el escritorio exige dígitos |
-| importe | Decimal normalizado a escala dos; positivo en un depósito |
-| cuenta del movimiento | Cuenta a la que pertenece el registro devuelto |
-| nromov | Número entero de movimiento dentro de la cuenta |
-| fecha | Fecha recuperada del registro; el DAO la lee como fecha SQL |
-| tipo | Descripción recuperada de TipoMovimiento |
-| accion | Clasificación de acción del tipo de movimiento |
-| resultado | Entero 1 o -1 en login y regDeposito; no es un token |
-
-: Tabla 27. Diccionario de datos del contrato
-
 La consulta no garantiza una hora de ejecución bancaria: el depósito inserta CURRENT_DATE y el DAO recupera la fecha como fecha SQL. El formato que muestre un cliente no debe interpretarse como evidencia de que el servicio conserva una marca temporal de precisión superior.
 
 ## Requisitos no funcionales

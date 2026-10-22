@@ -47,32 +47,6 @@ function Read-Schema([string]$path){
     return ,$tables
 }
 
-$labels=@{Cliente='Cliente';Credenciales='Credenciales';Cuenta='Cuenta bancaria';Moneda='Moneda';Movimiento='Movimiento';Transferencias='Transferencia';TipoMovimiento='Tipo de movimiento';Empleado='Empleado';Usuario='Usuario';Permiso='Permiso';Modulo='Módulo';LOGSESSION='Registro de sesión';Sucursal='Sucursal';Asignado='Asignación';CargoMantenimiento='Cargo de mantenimiento';CostoMovimiento='Costo de movimiento';InteresMensual='Interés mensual';Parametro='Parámetro';Contador='Contador'}
-function Label-Table([string]$n){if($labels.ContainsKey($n)){return $labels[$n]};return ($n -replace '_',' ')}
-function Describe-Table([string]$n){switch($n){
-    'Transferencias'{return 'Relaciona cliente, clave idempotente, cuentas de origen y destino e importe.'}
-    'Movimiento'{return 'Registra débitos, créditos, depósitos e importes asociados a una cuenta.'}
-    'Cuenta'{return 'Conserva titularidad, moneda, estado y saldo de cada cuenta bancaria.'}
-    'Cliente'{return 'Identifica al titular de cuentas y credenciales.'}
-    'Credenciales'{return 'Almacena identificador de acceso y verificador de contraseña.'}
-    'TipoMovimiento'{return 'Clasifica movimientos, incluidos 009 SALIDA y 008 INGRESO.'}
-    default{return 'Conserva información del dominio bancario y sus relaciones.'}
-}}
-function Describe-Column([string]$n,[bool]$pk,[bool]$fk){
-    if($pk){return 'Identificador principal de la entidad.'}
-    if($n -match 'saldo|importe|monto|valor|tasa|interes|costo|cargo'){return 'Importe o valor monetario.'}
-    if($n -match 'fecha|hora|dtt'){return 'Fecha y hora del registro o evento.'}
-    if($n -match 'cuenta|origen|destino'){if($fk){return 'Referencia a una cuenta bancaria.'};return 'Número de cuenta relacionado.'}
-    if($n -match 'cliente|moneda|usuario|empleado|sucursal|modulo|permiso|movimiento|transferencia|tipo'){if($fk){return 'Referencia a la entidad relacionada.'};return 'Código o clasificación relacionada.'}
-    if($n -match 'estado|activo|situacion'){return 'Estado operativo del registro.'}
-    if($n -match 'clave|token|hash|password|contrasena'){return 'Dato de control protegido; no contiene contraseña en texto claro.'}
-    if($fk){return 'Referencia a la entidad relacionada.'};return 'Atributo propio de la entidad.'
-}
-function Column-Label([string]$n){return (($n -replace '^(chr|vch|int|dec|dtt|fec|num|var)_','') -replace '_',' ')}
-function DbType([string]$type,$v,[string]$column){
-    if($v.Db -eq 'SQL Server'){if($type -eq 'INTEGER'){$type='INT'};if($type -eq 'DATETIME'){$type='DATETIME2'};if($column -in @('id_transferencia','clave_operacion')){$type='UNIQUEIDENTIFIER'}}
-    return $type
-}
 function P($doc,[string]$text,[int]$style=-1,[int]$align=0,[int]$size=10,[bool]$bold=$false){
     $start=[int]$doc.Content.End-1;$r=$doc.Range($start,$start);$r.InsertAfter($text+[char]13)
     $p=$doc.Range($start,$start+$text.Length+1).Paragraphs.Item(1);$p.Style=$style;$p.Alignment=$align;$p.Format.SpaceAfter=6;$p.Format.KeepTogether=-1
@@ -120,25 +94,6 @@ function New-Doc($word,[string]$path,[string]$title,[scriptblock]$build){
     finally{$doc.Close($false);[void][Runtime.InteropServices.Marshal]::FinalReleaseComObject($doc)}
 }
 
-function Dictionary($doc,$v,$tables){
-    Cover $doc $v 'DICCIONARIO DE DATOS' ('Modelo EurekaBank · '+$v.Db)
-    [void](P $doc '1. Descripción' -2 0 15 $true)
-    [void](P $doc ('Entidades y atributos, tipos de '+$v.Db+', nulabilidad, claves y significado funcional para la variante '+$v.Stack+' '+$v.Protocol+'.'))
-    [void](P $doc 'PK identifica clave primaria; FK identifica referencia foránea. Nulable indica si el motor permite ausencia de valor. Los UUID se representan como UNIQUEIDENTIFIER en SQL Server.')
-    [void](P $doc '2. Entidades y atributos' -2 0 15 $true)
-    foreach($table in $tables.Values){
-        [void](P $doc ((Label-Table $table.Name)+' ('+$table.Name+')') -3 0 12 $true);[void](P $doc (Describe-Table $table.Name) -1 0 9)
-        $rows=[Collections.Generic.List[object]]::new()
-        foreach($col in $table.Columns){
-            $pk=$table.PK -contains $col.Name;$fk=$table.FK|Where-Object{$_.Columns -contains $col.Name}|Select-Object -First 1
-            $key=if($pk){'PK'}else{''};if($null -ne $fk){$key=if($key){$key+', FK '+$fk.Parent}else{'FK '+$fk.Parent}}
-            $rows.Add(@((Column-Label $col.Name),(DbType $col.Type $v $col.Name),$(if($col.Nullable){'Sí'}else{'No'}),$key,(Describe-Column $col.Name $pk ($null -ne $fk))))
-        }
-        [void](T $doc @('Campo','Tipo','Nulable','Clave','Descripción') $rows.ToArray() @(88,88,43,84,174))
-    }
-    [void](P $doc '3. Transferencia contable' -2 0 15 $true)
-    [void](P $doc 'Cada transferencia confirmada registra 009 SALIDA en origen y 008 INGRESO en destino. Ambos movimientos se enlazan con Transferencias y se guardan en una transacción; cualquier error revierte la operación completa.')
-}
 function Manual($doc,$v,[string]$screenshot,[string[]]$mer){
     Cover $doc $v 'MANUAL TÉCNICO' ('Cliente '+$v.Stack+' · '+$v.Protocol)
     [void](P $doc '1. Propósito y alcance' -2 0 15 $true)
@@ -209,21 +164,20 @@ function Manual($doc,$v,[string]$screenshot,[string[]]$mer){
     [void](P $doc 'No registre contraseñas, tokens completos ni cadenas de conexión. Registre hora, código de respuesta e identificador de correlación.')
 }
 
-$schemaPath=Join-Path (Join-Path (Join-Path $Raiz $variants[0].Folder) '03. BDD') 'Crea_BD.sql';$tables=Read-Schema $schemaPath
+$schemaPath=Join-Path (Join-Path (Join-Path $Raiz $variants[0].Folder) '03. BDD') 'Crea_BD.sql';[void](Read-Schema $schemaPath)
 $word=$null
 try{
     $word=New-Object -ComObject Word.Application;$word.Visible=$false;$word.DisplayAlerts=0
     foreach($v in $variants){
         $root=Join-Path $Raiz $v.Folder;$docs=Join-Path $root '05. DOCUMENTACION'
-        $dictDir=Join-Path $docs '01. DICCIONARIO DE DATOS';$manualDir=Join-Path $docs '02. MANUAL TECNICO';$pptDir=Join-Path $docs '03. PRESENTACION'
-        $captureDir=Join-Path $manualDir 'Capturas';New-Item -ItemType Directory -Force -Path $dictDir,$manualDir,$pptDir,$captureDir|Out-Null
+        $manualDir=Join-Path $docs '01. MANUAL TECNICO';$pptDir=Join-Path $docs '02. PRESENTACION'
+        $captureDir=Join-Path $manualDir 'Capturas';New-Item -ItemType Directory -Force -Path $manualDir,$pptDir,$captureDir|Out-Null
         $phys=if($v.Stack -eq 'Java'){'Java_MySQL'}else{'DotNet_SQLServer'};$merRoot=Join-Path $root '02. MER'
         $mer=@((Join-Path (Join-Path $merRoot '01. CONCEPTUAL') ('GR09_EurekaBank_Conceptual_'+$v.Suffix+'_02_Transferencia_Origen.png')),(Join-Path (Join-Path $merRoot '02. LOGICO') ('GR09_EurekaBank_Logical_'+$v.Suffix+'_02_Transferencia_Origen.png')),(Join-Path (Join-Path $merRoot '03. FISICO') ('GR09_EurekaBank_Physical_'+$phys+'_02_Transferencia_Origen.png')))
         $shot=Join-Path $captureDir 'InterfazInicioSesion.png';foreach($asset in @($shot)+$mer){if(-not(Test-Path -LiteralPath $asset -PathType Leaf)){throw "Falta captura o MER para $($v.Key)"}}
-        $dict=Join-Path $dictDir ('DICCIONARIO_DATOS_EUREKABANK_'+$v.Key+'_GR09.docx');$manual=Join-Path $manualDir ('MANUAL_TECNICO_EUREKABANK_'+$v.Key+'_GR09.docx')
-        New-Doc $word $dict ('Diccionario EurekaBank '+$v.Stack+' '+$v.Protocol) {param($d) Dictionary $d $v $tables}
+        $manual=Join-Path $manualDir ('MANUAL_TECNICO_EUREKABANK_'+$v.Key+'_GR09.docx')
         New-Doc $word $manual ('Manual EurekaBank '+$v.Stack+' '+$v.Protocol) {param($d) Manual $d $v $shot $mer}
-        Write-Output ('Generado: '+$v.Key+' · diccionario y manual')
+        Write-Output ('Generado: '+$v.Key+' · manual técnico')
     }
 }finally{
     if($word){try{$word.Quit()}catch{};[void][Runtime.InteropServices.Marshal]::FinalReleaseComObject($word)}
