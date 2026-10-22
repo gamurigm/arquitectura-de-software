@@ -1,0 +1,15 @@
+<Application xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ec.edu.monster.App">
+    <Application.Resources>
+        <Color x:Key="Fondo">#0B1020</Color>
+        <Color x:Key="Superficie">#121C30</Color>
+        <Color x:Key="Acento">#52E0D2</Color>
+        <Style TargetType="Entry">
+            <Setter Property="TextColor" Value="#F3F6FF" />
+            <Setter Property="PlaceholderColor" Value="#A4B0C5" />
+            <Setter Property="BackgroundColor" Value="#17243A" />
+            <Setter Property="Margin" Value="0,4,0,12" />
+        </Style>
+    </Application.Resources>
+</Application>

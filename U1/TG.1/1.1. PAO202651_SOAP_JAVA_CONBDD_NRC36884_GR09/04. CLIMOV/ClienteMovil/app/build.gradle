@@ -1,0 +1,22 @@
+plugins { id 'com.android.application' }
+
+def endpoint = providers.gradleProperty('eurekabankSoapUrl')
+        .orElse('http://10.0.2.2:8080/WS_EurekaBank_SOAP_JAVA_GR09/WSEureka').get()
+
+android {
+    namespace 'ec.edu.monster'
+    compileSdk 35
+    defaultConfig {
+        applicationId 'ec.edu.monster.eurekabank'
+        minSdk 26
+        targetSdk 35
+        versionCode 1
+        versionName '1.0.0'
+        buildConfigField 'String', 'EUREKABANK_SOAP_URL', '"' + endpoint.replace('"', '\\"') + '"'
+    }
+    buildFeatures { buildConfig true }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}

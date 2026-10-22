@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">EurekaBank</string>
+    <string name="titulo_acceso">Banca personal</string>
+    <string name="descripcion_acceso">Acceso seguro a tus cuentas</string>
+    <string name="usuario">Usuario</string>
+    <string name="contrasena">Contraseña</string>
+    <string name="iniciar_sesion">Iniciar sesión</string>
+    <string name="cuenta">Número de cuenta (8 dígitos)</string>
+    <string name="importe">Importe en dólares</string>
+    <string name="consultar_movimientos">Consultar movimientos</string>
+    <string name="registrar_deposito">Registrar depósito</string>
+    <string name="cerrar_sesion">Cerrar sesión</string>
+</resources>

@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0-android</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>ec.edu.monster</RootNamespace>
+    <UseMaui>true</UseMaui>
+    <SingleProject>true</SingleProject>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Maui.Controls" Version="10.0.110" />
+  </ItemGroup>
+  <ItemGroup>
+    <MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#0B1020" />
+    <MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#0B1020" BaseSize="128,128" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\04. COMPARTIDO\EurekaBank.SoapClient\EurekaBank.SoapClient.csproj" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,56 @@
+<ContentPage x:Class="EurekaBank.ClienteMovil.MainPage"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             Title="EurekaBank" BackgroundColor="{StaticResource Fondo}">
+    <ScrollView>
+        <VerticalStackLayout Padding="24" Spacing="14">
+            <Label Text="MONSTER · EUREKABANK" TextColor="{StaticResource Acento}" FontSize="13" />
+            <Label Text="Banca móvil" TextColor="{StaticResource Texto}" FontSize="28" FontAttributes="Bold" />
+            <VerticalStackLayout x:Name="LoginPanel" Spacing="12">
+                <Entry x:Name="UsuarioEntry" Placeholder="Usuario" TextColor="{StaticResource Texto}" />
+                <Entry x:Name="ContrasenaEntry" Placeholder="Contraseña" IsPassword="True" TextColor="{StaticResource Texto}" />
+                <Button Text="Ingresar" Clicked="IniciarSesion_Click" BackgroundColor="{StaticResource Acento}" TextColor="#0B1020" />
+            </VerticalStackLayout>
+            <VerticalStackLayout x:Name="BancoPanel" IsVisible="False" Spacing="12">
+                <Label x:Name="SaludoLabel" TextColor="{StaticResource Texto}" FontSize="18" />
+                <Entry x:Name="CuentaConsultaEntry" Placeholder="Cuenta para consultar" Keyboard="Numeric" TextColor="{StaticResource Texto}" />
+                <Button Text="Consultar movimientos" Clicked="Consultar_Click" />
+                <CollectionView x:Name="MovimientosList" HeightRequest="250">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Border BackgroundColor="{StaticResource Superficie}" Padding="12" Margin="0,4" StrokeThickness="0">
+                                <VerticalStackLayout Spacing="3">
+                                    <Label Text="{Binding Tipo}" TextColor="{StaticResource Acento}" FontAttributes="Bold" />
+                                    <Label TextColor="{StaticResource Texto}">
+                                        <Label.FormattedText>
+                                            <FormattedString>
+                                                <Span Text="{Binding Cuenta}" /><Span Text=" · " /><Span Text="{Binding Accion}" />
+                                            </FormattedString>
+                                        </Label.FormattedText>
+                                    </Label>
+                                    <Label TextColor="{StaticResource Texto}" FontSize="12">
+                                        <Label.FormattedText>
+                                            <FormattedString>
+                                                <Span Text="{Binding Fecha, StringFormat='{0:O}'}" /><Span Text=" · " />
+                                                <Span Text="{Binding Importe, StringFormat='{0:N2}'}" />
+                                            </FormattedString>
+                                        </Label.FormattedText>
+                                    </Label>
+                                </VerticalStackLayout>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+                <Entry x:Name="CuentaDepositoEntry" Placeholder="Cuenta para depositar" Keyboard="Numeric" TextColor="{StaticResource Texto}" />
+                <Entry x:Name="ImporteEntry" Placeholder="Importe" Keyboard="Numeric" TextColor="{StaticResource Texto}" />
+                <Button Text="Registrar depósito" Clicked="Depositar_Click" />
+                <Entry x:Name="CuentaOrigenTransferenciaEntry" Placeholder="Cuenta origen" Keyboard="Numeric" TextColor="{StaticResource Texto}" />
+                <Entry x:Name="CuentaDestinoTransferenciaEntry" Placeholder="Cuenta destino" Keyboard="Numeric" TextColor="{StaticResource Texto}" />
+                <Entry x:Name="ImporteTransferenciaEntry" Placeholder="Importe a transferir" Keyboard="Numeric" TextColor="{StaticResource Texto}" />
+                <Button Text="Transferir" Clicked="Transferir_Click" />
+                <Button Text="Cerrar sesión" Clicked="CerrarSesion_Click" BackgroundColor="#A78BFA" TextColor="#0B1020" />
+            </VerticalStackLayout>
+            <Label x:Name="MensajeLabel" TextColor="{StaticResource Acento}" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

@@ -1,0 +1,7 @@
+.env
+**/appsettings.Local.json
+**/bin/
+**/obj/
+**/.vs/
+*.user
+*.suo

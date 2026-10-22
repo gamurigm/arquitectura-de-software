@@ -8,7 +8,7 @@ $env:JAVA_HOME = $javaHomePath
 $env:PATH = (Join-Path $javaHomePath 'bin') + ';' + $env:PATH
 $env:MAVEN_OPTS = (($env:MAVEN_OPTS + ' -Dmaven.repo.local=D:\tools\maven-repo').Trim())
 
-$envFilePath = Join-Path $PSScriptRoot '.env'
+$envFilePath = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..\..\.env'))
 if (Test-Path -LiteralPath $envFilePath) {
     foreach ($line in [System.IO.File]::ReadAllLines($envFilePath)) {
         if ($line -match '^\s*EUREKABANK_SOAP_URL\s*=\s*(.*?)\s*$' -and -not $Matches[1].StartsWith('#')) {

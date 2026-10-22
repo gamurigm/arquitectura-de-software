@@ -13,6 +13,7 @@ import javax.swing.JPanel;
 public final class MenuVista extends JFrame {
     private final JButton movimientos = new JButton("Consultar movimientos");
     private final JButton depositos = new JButton("Registrar depósito");
+    private final JButton transferencias = new JButton("Transferir");
     private final JButton salir = new JButton("Cerrar sesión");
 
     public MenuVista(String usuario) {
@@ -28,15 +29,18 @@ public final class MenuVista extends JFrame {
         opciones.add(sesion);
         movimientos.setName("verMovimientos");
         depositos.setName("verDepositos");
+        transferencias.setName("verTransferencias");
         salir.setName("cerrarSesion");
         TemaEureka.boton(movimientos, true);
         TemaEureka.boton(depositos, false);
+        TemaEureka.boton(transferencias, false);
         TemaEureka.boton(salir, false);
         opciones.add(movimientos);
         opciones.add(depositos);
+        opciones.add(transferencias);
         opciones.add(salir);
         contenido.add(opciones, BorderLayout.CENTER);
-        TemaEureka.ventana(this, contenido, 430);
+        TemaEureka.ventana(this, contenido, 500);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         pack();
         setMinimumSize(getSize());
@@ -45,5 +49,6 @@ public final class MenuVista extends JFrame {
 
     public void alConsultar(Runnable accion) { movimientos.addActionListener(evento -> accion.run()); }
     public void alDepositar(Runnable accion) { depositos.addActionListener(evento -> accion.run()); }
+    public void alTransferir(Runnable accion) { transferencias.addActionListener(evento -> accion.run()); }
     public void alSalir(Runnable accion) { salir.addActionListener(evento -> accion.run()); }
 }

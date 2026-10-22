@@ -1,0 +1,16 @@
+@model LoginViewModel
+<section class="panel login">
+    <p class="eyebrow">ACCESO SEGURO</p>
+    <h1>Iniciar sesión</h1>
+    <form asp-action="Login" method="post">
+        @Html.AntiForgeryToken()
+        <div asp-validation-summary="ModelOnly" class="error"></div>
+        <label asp-for="Usuario">Usuario</label>
+        <input asp-for="Usuario" autocomplete="username" />
+        <span asp-validation-for="Usuario" class="error"></span>
+        <label asp-for="Contrasena">Contraseña</label>
+        <input asp-for="Contrasena" type="password" autocomplete="current-password" />
+        <span asp-validation-for="Contrasena" class="error"></span>
+        <button type="submit">Ingresar</button>
+    </form>
+</section>

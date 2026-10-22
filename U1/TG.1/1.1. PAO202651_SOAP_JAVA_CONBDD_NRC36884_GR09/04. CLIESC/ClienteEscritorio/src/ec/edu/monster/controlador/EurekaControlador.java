@@ -6,9 +6,12 @@ import ec.edu.monster.vista.DepositosVista;
 import ec.edu.monster.vista.LoginVista;
 import ec.edu.monster.vista.MenuVista;
 import ec.edu.monster.vista.MovimientosVista;
+import ec.edu.monster.vista.TransferenciasVista;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -18,6 +21,8 @@ import javax.swing.SwingWorker;
 public final class EurekaControlador {
     private final EurekaService servicio;
     private boolean autenticado;
+    private String token;
+    private TransferenciaPendiente transferenciaPendiente;
 
     public EurekaControlador(EurekaService servicio) {
         this.servicio = servicio;
@@ -78,11 +83,22 @@ public final class EurekaControlador {
             });
             vista.setVisible(true);
         });
+        menu.alTransferir(() -> {
+            TransferenciasVista vista = new TransferenciasVista(menu);
+            vista.alTransferir(() -> {
+                String origen = vista.origen(), destino = vista.destino(), importe = vista.importe();
+                ejecutar(vista::ocupada, vista::mostrarMensaje,
+                        () -> transferir(origen, destino, importe), registrada -> {
+                            if (registrada) { vista.limpiar(); vista.mostrarMensaje("Transferencia registrada: débito y crédito confirmados."); }
+                            else vista.mostrarMensaje("Transferencia rechazada. Revise cuentas, moneda, saldo e importe.");
+                        }, "No se confirmó. Reenvíe la misma solicitud.");
+            });
+            vista.setVisible(true);
+        });
         menu.alSalir(() -> {
-            cerrarSesion();
-            menu.dispose();
-            login.mostrarMensaje("Sesión cerrada.");
-            login.setVisible(true);
+            ejecutar(valor -> menu.setEnabled(!valor), login::mostrarMensaje, () -> { cerrarSesion(); return true; },
+                    aceptado -> { menu.dispose(); login.mostrarMensaje("Sesión cerrada."); login.setVisible(true); },
+                    "Sesión cerrada localmente; el servidor la expirará.");
         });
         menu.setVisible(true);
     }
@@ -122,7 +138,12 @@ public final class EurekaControlador {
                     || contrasena == null || contrasena.length == 0 || contrasena.length > 1024) {
                 throw new IllegalArgumentException("Ingrese usuario y contraseña válidos.");
             }
-            autenticado = servicio.login(usuario.strip(), new String(contrasena)) == 1;
+            try {
+                token = servicio.crearSesion(usuario.strip(), new String(contrasena));
+            } catch (IOException e) {
+                throw new IllegalStateException("No se pudo conectar con EurekaBank.", e);
+            }
+            autenticado = token != null && !token.isBlank();
             return autenticado;
         } finally {
             if (contrasena != null) {
@@ -149,8 +170,34 @@ public final class EurekaControlador {
         return servicio.regDeposito(numero, importe) == 1;
     }
 
+    public boolean transferir(String origen, String destino, String textoImporte) {
+        exigirSesion();
+        String origenValido = validarCuenta(origen), destinoValido = validarCuenta(destino);
+        if (origenValido.length() != 8 || destinoValido.length() != 8 || origenValido.equals(destinoValido))
+            throw new IllegalArgumentException("Use dos cuentas distintas de ocho dígitos.");
+        if (textoImporte == null || !textoImporte.strip().matches("[0-9]+(?:[.,][0-9]{1,2})?"))
+            throw new IllegalArgumentException("Ingrese un importe positivo con hasta dos decimales.");
+        BigDecimal importe = new BigDecimal(textoImporte.strip().replace(',', '.')).setScale(2);
+        if (importe.signum() <= 0 || importe.precision() > 12)
+            throw new IllegalArgumentException("El importe debe estar entre 0,01 y 9.999.999.999,99.");
+        if (transferenciaPendiente == null || !transferenciaPendiente.coincide(origenValido, destinoValido, importe))
+            transferenciaPendiente = new TransferenciaPendiente(origenValido, destinoValido, importe, UUID.randomUUID());
+        try {
+            boolean registrada = servicio.transferir(token, origenValido, destinoValido, importe, transferenciaPendiente.clave());
+            transferenciaPendiente = null;
+            return registrada;
+        } catch (java.io.IOException e) { throw new IllegalStateException("No se confirmó. Reenvíe la misma solicitud.", e); }
+    }
+
     public void cerrarSesion() {
+        String actual = token; token = null; transferenciaPendiente = null;
         autenticado = false;
+        try { if (actual != null) servicio.cerrarSesion(actual); }
+        catch (java.io.IOException e) { throw new IllegalStateException("Sesión cerrada localmente; el servidor la expirará.", e); }
+    }
+
+    private record TransferenciaPendiente(String origen, String destino, BigDecimal importe, UUID clave) {
+        boolean coincide(String o, String d, BigDecimal i) { return origen.equals(o) && destino.equals(d) && importe.compareTo(i) == 0; }
     }
 
     private void exigirSesion() {

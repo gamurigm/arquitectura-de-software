@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="android.permission.INTERNET" />
+    <application android:theme="@style/ThemeEureka" android:label="EurekaBank"
+        android:usesCleartextTraffic="true" android:allowBackup="false" android:supportsRtl="true">
+        <activity android:name="ec.edu.monster.vista.DepositosActivity" android:exported="false" />
+        <activity android:name="ec.edu.monster.vista.TransferenciasActivity" android:exported="false" />
+        <activity android:name="ec.edu.monster.vista.MovimientosActivity" android:exported="false" />
+        <activity android:name="ec.edu.monster.vista.MenuActivity" android:exported="false" />
+        <activity android:name="ec.edu.monster.vista.LoginActivity" android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>

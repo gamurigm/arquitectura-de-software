@@ -1,0 +1,11 @@
+<Application x:Class="EurekaBank.ClienteEscritorio.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             ShutdownMode="OnMainWindowClose">
+    <Application.Resources>
+        <SolidColorBrush x:Key="Fondo" Color="#0B1020" />
+        <SolidColorBrush x:Key="Superficie" Color="#121C30" />
+        <SolidColorBrush x:Key="Acento" Color="#52E0D2" />
+        <SolidColorBrush x:Key="Texto" Color="#F5F7FB" />
+    </Application.Resources>
+</Application>

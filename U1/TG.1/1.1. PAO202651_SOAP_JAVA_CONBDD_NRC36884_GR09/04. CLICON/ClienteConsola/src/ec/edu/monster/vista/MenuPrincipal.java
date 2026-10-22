@@ -58,11 +58,16 @@ public final class MenuPrincipal {
         }
 
         try {
-            if (login.iniciarSesion(usuario.strip(), new String(contrasena))) {
+            String token = login.iniciarSesion(usuario.strip(), new String(contrasena));
+            if (token != null && !token.isBlank()) {
+                controlador.iniciarSesion(token);
                 System.out.println(estilo("  Sesión iniciada.", "32"));
                 return true;
             }
                 System.out.println(estilo("  Usuario o contraseña incorrectos.", "31"));
+            return false;
+        } catch (java.io.IOException e) {
+            System.out.println("No se pudo comunicar con EurekaBank: " + e.getMessage());
             return false;
         } finally {
             Arrays.fill(contrasena, '\0');
@@ -75,15 +80,18 @@ public final class MenuPrincipal {
             System.out.println(estilo("  ──────────────────────────────────", "36"));
             System.out.println("  " + estilo("1", "96") + "  Consultar movimientos");
             System.out.println("  " + estilo("2", "96") + "  Registrar depósito");
-            System.out.println("  " + estilo("3", "96") + "  Cerrar sesión");
+            System.out.println("  " + estilo("3", "96") + "  Transferir");
+            System.out.println("  " + estilo("4", "96") + "  Cerrar sesión");
             String opcion = leerLinea(entrada, consola, "Opción: ");
-            if (opcion == null || "3".equals(opcion.strip())) {
+            if (opcion == null || "4".equals(opcion.strip())) {
+                try { controlador.cerrarSesion(); } catch (java.io.IOException e) { System.out.println("Sesión cerrada localmente; el servidor la expirará."); }
                 return;
             }
 
             switch (opcion.strip()) {
                 case "1" -> consultarMovimientos(entrada, consola);
                 case "2" -> registrarDeposito(entrada, consola);
+                case "3" -> transferir(entrada, consola);
                 default -> System.out.println("Opción no válida.");
             }
         }
@@ -136,6 +144,25 @@ public final class MenuPrincipal {
         System.out.println(controlador.registrarDeposito(cuenta.strip(), importe)
                 ? estilo("  Depósito registrado.", "32")
                 : estilo("  No se pudo registrar el depósito.", "31"));
+    }
+
+    private void transferir(Scanner entrada, Console consola) {
+        String origen = leerLinea(entrada, consola, "Cuenta origen: ");
+        String destino = leerLinea(entrada, consola, "Cuenta destino: ");
+        BigDecimal importe;
+        try { importe = new BigDecimal(leerLinea(entrada, consola, "Importe: ").strip().replace(',', '.')); }
+        catch (NumberFormatException e) { System.out.println("Importe inválido."); return; }
+        if (!origen.matches("[0-9]{8}") || !destino.matches("[0-9]{8}") || origen.equals(destino)
+                || importe.signum() <= 0 || importe.scale() > 2) {
+            System.out.println("Use dos cuentas distintas de ocho dígitos e importe positivo con hasta dos decimales."); return;
+        }
+        try {
+            System.out.println(controlador.transferir(origen, destino, importe)
+                    ? "Transferencia registrada: débito y crédito confirmados."
+                    : "Transferencia rechazada. Revise cuentas, moneda, saldo e importe.");
+        } catch (java.io.IOException e) {
+            System.out.println("No se confirmó el resultado. Reenvíe la misma solicitud.");
+        }
     }
 
     private String leerLinea(Scanner entrada, Console consola, String mensaje) {

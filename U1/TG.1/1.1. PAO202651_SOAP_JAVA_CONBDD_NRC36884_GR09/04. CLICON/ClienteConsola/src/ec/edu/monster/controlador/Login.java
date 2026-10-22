@@ -9,7 +9,7 @@ public final class Login {
         this.servicio = servicio;
     }
 
-    public boolean iniciarSesion(String usuario, String contrasena) {
-        return servicio.login(usuario, contrasena) == 1;
+    public String iniciarSesion(String usuario, String contrasena) throws java.io.IOException {
+        return servicio.crearSesion(usuario, contrasena);
     }
 }

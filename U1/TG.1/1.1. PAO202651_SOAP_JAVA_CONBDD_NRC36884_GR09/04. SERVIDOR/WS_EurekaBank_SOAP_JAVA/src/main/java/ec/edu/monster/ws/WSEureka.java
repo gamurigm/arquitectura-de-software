@@ -31,6 +31,19 @@ public class WSEureka {
         }
     }
 
+    @WebMethod(operationName = "crearSesion")
+    @WebResult(name = "token")
+    public String crearSesion(
+            @WebParam(name = "usuario") String usuario,
+            @WebParam(name = "contrasena") String contrasena) {
+        try {
+            return service.crearSesion(usuario, contrasena);
+        } catch (SQLException | RuntimeException e) {
+            LOGGER.log(Level.SEVERE, "Error al crear sesión segura.", e);
+            return null;
+        }
+    }
+
     @WebMethod(operationName = "traerMovimientos")
     @WebResult(name = "movimiento")
     public List<Movimiento> traerMovimientos(@WebParam(name = "cuenta") String cuenta) {
@@ -53,5 +66,28 @@ public class WSEureka {
             LOGGER.log(Level.SEVERE, "Error al registrar el depósito.", e);
             return -1;
         }
+    }
+
+    @WebMethod(operationName = "transferir")
+    @WebResult(name = "resultado")
+    public int transferir(
+            @WebParam(name = "token") String token,
+            @WebParam(name = "cuentaOrigen") String cuentaOrigen,
+            @WebParam(name = "cuentaDestino") String cuentaDestino,
+            @WebParam(name = "importe") BigDecimal importe,
+            @WebParam(name = "claveOperacion") String claveOperacion) {
+        try {
+            return service.transferir(token, cuentaOrigen, cuentaDestino, importe, claveOperacion) ? 1 : -1;
+        } catch (SQLException | RuntimeException e) {
+            LOGGER.log(Level.SEVERE, "Error al registrar la transferencia.", e);
+            return -1;
+        }
+    }
+
+    @WebMethod(operationName = "cerrarSesion")
+    @WebResult(name = "resultado")
+    public int cerrarSesion(@WebParam(name = "token") String token) {
+        service.cerrarSesion(token);
+        return 1;
     }
 }

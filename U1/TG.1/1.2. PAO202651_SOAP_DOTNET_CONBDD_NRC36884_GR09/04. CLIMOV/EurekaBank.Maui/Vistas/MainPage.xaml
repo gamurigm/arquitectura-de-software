@@ -1,0 +1,41 @@
+<ContentPage x:Class="ec.edu.monster.Vistas.MainPage"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             BackgroundColor="{StaticResource Fondo}"
+             Title="EurekaBank">
+    <ScrollView>
+        <VerticalStackLayout Padding="24,38" Spacing="12">
+            <Label Text="EUREKABANK" TextColor="{StaticResource Acento}" FontAttributes="Bold" FontSize="13" CharacterSpacing="2" />
+            <Label Text="Tu banca,\na tu manera." TextColor="#F3F6FF" FontSize="34" FontAttributes="Bold" Margin="0,6,0,8" />
+            <Label x:Name="UsuarioEtiqueta" Text="Inicie sesión para continuar" TextColor="#A4B0C5" />
+            <VerticalStackLayout x:Name="LoginPanel" Spacing="4">
+                <Entry x:Name="Endpoint" Placeholder="URL SOAP" Keyboard="Url" />
+                <Entry x:Name="Usuario" Placeholder="Usuario" MaxLength="30" />
+                <Entry x:Name="Contrasena" Placeholder="Contraseña" IsPassword="True" MaxLength="1024" />
+                <Button Text="Ingresar" Clicked="IniciarSesion_Click" BackgroundColor="{StaticResource Acento}" TextColor="#0B1020" FontAttributes="Bold" CornerRadius="12" HeightRequest="50" />
+            </VerticalStackLayout>
+            <VerticalStackLayout x:Name="BancoPanel" IsVisible="False" Spacing="10">
+                <Border BackgroundColor="{StaticResource Superficie}" Stroke="#26344C" StrokeShape="RoundRectangle 16" Padding="18">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="CUENTA" TextColor="{StaticResource Acento}" FontSize="12" FontAttributes="Bold" />
+                        <Entry x:Name="Cuenta" Placeholder="Número de cuenta" Keyboard="Numeric" MaxLength="8" />
+                        <Button Text="Consultar movimientos" Clicked="Consultar_Clicked" BackgroundColor="#26344C" TextColor="#F3F6FF" CornerRadius="12" />
+                        <Label x:Name="Saldo" Text="Saldo: --" TextColor="#F3F6FF" FontSize="22" FontAttributes="Bold" Margin="0,8,0,4" />
+                        <Entry x:Name="Importe" Placeholder="Importe de depósito" Keyboard="Numeric" />
+                        <Button Text="Depositar" Clicked="Depositar_Clicked" BackgroundColor="{StaticResource Acento}" TextColor="#0B1020" FontAttributes="Bold" CornerRadius="12" />
+                        <Entry x:Name="CuentaOrigenTransferencia" Placeholder="Cuenta origen" Keyboard="Numeric" MaxLength="8" />
+                        <Entry x:Name="CuentaDestinoTransferencia" Placeholder="Cuenta destino" Keyboard="Numeric" MaxLength="8" />
+                        <Entry x:Name="ImporteTransferencia" Placeholder="Importe a transferir" Keyboard="Numeric" />
+                        <Button Text="Transferir" Clicked="Transferir_Clicked" BackgroundColor="#26344C" TextColor="#F3F6FF" CornerRadius="12" />
+                    </VerticalStackLayout>
+                </Border>
+                <Label Text="MOVIMIENTOS" TextColor="{StaticResource Acento}" FontSize="12" FontAttributes="Bold" Margin="2,8,0,0" />
+                <Border BackgroundColor="{StaticResource Superficie}" Stroke="#26344C" StrokeShape="RoundRectangle 16" Padding="16">
+                    <Label x:Name="ListaMovimientos" Text="Consulte una cuenta para ver movimientos." TextColor="#F3F6FF" LineBreakMode="WordWrap" />
+                </Border>
+                <Button Text="Cerrar sesión" Clicked="CerrarSesion_Clicked" BackgroundColor="Transparent" TextColor="#A4B0C5" />
+            </VerticalStackLayout>
+            <Label x:Name="Mensaje" TextColor="#FF8DAD" LineBreakMode="WordWrap" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

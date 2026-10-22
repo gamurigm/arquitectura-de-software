@@ -9,7 +9,7 @@ Cliente SOAP con Java Swing y arquitectura MVC. Su interfaz usa una paleta azul 
 
 ## Ejecutar
 
-Copie `.env.example` como `.env`, ajuste `EUREKABANK_SOAP_URL` a la URL WSDL del servidor y ejecute:
+Configure `EUREKABANK_SOAP_URL` en el archivo compartido `U1/TG.1/.env` y ejecute:
 
 ```powershell
 .\run.ps1

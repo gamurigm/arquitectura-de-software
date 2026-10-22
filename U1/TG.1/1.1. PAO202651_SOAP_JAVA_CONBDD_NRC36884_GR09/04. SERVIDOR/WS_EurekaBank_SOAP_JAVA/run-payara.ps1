@@ -1,8 +1,8 @@
 $ErrorActionPreference = 'Stop'
 
-$envFile = Join-Path $PSScriptRoot '.env'
+$envFile = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..\..\.env'))
 if (-not (Test-Path -LiteralPath $envFile)) {
-    throw "Falta el archivo local .env: $envFile"
+    throw "Falta el archivo común U1/TG.1/.env: $envFile"
 }
 
 foreach ($line in [System.IO.File]::ReadAllLines($envFile)) {
@@ -32,7 +32,7 @@ if (-not (Test-Path -LiteralPath $java)) {
     throw 'PAYARA_JAVA_HOME no apunta a un JDK válido.'
 }
 if (-not (Test-Path -LiteralPath $war)) {
-    throw 'Falta el WAR. Compila primero el proyecto del servidor con Java 21.'
+    throw 'Falta el WAR. Compila primero el proyecto del servidor con Java 25.'
 }
 
 $env:JAVA_HOME = $env:PAYARA_JAVA_HOME

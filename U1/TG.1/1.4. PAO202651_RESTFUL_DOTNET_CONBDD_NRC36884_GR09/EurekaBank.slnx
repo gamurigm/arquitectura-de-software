@@ -1,0 +1,8 @@
+<Solution>
+  <Project Path="00. COMPARTIDO/EurekaBank.Cliente/EurekaBank.Cliente.csproj" />
+  <Project Path="01. SERVIDOR/EurekaBank.Api/EurekaBank.Api.csproj" />
+  <Project Path="02. CLICON/EurekaBank.ClienteConsola/EurekaBank.ClienteConsola.csproj" />
+  <Project Path="03. CLIESC/EurekaBank.ClienteEscritorio/EurekaBank.ClienteEscritorio.csproj" />
+  <Project Path="04. CLIMOV/EurekaBank.ClienteMovil/EurekaBank.ClienteMovil.csproj" />
+  <Project Path="05. CLIWEB/EurekaBank.ClienteWeb/EurekaBank.ClienteWeb.csproj" />
+</Solution>

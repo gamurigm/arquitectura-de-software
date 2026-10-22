@@ -15,6 +15,7 @@ public final class EurekaService {
     private static final String ENDPOINT_PREDETERMINADO =
             "http://127.0.0.1:8080/WS_EurekaBank_SOAP_JAVA_GR09/WSEureka";
     private final WSEureka puerto;
+    private final SoapOperacionesSeguras seguras;
 
     public EurekaService() {
         this(System.getenv().getOrDefault("EUREKABANK_SOAP_URL", ENDPOINT_PREDETERMINADO));
@@ -37,11 +38,23 @@ public final class EurekaService {
                 BindingProvider.ENDPOINT_ADDRESS_PROPERTY, uri.toString());
         ((BindingProvider) puerto).getRequestContext().put(JAXWSProperties.CONNECT_TIMEOUT, 5000);
         ((BindingProvider) puerto).getRequestContext().put(JAXWSProperties.REQUEST_TIMEOUT, 15000);
+        seguras = new SoapOperacionesSeguras(uri.toString());
     }
 
     public int login(String usuario, String contrasena) {
         return puerto.login(usuario, contrasena);
     }
+
+    public String crearSesion(String usuario, String contrasena) throws java.io.IOException {
+        return seguras.crearSesion(usuario, contrasena);
+    }
+
+    public boolean transferir(String token, String origen, String destino, BigDecimal importe, java.util.UUID clave)
+            throws java.io.IOException {
+        return seguras.transferir(token, origen, destino, importe, clave);
+    }
+
+    public void cerrarSesion(String token) throws java.io.IOException { seguras.cerrarSesion(token); }
 
     public List<Movimiento> traerMovimientos(String cuenta) {
         return puerto.traerMovimientos(cuenta).stream()

@@ -4,6 +4,7 @@ import ec.edu.monster.SoapSimulado;
 import ec.edu.monster.service.EurekaService;
 import jakarta.xml.ws.WebServiceException;
 import java.math.BigDecimal;
+import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -101,6 +102,43 @@ class EurekaControladorTest {
     }
 
     @Test
+    void validaTransferenciaAntesDeEnviar() {
+        autenticar();
+        assertThrows(IllegalArgumentException.class,
+                () -> controlador.transferir("0010000", "00100002", "1.00"));
+        assertThrows(IllegalArgumentException.class,
+                () -> controlador.transferir("00100001", "00100001", "1.00"));
+        assertThrows(IllegalArgumentException.class,
+                () -> controlador.transferir("00100001", "00100002", "1.001"));
+        assertEquals(0, banco.llamadas.get());
+    }
+
+    @Test
+    void enviaTransferenciaConDosCuentasYClaveIdempotente() {
+        autenticar();
+        assertTrue(controlador.transferir("00100001", "00100002", "23.45"));
+        assertEquals("00100001", banco.ultimaCuentaOrigen);
+        assertEquals("00100002", banco.ultimaCuentaDestino);
+        assertEquals(new BigDecimal("23.45"), banco.ultimoImporte);
+        assertDoesNotThrow(() -> UUID.fromString(banco.ultimaClaveOperacion));
+        assertEquals(1, banco.llamadas.get());
+    }
+
+    @Test
+    void conservaClaveIdempotenteTrasRespuestaIncierta() {
+        autenticar();
+        banco.fallar = true;
+        assertThrows(IllegalStateException.class,
+                () -> controlador.transferir("00100001", "00100002", "23.45"));
+        String clave = banco.ultimaClaveOperacion;
+        assertDoesNotThrow(() -> UUID.fromString(clave));
+        banco.fallar = false;
+        assertTrue(controlador.transferir("00100001", "00100002", "23.45"));
+        assertEquals(clave, banco.ultimaClaveOperacion);
+        assertEquals(2, banco.llamadas.get());
+    }
+
+    @Test
     void convierteMovimientosSinPerderDecimalesNiFecha() {
         autenticar();
         var movimientos = controlador.consultarMovimientos("00100001");
@@ -123,6 +161,7 @@ class EurekaControladorTest {
         autenticar();
         controlador.cerrarSesion();
         assertThrows(IllegalStateException.class, () -> controlador.consultarMovimientos("00100001"));
-        assertEquals(0, banco.llamadas.get());
+        assertEquals(1, banco.llamadas.get());
+        assertEquals("token-prueba", banco.ultimoTokenRevocado);
     }
 }

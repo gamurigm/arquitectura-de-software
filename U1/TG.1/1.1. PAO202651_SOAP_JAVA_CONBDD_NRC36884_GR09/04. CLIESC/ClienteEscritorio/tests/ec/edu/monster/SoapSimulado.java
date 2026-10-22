@@ -19,11 +19,16 @@ public final class SoapSimulado implements AutoCloseable {
     public final AtomicInteger llamadas = new AtomicInteger();
     public volatile int resultadoLogin = 1;
     public volatile int resultadoDeposito = 1;
+    public volatile int resultadoTransferencia = 1;
     public volatile boolean fallar;
     public volatile long demora;
     public volatile BigDecimal ultimoImporte;
     public volatile String ultimaCuenta;
+    public volatile String ultimaCuentaOrigen;
+    public volatile String ultimaCuentaDestino;
+    public volatile String ultimaClaveOperacion;
     public volatile String ultimaClave;
+    public volatile String ultimoTokenRevocado;
 
     public SoapSimulado() throws IOException {
         servidor = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
@@ -50,6 +55,12 @@ public final class SoapSimulado implements AutoCloseable {
             String operacion = documento.getElementsByTagNameNS(
                     "http://schemas.xmlsoap.org/soap/envelope/", "Body")
                     .item(0).getFirstChild().getLocalName();
+            if (operacion.equals("transferir")) {
+                ultimaCuentaOrigen = texto(documento, "cuentaOrigen");
+                ultimaCuentaDestino = texto(documento, "cuentaDestino");
+                ultimoImporte = new BigDecimal(texto(documento, "importe"));
+                ultimaClaveOperacion = texto(documento, "claveOperacion");
+            }
             String contenido;
             int estado = 200;
             if (fallar) {
@@ -62,10 +73,22 @@ public final class SoapSimulado implements AutoCloseable {
                         ultimaClave = texto(documento, "contrasena");
                         yield respuesta("login", "<login>" + resultadoLogin + "</login>");
                     }
+                    case "crearSesion" -> {
+                        ultimaClave = texto(documento, "contrasena");
+                        String token = resultadoLogin == 1 ? "token-prueba" : "";
+                        yield respuesta("crearSesion", "<token>" + token + "</token>");
+                    }
                     case "regDeposito" -> {
                         ultimaCuenta = texto(documento, "cuenta");
                         ultimoImporte = new BigDecimal(texto(documento, "importe"));
                         yield respuesta("regDeposito", "<resultado>" + resultadoDeposito + "</resultado>");
+                    }
+                    case "transferir" -> {
+                        yield respuesta("transferir", "<resultado>" + resultadoTransferencia + "</resultado>");
+                    }
+                    case "cerrarSesion" -> {
+                        ultimoTokenRevocado = texto(documento, "token");
+                        yield respuesta("cerrarSesion", "<resultado>1</resultado>");
                     }
                     case "traerMovimientos" -> {
                         ultimaCuenta = texto(documento, "cuenta");
@@ -99,7 +122,7 @@ public final class SoapSimulado implements AutoCloseable {
     }
 
     private static String texto(Document documento, String etiqueta) {
-        return documento.getElementsByTagName(etiqueta).item(0).getTextContent();
+        return documento.getElementsByTagNameNS("*", etiqueta).item(0).getTextContent();
     }
 
     @Override

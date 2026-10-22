@@ -1,0 +1,88 @@
+@model InicioViewModel
+
+<header class="topbar">
+    <a class="brand" asp-controller="Home" asp-action="Index">EUREKABANK</a>
+    @if (Model.Usuario is not null)
+    {
+        <form asp-action="Logout" method="post">
+            @Html.AntiForgeryToken()
+            <button class="button button-quiet" type="submit">Cerrar sesión</button>
+        </form>
+    }
+</header>
+
+@if (!string.IsNullOrWhiteSpace(Model.Mensaje))
+{
+    <div class="notice @(Model.EsError ? "error" : "")" role="status">@Model.Mensaje</div>
+}
+
+@if (Model.Usuario is null)
+{
+    <section class="login-card">
+        <p class="eyebrow">Banca segura</p>
+        <h1>Bienvenido</h1>
+        <p class="muted">Inicie sesión para consultar sus movimientos.</p>
+        <form asp-action="Login" method="post" class="form-stack">
+            @Html.AntiForgeryToken()
+            <label for="usuario">Usuario</label>
+            <input id="usuario" name="usuario" maxlength="30" autocomplete="username" required />
+            <label for="contrasena">Contraseña</label>
+            <input id="contrasena" name="contrasena" type="password" maxlength="1024" autocomplete="current-password" required />
+            <button class="button button-primary" type="submit">Ingresar</button>
+        </form>
+    </section>
+}
+else
+{
+    <section class="welcome">
+        <div><p class="eyebrow">Cuenta bancaria</p><h1>Hola, @Model.Usuario</h1></div>
+        <form asp-action="Movimientos" method="post" class="account-form">
+            @Html.AntiForgeryToken()
+            <label for="cuenta">Cuenta</label>
+            <input id="cuenta" name="cuenta" value="@Model.Cuenta" maxlength="8" required />
+            <button class="button button-primary" type="submit">Consultar</button>
+        </form>
+    </section>
+
+    @if (Model.Cuenta.Length > 0)
+    {
+        <section class="balance-card">
+            <div><p class="eyebrow">Saldo calculado</p><strong>@Model.Saldo.ToString("N2")</strong></div>
+            <form asp-action="Deposito" method="post" class="deposit-form">
+                @Html.AntiForgeryToken()
+                <label for="importe">Nuevo depósito</label>
+                <input id="importe" name="importe" type="number" min="0.01" step="0.01" inputmode="decimal" required />
+                <button class="button button-primary" type="submit">Depositar</button>
+            </form>
+        </section>
+        <section class="balance-card">
+            <div><p class="eyebrow">Transferencia</p><strong>Débito y crédito</strong></div>
+            <form asp-action="Transferencia" method="post" class="deposit-form">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="claveOperacion" value="@Model.ClaveOperacion" />
+                <label for="cuentaOrigen">Cuenta origen</label>
+                <input id="cuentaOrigen" name="cuentaOrigen" maxlength="8" pattern="[0-9]{8}" required />
+                <label for="cuentaDestino">Cuenta destino</label>
+                <input id="cuentaDestino" name="cuentaDestino" maxlength="8" pattern="[0-9]{8}" value="@Model.Cuenta" required />
+                <label for="importeTransferencia">Importe</label>
+                <input id="importeTransferencia" name="importe" type="number" min="0.01" max="9999999999.99" step="0.01" required />
+                <button class="button button-primary" type="submit">Transferir</button>
+            </form>
+        </section>
+        <section class="table-card">
+            <h2>Movimientos</h2>
+            <div class="table-scroll">
+                <table>
+                    <thead><tr><th>N.º</th><th>Fecha</th><th>Tipo</th><th>Acción</th><th class="number">Importe</th></tr></thead>
+                    <tbody>
+                    @foreach (var movimiento in Model.Movimientos)
+                    {
+                        <tr><td>@movimiento.Nromov</td><td>@movimiento.Fecha.ToString("yyyy-MM-dd")</td><td>@movimiento.Tipo</td><td>@movimiento.Accion</td><td class="number">@movimiento.Importe.ToString("N2")</td></tr>
+                    }
+                    @if (Model.Movimientos.Count == 0) { <tr><td colspan="5" class="empty">No hay movimientos para esta cuenta.</td></tr> }
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    }
+}

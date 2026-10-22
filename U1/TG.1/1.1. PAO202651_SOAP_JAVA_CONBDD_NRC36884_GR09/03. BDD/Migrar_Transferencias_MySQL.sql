@@ -1,0 +1,33 @@
+USE eurekabank_gr09;
+
+ALTER TABLE Credenciales
+    ADD COLUMN chr_cliecodigo CHAR(5) NULL,
+    ADD CONSTRAINT FK_Credenciales_Cliente FOREIGN KEY (chr_cliecodigo)
+        REFERENCES Cliente (chr_cliecodigo)
+        ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+CREATE TABLE Transferencias (
+    id_transferencia CHAR(36) NOT NULL,
+    usuario VARCHAR(30) NOT NULL,
+    clave_operacion CHAR(36) NOT NULL,
+    chr_cliecodigo CHAR(5) NOT NULL,
+    chr_cuencodigo_origen CHAR(8) NOT NULL,
+    chr_cuencodigo_destino CHAR(8) NOT NULL,
+    dec_importe DECIMAL(12,2) NOT NULL,
+    dtt_fecha DATETIME NOT NULL,
+    CONSTRAINT PK_Transferencias PRIMARY KEY (id_transferencia),
+    CONSTRAINT UQ_Transferencias_Usuario_Clave UNIQUE (usuario, clave_operacion),
+    CONSTRAINT CK_Transferencias_Importe CHECK (dec_importe > 0),
+    CONSTRAINT CK_Transferencias_Cuentas CHECK (chr_cuencodigo_origen <> chr_cuencodigo_destino),
+    CONSTRAINT FK_Transferencias_Cliente FOREIGN KEY (chr_cliecodigo) REFERENCES Cliente (chr_cliecodigo),
+    CONSTRAINT FK_Transferencias_Origen FOREIGN KEY (chr_cuencodigo_origen) REFERENCES Cuenta (chr_cuencodigo),
+    CONSTRAINT FK_Transferencias_Destino FOREIGN KEY (chr_cuencodigo_destino) REFERENCES Cuenta (chr_cuencodigo)
+) ENGINE = INNODB;
+
+ALTER TABLE Movimiento
+    ADD COLUMN id_transferencia CHAR(36) NULL,
+    ADD CONSTRAINT FK_Movimiento_Transferencias FOREIGN KEY (id_transferencia)
+        REFERENCES Transferencias (id_transferencia)
+        ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+-- Asigne chr_cliecodigo solo tras validar la identidad del titular. No se infiere desde el nombre de usuario.

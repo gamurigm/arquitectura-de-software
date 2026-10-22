@@ -1,0 +1,64 @@
+@model CuentaViewModel
+<section class="heading">
+    <div><p class="eyebrow">BANCA EN LÍNEA</p><h1>Bienvenido, @Model.Usuario</h1></div>
+    <form asp-action="Logout" method="post">
+        @Html.AntiForgeryToken()
+        <button class="secondary" type="submit">Cerrar sesión</button>
+    </form>
+</section>
+<section class="grid">
+    <article class="panel">
+        <h2>Consultar movimientos</h2>
+        <form asp-action="Movimientos" method="post">
+            @Html.AntiForgeryToken()
+            <label asp-for="Cuenta">Número de cuenta</label>
+            <input asp-for="Cuenta" maxlength="8" inputmode="numeric" />
+            <button type="submit">Consultar</button>
+        </form>
+    </article>
+    <article class="panel">
+        <h2>Registrar depósito</h2>
+        <form asp-action="Depositar" method="post">
+            @Html.AntiForgeryToken()
+            <label asp-for="CuentaDeposito">Número de cuenta</label>
+            <input asp-for="CuentaDeposito" maxlength="8" inputmode="numeric" />
+            <label asp-for="Importe">Importe</label>
+            <input asp-for="Importe" type="number" min="0.01" max="9999999999.99" step="0.01" />
+            <button type="submit">Depositar</button>
+        </form>
+    </article>
+    <article class="panel">
+        <h2>Transferir</h2>
+        <form asp-action="Transferir" method="post">
+            @Html.AntiForgeryToken()
+            <input asp-for="ClaveOperacion" type="hidden" />
+            <label asp-for="CuentaOrigenTransferencia">Cuenta de origen</label>
+            <input asp-for="CuentaOrigenTransferencia" maxlength="8" inputmode="numeric" />
+            <label asp-for="CuentaDestinoTransferencia">Cuenta de destino</label>
+            <input asp-for="CuentaDestinoTransferencia" maxlength="8" inputmode="numeric" />
+            <label asp-for="ImporteTransferencia">Importe</label>
+            <input asp-for="ImporteTransferencia" type="number" min="0.01" max="9999999999.99" step="0.01" />
+            <button type="submit">Transferir</button>
+        </form>
+    </article>
+</section>
+@if (!string.IsNullOrWhiteSpace(Model.Mensaje)) { <p class="notice">@Model.Mensaje</p> }
+@if (Model.Movimientos.Count > 0)
+{
+    <section class="panel table-wrap">
+        <h2>Movimientos · @Model.Cuenta</h2>
+        <table>
+            <thead><tr><th>N.º</th><th>Cuenta</th><th>Fecha</th><th>Tipo</th><th>Acción</th><th>Importe</th></tr></thead>
+            <tbody>
+            @foreach (var movimiento in Model.Movimientos)
+            {
+                <tr>
+                    <td>@movimiento.Numero</td><td>@movimiento.Cuenta</td>
+                    <td>@movimiento.Fecha.ToString("O")</td><td>@movimiento.Tipo</td>
+                    <td>@movimiento.Accion</td><td>@movimiento.Importe.ToString("N2")</td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </section>
+}

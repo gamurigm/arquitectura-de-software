@@ -2,6 +2,8 @@ package ec.edu.monster.servicios;
 
 import ec.edu.monster.db.EurekaBankDao;
 import ec.edu.monster.modelo.Movimiento;
+import ec.edu.monster.modelo.SolicitudTransferencia;
+import ec.edu.monster.seguridad.SesionesActivas;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.SQLException;
@@ -18,6 +20,27 @@ public final class EurekaService {
         }
         return dao.autenticar(usuario.strip(), contrasena.toCharArray());
     }
+
+    public String crearSesion(String usuario, String contrasena) throws SQLException {
+        if (!iniciarSesion(usuario, contrasena)) return null;
+        String usuarioNormalizado = usuario.strip();
+        return SesionesActivas.getInstancia().crear(usuarioNormalizado, dao.obtenerCodigoCliente(usuarioNormalizado));
+    }
+
+    public boolean transferir(String token, String origen, String destino, BigDecimal importe, String claveOperacion)
+            throws SQLException {
+        SesionesActivas.Sesion sesion = SesionesActivas.getInstancia().obtener(token);
+        if (sesion == null || sesion.codigoCliente() == null) return false;
+        SolicitudTransferencia solicitud = new SolicitudTransferencia();
+        solicitud.setCuentaOrigen(origen);
+        solicitud.setCuentaDestino(destino);
+        solicitud.setImporte(importe);
+        solicitud.setClaveOperacion(claveOperacion);
+        SolicitudTransferencia normalizada = TransferenciaValidator.normalizar(solicitud);
+        return normalizada != null && dao.transferir(sesion.usuario(), sesion.codigoCliente(), normalizada);
+    }
+
+    public void cerrarSesion(String token) { SesionesActivas.getInstancia().revocar(token); }
 
     public List<Movimiento> traerMovimientos(String cuenta) throws SQLException {
         if (cuenta == null || cuenta.isBlank() || cuenta.strip().length() > 8) {
