@@ -21,7 +21,7 @@ El proyecto permitirá:
 
 1. Iniciar un servidor local con `npm start`.
 2. Abrir una página con un campo para pegar un enlace de Spotify.
-3. Aceptar enlaces web estándar de `open.spotify.com` cuyo recurso sea una playlist o un álbum.
+3. Aceptar enlaces HTTPS estándar de `open.spotify.com` cuyo recurso sea una playlist o un álbum.
 4. Validar host, tipo de recurso e identificador antes de construir la URL del reproductor.
 5. Mostrar el reproductor oficial en un iframe adaptable al ancho de la página.
 6. Mostrar un mensaje accesible cuando el enlace no sea compatible.
@@ -40,7 +40,7 @@ El código nuevo vivirá en `fastify-app/`: `package.json`, `package-lock.json`,
 ### Página y flujo de reproducción
 
 1. El usuario abre `http://127.0.0.1:3000` y pega un enlace de playlist o álbum.
-2. El navegador analiza la URL con el constructor `URL` y comprueba que el host sea exactamente `open.spotify.com`.
+2. La página comprueba primero la estructura del enlace original para impedir que la normalización de URL acepte segmentos de ruta extra; después analiza la URL con el constructor `URL` y comprueba que el protocolo sea HTTPS y el host exactamente `open.spotify.com`.
 3. La página acepta solo rutas `/playlist/{id}` y `/album/{id}` con identificador alfanumérico. Los parámetros de consulta y fragmentos no se reutilizan.
 4. La página construye una URL fija bajo `https://open.spotify.com/embed/` y la asigna al iframe. Nunca inserta el enlace proporcionado como HTML.
 5. Spotify presenta sus propios controles y gestiona la sesión, disponibilidad y reproducción.
@@ -48,7 +48,7 @@ El código nuevo vivirá en `fastify-app/`: `package.json`, `package-lock.json`,
 ### Seguridad y privacidad
 
 - El servidor escucha solo en loopback por defecto.
-- El navegador no acepta hosts arbitrarios ni rutas que no sean playlist o álbum.
+- El navegador no acepta protocolos distintos de HTTPS, hosts arbitrarios ni rutas que no sean playlist o álbum.
 - No se usan OAuth, claves de Spotify, tokens, almacenamiento persistente ni una base de datos.
 - El proyecto no consulta la biblioteca privada ni modifica la cuenta de Spotify.
 - La conexión al reproductor se realiza directamente desde el navegador a Spotify; la página requiere internet para mostrarlo.
@@ -57,7 +57,7 @@ El código nuevo vivirá en `fastify-app/`: `package.json`, `package-lock.json`,
 
 - Un enlace mal formado, de otro dominio o de un tipo no permitido deja el reproductor actual intacto y muestra un mensaje comprensible.
 - Spotify decide si solicita inicio de sesión y qué reproducción está disponible según la cuenta, el contenido y la región. El proyecto no descarga ni retransmite audio.
-- Solo se aceptan enlaces web completos `open.spotify.com`; no se resolverán enlaces cortos `spotify.link`, URIs `spotify:`, canciones sueltas ni enlaces a artistas.
+- Solo se aceptan enlaces HTTPS completos `open.spotify.com`; no se resolverán enlaces HTTP, enlaces cortos `spotify.link`, URIs `spotify:`, canciones sueltas ni enlaces a artistas.
 
 ## Fuera de alcance
 
@@ -73,7 +73,7 @@ El código nuevo vivirá en `fastify-app/`: `package.json`, `package-lock.json`,
 - `npm start` inicia el servidor local en el puerto predeterminado o en el valor de `PORT`.
 - La raíz del servidor entrega la página y sus recursos estáticos.
 - Un enlace válido de playlist o álbum genera un iframe del dominio oficial de Spotify.
-- Enlaces inválidos, enlaces de hosts externos y tipos no permitidos muestran un error accesible y no se insertan en el DOM como HTML.
+- Enlaces no HTTPS, malformados, de hosts externos, con segmentos extra o de tipos no permitidos muestran un error accesible y no se insertan en el DOM como HTML.
 - La documentación explica cómo instalar dependencias, iniciar el servidor, pegar el enlace y las limitaciones del reproductor.
 - No se modifican los proyectos Java/.NET ni los cambios preexistentes del usuario.
 

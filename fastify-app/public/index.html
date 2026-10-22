@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Escucha tus playlists y álbumes de Spotify.">
+    <title>Mi música | Reproductor de Spotify</title>
+    <link rel="stylesheet" href="/styles.css">
+    <script src="/app.js" defer></script>
+  </head>
+  <body>
+    <main class="page-shell">
+      <section class="player-card" aria-labelledby="page-title">
+        <div class="brand-mark" aria-hidden="true">♫</div>
+        <p class="eyebrow">TU ESPACIO MUSICAL</p>
+        <h1 id="page-title">Mi música</h1>
+        <p class="intro">Pega el enlace de una playlist o un álbum de Spotify para reproducirlo aquí.</p>
+
+        <form id="spotify-form" class="link-form">
+          <label for="spotify-url">Enlace de Spotify</label>
+          <div class="form-row">
+            <input
+              id="spotify-url"
+              name="spotify-url"
+              type="text"
+              inputmode="url"
+              autocomplete="url"
+              placeholder="https://open.spotify.com/playlist/..."
+            >
+            <button type="submit">Cargar</button>
+          </div>
+          <p id="form-status" class="form-status" role="status" aria-live="polite"></p>
+        </form>
+
+        <section class="player-area" aria-label="Reproductor de Spotify">
+          <p id="empty-state" class="empty-state">Tu reproductor aparecerá aquí.</p>
+          <div id="player-container" class="player-container"></div>
+        </section>
+
+        <p class="footnote">La reproducción y el inicio de sesión dependen de Spotify.</p>
+      </section>
+    </main>
+  </body>
+</html>
