@@ -1,0 +1,11 @@
+<Project>
+  <PropertyGroup>
+    <LangVersion>14.0</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <BaseIntermediateOutputPath>D:\tools\CelularGR09\obj\$(MSBuildProjectName)\</BaseIntermediateOutputPath>
+    <BaseOutputPath>D:\tools\CelularGR09\bin\$(MSBuildProjectName)\</BaseOutputPath>
+    <RestorePackagesPath>D:\tools\nuget-packages</RestorePackagesPath>
+  </PropertyGroup>
+</Project>
+
