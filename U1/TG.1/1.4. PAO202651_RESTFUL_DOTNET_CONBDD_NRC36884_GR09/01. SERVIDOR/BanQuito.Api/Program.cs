@@ -1,4 +1,5 @@
-using Celulares.Contratos;
+using BanQuito.Contratos;
+using BanQuito.Dominio;
 using BanQuito.Api.Servicios;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;

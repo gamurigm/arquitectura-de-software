@@ -1,11 +1,13 @@
 <Project>
   <PropertyGroup>
+    <CelularBuildRoot Condition="'$(CelularBuildRoot)' == ''">C:\Users\GABI\Documents\ESPE VIII SII2026\tools\CelularGR09</CelularBuildRoot>
+    <CelularPackagesRoot Condition="'$(CelularPackagesRoot)' == ''">C:\Users\GABI\Documents\ESPE VIII SII2026\tools\nuget-packages</CelularPackagesRoot>
     <LangVersion>14.0</LangVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <BaseIntermediateOutputPath>D:\tools\CelularGR09\obj\$(MSBuildProjectName)\</BaseIntermediateOutputPath>
-    <BaseOutputPath>D:\tools\CelularGR09\bin\$(MSBuildProjectName)\</BaseOutputPath>
-    <RestorePackagesPath>D:\tools\nuget-packages</RestorePackagesPath>
+    <BaseIntermediateOutputPath>$(CelularBuildRoot)\obj\$(MSBuildProjectName)\</BaseIntermediateOutputPath>
+    <BaseOutputPath>$(CelularBuildRoot)\bin\$(MSBuildProjectName)\</BaseOutputPath>
+    <RestorePackagesPath>$(CelularPackagesRoot)</RestorePackagesPath>
   </PropertyGroup>
 </Project>
 

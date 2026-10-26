@@ -29,4 +29,3 @@ catch (Exception ex) when (ex is SqlException or IOException)
     Console.Error.WriteLine($"No se pudo inicializar SQL Server: {ex.Message}");
     return 1;
 }
-

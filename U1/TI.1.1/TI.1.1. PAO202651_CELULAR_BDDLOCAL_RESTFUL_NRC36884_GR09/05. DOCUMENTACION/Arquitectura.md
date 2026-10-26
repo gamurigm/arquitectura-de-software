@@ -2,20 +2,15 @@
 
 ~~~mermaid
 flowchart LR
-    C["Consola .NET pendiente"] --> R["API comercializadora 19102 pendiente"]
+    C["Consola pendiente"] --> R["API comercializadora :19102"]
     E["WPF pendiente"] --> R
     M["MAUI Android pendiente"] --> R
-    W["MVC web 19103 pendiente"] --> R
-    R --> V[("SQL ComercializadoraCelulares: script creado")]
-    R --> B["API BanQuito 19101 implementada; integración pendiente"]
-    B --> D[("SQL BanQuitoCore: script creado")]
-    B --> N["Dominio financiero: 21 pruebas correctas"]
+    W["MVC web :19103 pendiente"] --> R
+    R --> V[("ComercializadoraCelulares\nbase de este proyecto")]
+    R -- "HTTP / API bancaria" --> B["BanQuito.Api :19101\nproyecto independiente del banco"]
+    B --> D[("BanQuitoCore\nbase del proyecto bancario")]
 ~~~
 
-El Core solo expone servicios de crédito. La comercializadora coordina catálogo, facturas y llamadas al banco.
-Todas las interfaces usarán la misma API comercializadora para conservar reglas y datos.
-Las dos APIs se desplegarán por separado. Los clientes no recibirán credenciales SQL.
-La API bancaria permanece en localhost; el acceso de Android se resuelve a través de la API comercializadora.
+La comercializadora coordina catálogo y facturas. BanQuito evalúa elegibilidad, calcula y registra crédito y amortización. Cada API y cada base pertenecen a su proyecto; el enlace entre proyectos es HTTP y `COD_CREDITO` es una referencia remota.
 
-La estructura identifica expresamente qué está pendiente. No prueba despliegue o ejecución de los componentes todavía no implementados.
-
+Las interfaces de consola, WPF, MVC y MAUI siguen pendientes. El diagrama describe responsabilidades y no afirma que los clientes pendientes estén implementados.

@@ -1,5 +1,9 @@
 <Solution>
   <Project Path="00. COMPARTIDO/EurekaBank.Cliente/EurekaBank.Cliente.csproj" />
+  <Project Path="01. SERVIDOR/BanQuito.Contratos/BanQuito.Contratos.csproj" />
+  <Project Path="01. SERVIDOR/BanQuito.Dominio/BanQuito.Dominio.csproj" />
+  <Project Path="01. SERVIDOR/BanQuito.Api/BanQuito.Api.csproj" />
+  <Project Path="01. SERVIDOR/BanQuito.Administracion/BanQuito.Administracion.csproj" />
   <Project Path="01. SERVIDOR/EurekaBank.Api/EurekaBank.Api.csproj" />
   <Project Path="02. CLICON/EurekaBank.ClienteConsola/EurekaBank.ClienteConsola.csproj" />
   <Project Path="03. CLIESC/EurekaBank.ClienteEscritorio/EurekaBank.ClienteEscritorio.csproj" />

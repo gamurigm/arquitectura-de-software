@@ -1,0 +1,12 @@
+<Project>
+  <PropertyGroup>
+    <BankBuildRoot Condition="'$(BankBuildRoot)' == ''">C:\Users\GABI\Documents\ESPE VIII SII2026\tools\BankGR09</BankBuildRoot>
+    <BankPackagesRoot Condition="'$(BankPackagesRoot)' == ''">C:\Users\GABI\Documents\ESPE VIII SII2026\tools\nuget-packages</BankPackagesRoot>
+    <LangVersion>14.0</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <BaseIntermediateOutputPath>$(BankBuildRoot)\obj\$(MSBuildProjectName)\</BaseIntermediateOutputPath>
+    <BaseOutputPath>$(BankBuildRoot)\bin\$(MSBuildProjectName)\</BaseOutputPath>
+    <RestorePackagesPath>$(BankPackagesRoot)</RestorePackagesPath>
+  </PropertyGroup>
+</Project>

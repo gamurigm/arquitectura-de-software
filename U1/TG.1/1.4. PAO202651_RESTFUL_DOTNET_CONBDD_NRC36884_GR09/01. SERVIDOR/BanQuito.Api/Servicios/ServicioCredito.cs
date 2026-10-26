@@ -1,6 +1,6 @@
 using System.Data;
 using BanQuito.Dominio;
-using Celulares.Contratos;
+using BanQuito.Contratos;
 using Microsoft.Data.SqlClient;
 namespace BanQuito.Api.Servicios;
 

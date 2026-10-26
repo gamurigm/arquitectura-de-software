@@ -1,4 +1,4 @@
-using Celulares.Contratos;
+using BanQuito.Contratos;
 namespace BanQuito.Dominio;
 public static class ReglasCredito
 {

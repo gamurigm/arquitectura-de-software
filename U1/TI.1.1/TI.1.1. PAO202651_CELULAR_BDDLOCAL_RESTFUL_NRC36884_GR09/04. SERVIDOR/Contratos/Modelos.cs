@@ -2,8 +2,6 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Celulares.Contratos;
 
-public record ClienteBanco(int CodigoCliente, string Cedula, string Nombre, string Genero, DateOnly FechaNacimiento);
-public record Movimiento(string Tipo, decimal Valor, DateOnly Fecha);
 public record EvaluacionCredito(bool SujetoCredito, int? CodigoCliente, string Nombre, string Motivo, decimal MontoMaximo);
 public record Cuota(int NumeroCuota, DateOnly FechaPago, decimal ValorCuota, decimal InteresPagado, decimal CapitalPagado, decimal Saldo);
 public record Credito(int Id, int CodigoCliente, decimal Monto, int NumeroCuotas, DateOnly Fecha, string Estado, IReadOnlyList<Cuota> Cuotas);

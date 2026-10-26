@@ -1,37 +1,24 @@
-# Avance de implementación al corte del 23 de octubre de 2026
+# Avance del proyecto de celulares al 25 de octubre de 2026
 
-## Hecho
+## Separación aplicada
 
-- Revisado el enunciado Word, incluido modelo Core y ejemplo de amortización.
-- Creada estructura GR09; GR01 se conserva únicamente como referencia de consulta.
-- Guardado plan con .NET 10, SQL Server 2025 Express y porcentaje 35% elegido por el usuario.
-- Implementados contratos y dominio financiero con 21 pruebas correctas.
-- Implementada API bancaria: elegibilidad, monto máximo, otorgamiento transaccional y consulta de cuotas.
-- Implementada referencia idempotente para reintentar otorgamientos sin duplicar créditos.
-- Creados scripts SQL de ambas bases y datos de 5 clientes, 5 cuentas y 50 movimientos.
-- Creado inicializador SQL y script de instalación del motor con destinos configurables en D:.
-- API bancaria e inicializador compilan sin advertencias ni errores.
-- Probada API en localhost: entradas inválidas y cédula vacía devuelven HTTP 400.
-- Creada documentación editable de casos de uso, ER, arquitectura y manual del avance.
+- BanQuito.Api, su dominio y contratos, las reglas de crédito, las pruebas, el inicializador y los scripts BanQuitoCore están en el proyecto bancario REST .NET.
+- La comercializadora mantiene catálogo, facturación, sus propios DTOs del cliente HTTP y `ComercializadoraCelulares`.
+- No hay `ProjectReference` del celular al banco ni scripts bancarios en `U1/TI.1.1/...CELULAR...`.
+- Los dos inicializadores aplicaron sus scripts por separado contra el SQL Server Developer local. Los scripts no borran datos y no recrearon las bases que ya existían.
+- La regla del descuento del 42% y su prueba permanecen en el proyecto de la comercializadora; las reglas y pruebas de crédito permanecen en el proyecto bancario.
 
-## Pendiente
+## Verificación
 
-- Completar instalación SQL Server 2025 Express. El intento devolvió -2067529714.
-- Aplicar y verificar scripts contra el motor real; no se afirma que las bases ya estén creadas.
-- Probar persistencia, concurrencia y reintentos de crédito contra SQL Server.
-- Implementar API comercializadora, consola, WPF, MVC y MAUI Android.
-- Completar interfaces, facturación integrada, diagramas finales y manual de entrega.
+- `BanQuito.Api` y sus contratos/dominio compilaron: 0 advertencias, 0 errores.
+- `BanQuito.Administracion` compiló: 0 advertencias, 0 errores.
+- `BanQuito.Pruebas` compiló: 0 advertencias, 0 errores; no se ejecutó la suite.
+- `Comercializadora.Api` y sus contratos/dominio compilaron: 0 advertencias, 0 errores.
+- El inicializador de la comercializadora compiló: 0 advertencias, 0 errores.
+- `Comercializadora.Pruebas` compiló: 0 advertencias, 0 errores; no se ejecutó la suite.
+- Los scripts de cada proyecto se aplicaron sin errores. No se iniciaron APIs ni se hicieron llamadas HTTP en esta corrección.
+- Consola, WPF, MVC y MAUI Android siguen pendientes.
 
-## Evidencia y límites
+## Entorno local
 
-21 pruebas de negocio correctas. Incluyen 35%, edad, ventanas, redondeo, plazos, mayúsculas/minúsculas y cultura decimal.
-El ciclo de pruebas observó fallos iniciales y su corrección.
-La revisión independiente detectó el caso de género/movimiento en minúsculas; quedó corregido con dos pruebas.
-Una prueba HTTP detectó un error de validación por cultura decimal; se corrigió y verificó.
-Se corrigió una dependencia transitiva vulnerable usando System.Security.Cryptography.Pkcs 10.0.13.
-La comprobación /api/salud devuelve HTTP 503 mientras SQL Server no esté disponible.
-La API se detuvo después de las pruebas HTTP; no queda presentada como servicio desplegado.
-
-El usuario autorizó commit y push del avance a las 17:00, incluso incompleto.
-La tarea de publicación solo incluye este directorio. Excluye GR01 y el DOCX original sin seguimiento.
-
+SQL Server 2025 Developer está activo en la instancia predeterminada para desarrollo local. SQL Server Express sigue siendo el destino previsto de entrega. Los artefactos y paquetes de ambos proyectos quedan bajo `C:\Users\GABI\Documents\ESPE VIII SII2026\tools`.

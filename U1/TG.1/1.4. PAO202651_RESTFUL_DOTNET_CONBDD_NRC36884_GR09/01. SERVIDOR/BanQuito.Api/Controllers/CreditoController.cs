@@ -1,5 +1,5 @@
 using BanQuito.Api.Servicios;
-using Celulares.Contratos;
+using BanQuito.Contratos;
 using Microsoft.AspNetCore.Mvc;
 namespace BanQuito.Api.Controllers;
 

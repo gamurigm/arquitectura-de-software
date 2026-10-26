@@ -1,10 +1,15 @@
 $ErrorActionPreference = 'Stop'
-$env:DOTNET_ROOT = 'D:\tools\dotnet10'
-$env:DOTNET_CLI_HOME = 'D:\tools\dotnet10-cli'
-$env:NUGET_PACKAGES = 'D:\tools\nuget-packages'
-$env:TEMP = 'D:\tools\dotnet10-tmp'
+$toolsRoot = 'C:\Users\GABI\Documents\ESPE VIII SII2026\tools'
+$env:DOTNET_ROOT = 'C:\Program Files\dotnet'
+$env:DOTNET_CLI_HOME = Join-Path $toolsRoot 'dotnet-cli'
+$env:NUGET_PACKAGES = Join-Path $toolsRoot 'nuget-packages'
+$env:TEMP = Join-Path $toolsRoot 'dotnet-temp'
 $env:TMP = $env:TEMP
-foreach ($ruta in @($env:DOTNET_CLI_HOME, $env:NUGET_PACKAGES, $env:TEMP, 'D:\tools\CelularGR09')) {
+$env:CelularBuildRoot = Join-Path $toolsRoot 'CelularGR09'
+$env:CelularPackagesRoot = $env:NUGET_PACKAGES
+if (-not (Get-Command dotnet -ErrorAction SilentlyContinue)) {
+    throw 'No se encuentra dotnet en el PATH. Abra una terminal nueva y vuelva a intentarlo.'
+}
+foreach ($ruta in @($env:DOTNET_CLI_HOME, $env:NUGET_PACKAGES, $env:TEMP, $env:CelularBuildRoot)) {
     New-Item -ItemType Directory -Force -Path $ruta | Out-Null
 }
-

@@ -1,8 +1,8 @@
 using BanQuito.Dominio;
-using Celulares.Contratos;
+using BanQuito.Contratos;
 using Xunit;
 
-namespace Celulares.Pruebas;
+namespace BanQuito.Pruebas;
 
 public class ReglasCreditoTests
 {
@@ -56,8 +56,6 @@ public class ReglasCreditoTests
         Assert.Throws<ErrorNegocio>(() => ReglasCredito.Amortizar(450m, meses, Hoy));
     [Theory] [InlineData(0)] [InlineData(-5)] public void MontoNoPositivoFalla(decimal monto) =>
         Assert.Throws<ErrorNegocio>(() => ReglasCredito.Amortizar(monto, 6, Hoy));
-    [Fact] public void EfectivoDescuenta42PorCiento() =>
-        Assert.Equal(58m, ReglasFacturacion.TotalEfectivo(100m));
     [Fact] public void MasculinoMinusculaNoEvitaReglaDeEdad() =>
         Assert.False(ReglasCredito.Evaluar(Cliente("m", 24), Movimientos, false, Hoy).SujetoCredito);
     [Fact] public void CodigosMinusculaConservanSuSignificado()
