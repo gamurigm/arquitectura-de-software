@@ -1,12 +1,14 @@
 $ErrorActionPreference = 'Stop'
 
-$env:JAVA_HOME = 'D:\tools\jdk-25'
-$env:PATH = "$env:JAVA_HOME\bin;$env:PATH"
-$env:MAVEN_OPTS = '-Dmaven.repo.local=D:\tools\maven-repo'
-
-if (-not (Test-Path $env:JAVA_HOME)) {
-    throw "No se encontró Java 25 en $env:JAVA_HOME"
+$repositoryRoot = $PSScriptRoot
+while ($repositoryRoot -and -not (Test-Path -LiteralPath (Join-Path $repositoryRoot 'scripts\Initialize-NetBeansJavaEnvironment.ps1'))) {
+    $repositoryRoot = Split-Path -Parent $repositoryRoot
 }
+if (-not $repositoryRoot) {
+    throw 'No se encontró scripts\Initialize-NetBeansJavaEnvironment.ps1 en el repositorio.'
+}
+. (Join-Path $repositoryRoot 'scripts\Initialize-NetBeansJavaEnvironment.ps1')
+$localJava = Initialize-NetBeansJavaEnvironment -RepositoryRoot $repositoryRoot
 
 $envFilePath = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..\..\.env'))
 if (Test-Path -LiteralPath $envFilePath) {
@@ -18,5 +20,5 @@ if (Test-Path -LiteralPath $envFilePath) {
 }
 
 Set-Location -LiteralPath $PSScriptRoot
-$maven = Get-Command mvn -ErrorAction Stop
-& $maven.Source compile exec:java
+& $localJava.Maven --batch-mode --no-transfer-progress compile exec:java
+if ($LASTEXITCODE -ne 0) { throw "Maven terminó con código $LASTEXITCODE." }

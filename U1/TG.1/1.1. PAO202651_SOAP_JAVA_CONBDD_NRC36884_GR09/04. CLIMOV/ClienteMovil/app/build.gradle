@@ -20,3 +20,20 @@ android {
         targetCompatibility JavaVersion.VERSION_17
     }
 }
+
+tasks.register('installAndLaunchDebug') {
+    group = 'application'
+    description = 'Instala y abre la aplicación debug en el dispositivo Android conectado.'
+    dependsOn('installDebug')
+
+    doLast {
+        def appId = android.defaultConfig.applicationId ?: android.namespace
+        def adb = new File(android.sdkDirectory, 'platform-tools/adb.exe')
+        if (!adb.isFile()) {
+            throw new GradleException("No se encontró ADB en ${adb}. Abre los proyectos con Abrir-Proyectos-Java-NetBeans.ps1.")
+        }
+        exec {
+            commandLine adb.absolutePath, 'shell', 'monkey', '-p', appId, '1'
+        }
+    }
+}

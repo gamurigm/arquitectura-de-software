@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>ec.edu.monster.gr09</groupId>
+    <artifactId>eurekabank-soap-java-gr09</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>EurekaBank SOAP Java GR09</name>
+    <description>Agrega los módulos Maven activos del proyecto GR09.</description>
+
+    <modules>
+        <module>04. CLICON/ClienteConsola</module>
+        <module>04. CLIESC/ClienteEscritorio</module>
+        <module>04. CLIWEB/ClienteWeb</module>
+        <module>04. SERVIDOR/WS_EurekaBank_SOAP_JAVA</module>
+    </modules>
+
+    <!-- 04. CLIMOV conserva su build Gradle y se abre como proyecto separado. -->
+</project>

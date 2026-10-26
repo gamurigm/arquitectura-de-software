@@ -26,6 +26,16 @@ android {
     }
 }
 
+tasks.register<Exec>("installAndLaunchDebug") {
+    group = "application"
+    description = "Instala y abre la aplicación debug en el dispositivo Android conectado."
+    dependsOn("installDebug")
+    commandLine(
+        file("${android.sdkDirectory}/platform-tools/adb.exe"),
+        "shell", "monkey", "-p", android.defaultConfig.applicationId ?: android.namespace, "1"
+    )
+}
+
 dependencies {
     implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("com.google.android.material:material:1.12.0")

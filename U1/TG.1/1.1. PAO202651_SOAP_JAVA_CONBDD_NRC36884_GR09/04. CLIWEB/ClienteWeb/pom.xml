@@ -8,9 +8,10 @@
     <packaging>war</packaging>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.release>25</maven.compiler.release>
+        <maven.compiler.release>21</maven.compiler.release>
         <metro.version>4.0.4</metro.version>
-        <eurekabank.build.directory>D:/tools/build-cache/eurekabank-gr09/cliente-web</eurekabank.build.directory>
+        <eurekabank.build.directory>${user.home}/Documents/ESPE VIII SII2026/tools/build-cache/eurekabank-gr09/cliente-web</eurekabank.build.directory>
+        <netbeans.hint.deploy.server>pfv5ee8</netbeans.hint.deploy.server>
     </properties>
     <dependencies>
         <dependency>

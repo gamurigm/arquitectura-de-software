@@ -1,26 +1,31 @@
 $ErrorActionPreference = 'Stop'
 $proyecto = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
+$repositoryRoot = $PSScriptRoot
+while ($repositoryRoot -and -not (Test-Path -LiteralPath (Join-Path $repositoryRoot 'scripts\Initialize-NetBeansJavaEnvironment.ps1'))) {
+    $repositoryRoot = Split-Path -Parent $repositoryRoot
+}
+if (-not $repositoryRoot) { throw 'No se encontró scripts\Initialize-NetBeansJavaEnvironment.ps1 en el repositorio.' }
+$mavenAnterior = $env:MAVEN_OPTS
+$javaHomeAnterior = $env:JAVA_HOME
+$mvndJavaHomeAnterior = $env:MVND_JAVA_HOME
+$pathAnterior = $env:PATH
+. (Join-Path $repositoryRoot 'scripts\Initialize-NetBeansJavaEnvironment.ps1')
+$localJava = Initialize-NetBeansJavaEnvironment -RepositoryRoot $repositoryRoot
 $listener = [System.Net.Sockets.TcpListener]::new([System.Net.IPAddress]::Loopback, 0)
 $listener.Start()
 $puerto = $listener.LocalEndpoint.Port
 $listener.Stop()
 
 $urlAnterior = $env:EUREKABANK_REST_URL
-$mavenAnterior = $env:MAVEN_OPTS
-$javaHomeAnterior = $env:JAVA_HOME
-$mvndJavaHomeAnterior = $env:MVND_JAVA_HOME
-$pathAnterior = $env:PATH
-$java = (Get-Command java -ErrorAction Stop).Source
-$javaHome = Split-Path -Parent (Split-Path -Parent $java)
+$javaHome = $localJava.Jdk25
 $env:EUREKABANK_REST_URL = "http://127.0.0.1:$puerto/api/eureka"
-$env:MAVEN_OPTS = (($mavenAnterior + ' -Dmaven.repo.local=D:\tools\maven-repo').Trim())
 $env:JAVA_HOME = $javaHome
 $env:MVND_JAVA_HOME = $javaHome
 $env:PATH = (Join-Path $javaHome 'bin') + ';' + $pathAnterior
 Push-Location $proyecto
 try {
     $entrada = "usuario-prueba`nclave-invalida`n"
-    $salida = $entrada | & mvn --batch-mode --no-transfer-progress -q compile exec:java 2>&1
+    $salida = $entrada | & $localJava.Maven --batch-mode --no-transfer-progress -q compile exec:java 2>&1
     $texto = $salida -join [Environment]::NewLine
     if ($LASTEXITCODE -ne 0) { throw "No se pudo ejecutar el cliente de consola. Salida: $texto" }
     if ($texto -match 'EurekaBank: null') { throw 'El cliente mostró una excepción sin mensaje.' }

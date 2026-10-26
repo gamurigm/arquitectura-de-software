@@ -22,3 +22,13 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 }
+
+tasks.register<Exec>("installAndLaunchDebug") {
+    group = "application"
+    description = "Instala y abre la aplicación debug en el dispositivo Android conectado."
+    dependsOn("installDebug")
+    commandLine(
+        file("${android.sdkDirectory}/platform-tools/adb.exe"),
+        "shell", "monkey", "-p", android.defaultConfig.applicationId ?: android.namespace, "1"
+    )
+}
