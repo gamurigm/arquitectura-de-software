@@ -5,7 +5,9 @@
     <groupId>ec.edu.monster</groupId>
     <artifactId>ClienteConsolaEurekaBankREST</artifactId>
     <version>1.0.0</version>
+    <name>GR09 - REST - Java - CON BDD - EurekaBank - Cliente Consola</name>
     <properties>
+        <netbeans.hint.jdkPlatform>JDK_25</netbeans.hint.jdkPlatform>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>21</maven.compiler.release>
         <jackson.version>2.18.4</jackson.version>

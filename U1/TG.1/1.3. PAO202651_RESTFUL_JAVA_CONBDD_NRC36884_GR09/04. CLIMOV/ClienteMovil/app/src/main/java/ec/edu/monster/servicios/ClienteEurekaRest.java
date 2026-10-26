@@ -2,6 +2,7 @@ package ec.edu.monster.servicios;
 
 import ec.edu.monster.BuildConfig;
 import ec.edu.monster.modelo.Movimiento;
+import ec.edu.monster.modelo.Cuenta;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,9 +34,9 @@ public final class ClienteEurekaRest {
         return respuesta.optString("token", null);
     }
 
-    public List<Movimiento> traerMovimientos(String cuenta) throws IOException {
+    public List<Movimiento> traerMovimientos(String token, String cuenta) throws IOException {
         String ruta = "/movimientos?cuenta=" + URLEncoder.encode(cuenta, StandardCharsets.UTF_8);
-        HttpURLConnection conexion = abrir("GET", ruta, null);
+        HttpURLConnection conexion = abrir("GET", ruta, null, token);
         try {
             String cuerpo = leerRespuesta(conexion);
             JSONArray filas = new JSONArray(cuerpo);
@@ -52,9 +53,24 @@ public final class ClienteEurekaRest {
         } finally { conexion.disconnect(); }
     }
 
-    public boolean registrarDeposito(String cuenta, BigDecimal importe) throws IOException {
+    public List<Cuenta> traerCuentas(String token) throws IOException {
+        HttpURLConnection conexion = abrir("GET", "/cuentas", null, token);
+        try {
+            JSONArray filas = new JSONArray(leerRespuesta(conexion));
+            List<Cuenta> cuentas = new ArrayList<>();
+            for (int i = 0; i < filas.length(); i++) {
+                JSONObject fila = filas.getJSONObject(i);
+                cuentas.add(new Cuenta(fila.getString("numero"), fila.getString("moneda"), fila.optString("monedaNombre", ""), new BigDecimal(fila.get("saldo").toString())));
+            }
+            return cuentas;
+        } catch (org.json.JSONException | NumberFormatException e) {
+            throw new IOException("El servidor envió cuentas con formato inválido.", e);
+        } finally { conexion.disconnect(); }
+    }
+
+    public boolean registrarDeposito(String token, String cuenta, BigDecimal importe) throws IOException {
         JSONObject solicitud = objeto("cuenta", cuenta, "importe", importe);
-        return enviar("POST", "/depositos", solicitud).optBoolean("registrado", false);
+        return enviar(token, "POST", "/depositos", solicitud).optBoolean("registrado", false);
     }
 
     public boolean transferir(String token, String origen, String destino, BigDecimal importe, String claveOperacion) throws IOException {

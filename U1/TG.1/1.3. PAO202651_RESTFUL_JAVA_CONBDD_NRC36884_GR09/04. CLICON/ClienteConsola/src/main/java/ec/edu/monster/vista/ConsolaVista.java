@@ -20,7 +20,9 @@ public final class ConsolaVista {
             if (!autenticar(entrada, consola)) return;
             while (controlador.estaAutenticado()) {
                 System.out.println("\nEUREKABANK  |  Bienvenido/a, " + controlador.usuarioActual());
-                System.out.println("1. Consultar movimientos\n2. Registrar depósito\n3. Transferir\n4. Cerrar sesión");
+                mostrarCuentas();
+                System.out.println("\n  MIS CUENTAS");
+                System.out.println("\n  OPERACIONES\n1. Consultar movimientos\n2. Registrar depósito\n3. Transferir\n4. Cerrar sesión");
                 switch (leer(entrada, consola, "Opción: ")) {
                     case "1" -> consultar(entrada, consola);
                     case "2" -> depositar(entrada, consola);
@@ -48,7 +50,8 @@ public final class ConsolaVista {
     }
 
     private void consultar(Scanner entrada, Console consola) {
-        String cuenta = leer(entrada, consola, "Número de cuenta (8 dígitos): ").strip();
+        String cuenta = seleccionarCuenta(entrada, consola);
+        if (cuenta == null) return;
         try {
             List<Movimiento> movimientos = controlador.consultarMovimientos(cuenta);
             if (movimientos.isEmpty()) { System.out.println("No hay movimientos para esa cuenta."); return; }
@@ -60,7 +63,8 @@ public final class ConsolaVista {
     }
 
     private void depositar(Scanner entrada, Console consola) {
-        String cuenta = leer(entrada, consola, "Número de cuenta (8 dígitos): ").strip();
+        String cuenta = seleccionarCuenta(entrada, consola);
+        if (cuenta == null) return;
         BigDecimal importe;
         try { importe = new BigDecimal(leer(entrada, consola, "Importe: ").strip().replace(',', '.')); }
         catch (NumberFormatException e) { System.out.println("Ingrese un importe decimal válido."); return; }
@@ -70,13 +74,15 @@ public final class ConsolaVista {
     }
 
     private void transferir(Scanner entrada, Console consola) {
-        String origen = leer(entrada, consola, "Cuenta origen: ").strip();
-        String destino = leer(entrada, consola, "Cuenta destino: ").strip();
+        String origen = seleccionarCuenta(entrada, consola);
+        if (origen == null) return;
+        String destino = seleccionarCuenta(entrada, consola, origen);
+        if (destino == null) return;
         BigDecimal importe;
         try { importe = new BigDecimal(leer(entrada, consola, "Importe: ").strip().replace(',', '.')); }
         catch (NumberFormatException e) { System.out.println("Ingrese un importe decimal válido."); return; }
         if (origen.equals(destino) || importe.signum() <= 0 || importe.scale() > 2) {
-            System.out.println("Cuentas distintas e importe positivo con hasta dos decimales requeridos."); return;
+            System.out.println("Seleccione cuentas distintas e importe positivo con hasta dos decimales."); return;
         }
         String clave = java.util.UUID.randomUUID().toString();
         try {
@@ -84,6 +90,28 @@ public final class ConsolaVista {
                     ? "Transferencia registrada: débito y crédito confirmados."
                     : "Transferencia rechazada. Revise cuentas, moneda, saldo e importe.");
         } catch (IOException | InterruptedException e) { fallo(e); }
+    }
+
+    private void mostrarCuentas() {
+        if (controlador.cuentas().isEmpty()) System.out.println("No hay cuentas activas asignadas.");
+        else controlador.cuentas().forEach(c -> System.out.println("  " + c.numero() + "  |  " + c.nombreMoneda() + "\n      Saldo disponible: " + c.simbolo() + " " + c.saldoFormateado()));
+    }
+
+    private String seleccionarCuenta(Scanner entrada, Console consola) {
+        return seleccionarCuenta(entrada, consola, null);
+    }
+
+    private String seleccionarCuenta(Scanner entrada, Console consola, String origen) {
+        if (controlador.cuentas().isEmpty()) { System.out.println("No hay cuentas activas asignadas."); return null; }
+        var cuentaOrigen = controlador.cuentas().stream().filter(c -> c.numero().equals(origen)).findFirst().orElse(null);
+        var disponibles = controlador.cuentas().stream().filter(c -> origen == null || cuentaOrigen != null
+                && !c.numero().equals(origen) && cuentaOrigen.moneda().equals(c.moneda())).toList();
+        if (disponibles.isEmpty()) { System.out.println("No hay otra cuenta activa en la misma moneda."); return null; }
+        for (int i = 0; i < disponibles.size(); i++) System.out.println((i + 1) + ". " + disponibles.get(i));
+        try {
+            int opcion = Integer.parseInt(leer(entrada, consola, "Seleccione cuenta: ").strip());
+            return opcion > 0 && opcion <= disponibles.size() ? disponibles.get(opcion - 1).numero() : null;
+        } catch (NumberFormatException e) { return null; }
     }
 
     private String leer(Scanner entrada, Console consola, String prompt) {

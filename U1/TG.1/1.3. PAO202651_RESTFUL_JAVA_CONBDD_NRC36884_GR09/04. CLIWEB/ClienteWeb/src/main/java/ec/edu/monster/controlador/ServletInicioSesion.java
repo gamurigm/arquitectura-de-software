@@ -28,10 +28,12 @@ public class ServletInicioSesion extends HttpServlet {
         try {
             String token = cliente.iniciarSesion(usuario, contrasena);
             if (token != null && !token.isBlank()) {
+                var cuentas = cliente.traerCuentas(token);
                 HttpSession sesion = request.getSession(true);
                 request.changeSessionId();
                 sesion.setAttribute("usuario", usuario.strip());
                 sesion.setAttribute("token", token);
+                sesion.setAttribute("cuentas", cuentas);
                 sesion.setMaxInactiveInterval(30 * 60);
                 response.sendRedirect(request.getContextPath() + "/inicio");
                 return;

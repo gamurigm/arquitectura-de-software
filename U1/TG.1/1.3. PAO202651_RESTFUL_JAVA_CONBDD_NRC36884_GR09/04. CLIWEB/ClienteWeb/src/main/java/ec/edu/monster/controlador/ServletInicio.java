@@ -21,6 +21,7 @@ public class ServletInicio extends HttpServlet {
             sesion.setAttribute("csrfToken", java.util.Base64.getUrlEncoder().withoutPadding().encodeToString(bytes));
         }
         request.setAttribute("usuario", sesion.getAttribute("usuario"));
+        request.setAttribute("cuentas", sesion.getAttribute("cuentas"));
         request.setAttribute("csrfToken", sesion.getAttribute("csrfToken"));
         request.setAttribute("claveOperacion", java.util.UUID.randomUUID().toString());
         request.getRequestDispatcher("/WEB-INF/vista/inicio.jsp").forward(request, response);

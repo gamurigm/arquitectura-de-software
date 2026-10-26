@@ -14,31 +14,34 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
+import android.widget.Spinner;
+import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import ec.edu.monster.controlador.ControladorCliente;
 import ec.edu.monster.modelo.Movimiento;
+import ec.edu.monster.modelo.Cuenta;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public final class ActividadPrincipal extends Activity {
-    private static final int FONDO = Color.rgb(11, 16, 32);
-    private static final int PANEL = Color.rgb(18, 28, 48);
-    private static final int CAMPO = Color.rgb(23, 36, 58);
-    private static final int TEXTO = Color.rgb(244, 247, 252);
-    private static final int MUTED = Color.rgb(169, 183, 203);
-    private static final int TURQUESA = Color.rgb(82, 224, 210);
+    private static final int FONDO = Color.rgb(243, 247, 250);
+    private static final int PANEL = Color.WHITE;
+    private static final int CAMPO = Color.WHITE;
+    private static final int TEXTO = Color.rgb(23, 50, 77);
+    private static final int MUTED = Color.rgb(102, 123, 142);
+    private static final int TURQUESA = Color.rgb(8, 127, 123);
     private final ControladorCliente controlador = new ControladorCliente();
     private final ExecutorService tareas = Executors.newSingleThreadExecutor();
     private final Handler principal = new Handler(Looper.getMainLooper());
     private LinearLayout raiz;
     private EditText usuario;
     private EditText contrasena;
-    private EditText cuenta;
+    private Spinner cuenta;
     private EditText importe;
-    private EditText cuentaOrigen;
-    private EditText cuentaDestino;
+    private Spinner cuentaOrigen;
+    private Spinner cuentaDestino;
     private EditText importeTransferencia;
     private TextView estado;
     private TextView resultados;
@@ -85,8 +88,13 @@ public final class ActividadPrincipal extends Activity {
         encabezado.addView(salir);
         tarjeta.addView(encabezado);
         tarjeta.addView(texto("Sesión de " + controlador.usuarioActual(), 14, MUTED, false));
-        cuenta = campo("Número de cuenta (8 dígitos)", InputType.TYPE_CLASS_NUMBER);
-        importe = campo("Importe en dólares", InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL | InputType.TYPE_NUMBER_FLAG_SIGNED);
+        tarjeta.addView(texto("MIS CUENTAS · SALDO DISPONIBLE", 12, TURQUESA, true));
+        LinearLayout listaCuentas = new LinearLayout(this);
+        listaCuentas.setOrientation(LinearLayout.VERTICAL);
+        listaCuentas.setTag("lista-cuentas");
+        tarjeta.addView(listaCuentas);
+        cuenta = new Spinner(this);
+        importe = campo("Importe del depósito", InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL | InputType.TYPE_NUMBER_FLAG_SIGNED);
         tarjeta.addView(cuenta);
         tarjeta.addView(importe);
         Button movimientos = boton("Consultar movimientos", true);
@@ -95,11 +103,14 @@ public final class ActividadPrincipal extends Activity {
         Button deposito = boton("Registrar depósito", false);
         deposito.setOnClickListener(v -> { botonAccion = (Button) v; depositar(); });
         tarjeta.addView(deposito);
-        cuentaOrigen = campo("Cuenta origen (8 dígitos)", InputType.TYPE_CLASS_NUMBER);
-        cuentaDestino = campo("Cuenta destino (8 dígitos)", InputType.TYPE_CLASS_NUMBER);
+        cuentaOrigen = new Spinner(this);
+        cuentaDestino = new Spinner(this);
         importeTransferencia = campo("Importe a transferir", InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+        tarjeta.addView(texto("CUENTA DE ORIGEN", 12, MUTED, true));
         tarjeta.addView(cuentaOrigen);
+        tarjeta.addView(texto("CUENTA DE DESTINO · MISMA MONEDA", 12, MUTED, true));
         tarjeta.addView(cuentaDestino);
+        importeTransferencia.setHint("Importe en la moneda seleccionada");
         tarjeta.addView(importeTransferencia);
         Button transferencia = boton("Transferir", false);
         transferencia.setOnClickListener(v -> { botonAccion = transferencia; transferir(); });
@@ -117,14 +128,15 @@ public final class ActividadPrincipal extends Activity {
         String nombre = usuario.getText().toString().trim();
         String clave = contrasena.getText().toString();
         ejecutar(() -> controlador.iniciarSesion(nombre, clave), resultado -> {
-            if (Boolean.TRUE.equals(resultado)) mostrarPanel();
+            if (Boolean.TRUE.equals(resultado)) { mostrarPanel(); llenarCuentas(); }
             else estado.setText("Credenciales incorrectas.");
             contrasena.setText("");
         });
     }
 
     private void consultar() {
-        String numero = cuenta.getText().toString().trim();
+        String numero = cuentaSeleccionada(cuenta);
+        if (numero.isBlank()) { estado.setText("No hay cuentas activas asignadas."); return; }
         ejecutar(() -> controlador.traerMovimientos(numero), resultado -> {
             @SuppressWarnings("unchecked") List<Movimiento> lista = (List<Movimiento>) resultado;
             if (lista.isEmpty()) { resultados.setText("No hay movimientos para esta cuenta."); return; }
@@ -140,7 +152,8 @@ public final class ActividadPrincipal extends Activity {
         try { valor = new BigDecimal(importe.getText().toString().trim().replace(',', '.')); }
         catch (NumberFormatException e) { estado.setText("Ingrese un importe decimal válido."); return; }
         if (valor.signum() <= 0 || valor.scale() > 2) { estado.setText("Use un importe positivo de hasta dos decimales."); return; }
-        String numero = cuenta.getText().toString().trim();
+        String numero = cuentaSeleccionada(cuenta);
+        if (numero.isBlank()) { estado.setText("No hay cuentas activas asignadas."); return; }
         ejecutar(() -> controlador.registrarDeposito(numero, valor), resultado -> {
             if (Boolean.TRUE.equals(resultado)) { estado.setText("Depósito registrado."); consultar(); }
             else estado.setText("No se pudo registrar el depósito. Revise la cuenta.");
@@ -148,19 +161,70 @@ public final class ActividadPrincipal extends Activity {
     }
 
     private void transferir() {
-        String origen = cuentaOrigen.getText().toString().trim();
-        String destino = cuentaDestino.getText().toString().trim();
+        String origen = cuentaSeleccionada(cuentaOrigen);
+        String destino = cuentaSeleccionada(cuentaDestino);
         BigDecimal valor;
         try { valor = new BigDecimal(importeTransferencia.getText().toString().trim().replace(',', '.')); }
         catch (NumberFormatException e) { estado.setText("Ingrese un importe decimal válido."); return; }
-        if (!origen.matches("[0-9]{8}") || !destino.matches("[0-9]{8}") || origen.equals(destino)
+        if (origen.isBlank() || destino.isBlank() || origen.equals(destino)
                 || valor.signum() <= 0 || valor.scale() > 2) {
-            estado.setText("Use dos cuentas distintas e importe positivo de hasta dos decimales."); return;
+            estado.setText("Seleccione cuentas distintas en la misma moneda e importe positivo."); return;
         }
         ejecutar(() -> controlador.transferir(origen, destino, valor), resultado ->
                 estado.setText(Boolean.TRUE.equals(resultado)
                         ? "Transferencia registrada: débito y crédito confirmados."
                         : "Transferencia rechazada. Revise cuentas, moneda, saldo e importe."));
+    }
+
+    private void llenarCuentas() {
+        var cuentas = controlador.cuentas();
+        LinearLayout listaCuentas = (LinearLayout) raiz.findViewWithTag("lista-cuentas");
+        if (listaCuentas != null) {
+            listaCuentas.removeAllViews();
+            for (Cuenta c : cuentas) {
+                LinearLayout fila = new LinearLayout(this);
+                fila.setOrientation(LinearLayout.VERTICAL);
+                fila.setPadding(dp(14), dp(12), dp(14), dp(12));
+                fila.setBackground(redondeado(PANEL, 14));
+                LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(-1, -2);
+                p.topMargin = dp(8);
+                fila.setLayoutParams(p);
+                fila.addView(texto(c.numero() + " · " + c.nombreMoneda(), 14, TEXTO, true));
+                fila.addView(texto("Saldo disponible  " + c.simbolo() + " " + c.saldoFormateado(), 20, TURQUESA, true));
+                listaCuentas.addView(fila);
+            }
+        }
+        var adaptador = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, cuentas);
+        adaptador.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        cuenta.setAdapter(adaptador);
+        var origen = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, cuentas);
+        origen.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        cuentaOrigen.setAdapter(origen);
+        actualizarDestinos();
+        cuentaOrigen.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
+            @Override public void onItemSelected(android.widget.AdapterView<?> parent, View view, int position, long id) { actualizarDestinos(); }
+            @Override public void onNothingSelected(android.widget.AdapterView<?> parent) { cuentaDestino.setAdapter(null); }
+        });
+        if (cuentas.isEmpty()) estado.setText("No hay cuentas activas asignadas.");
+    }
+
+    private void actualizarDestinos() {
+        String origen = cuentaSeleccionada(cuentaOrigen);
+        Cuenta cuentaOrigenSeleccionada = controlador.cuentas().stream()
+                .filter(c -> c.numero().equals(origen)).findFirst().orElse(null);
+        String destinoActual = cuentaSeleccionada(cuentaDestino);
+        var destinos = new java.util.ArrayList<Cuenta>();
+        controlador.cuentas().stream().filter(c -> cuentaOrigenSeleccionada != null
+                && !c.numero().equals(origen) && c.moneda().equals(cuentaOrigenSeleccionada.moneda()))
+                .forEach(destinos::add);
+        var adaptador = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, destinos);
+        adaptador.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        cuentaDestino.setAdapter(adaptador);
+        for (int i = 0; i < destinos.size(); i++) if (destinos.get(i).numero().equals(destinoActual)) cuentaDestino.setSelection(i);
+    }
+
+    private static String cuentaSeleccionada(Spinner selector) {
+        return selector.getSelectedItem() instanceof Cuenta cuenta ? cuenta.numero() : "";
     }
 
     private void ejecutar(Tarea tarea, java.util.function.Consumer<Object> alCompletar) {
@@ -175,7 +239,12 @@ public final class ActividadPrincipal extends Activity {
             Exception fallo = error;
             principal.post(() -> {
                 if (botonAccion != null) botonAccion.setEnabled(true);
-                if (fallo != null) estado.setText("No se pudo completar la solicitud. Revise la conexión.");
+                if (fallo != null) {
+                    String detalle = fallo.getMessage();
+                    estado.setText(detalle != null && detalle.startsWith("El servidor respondió HTTP ")
+                            ? detalle
+                            : "No se pudo completar la solicitud. Revise la conexión.");
+                }
                 else { estado.setText("Operación completada."); alCompletar.accept(resultado); }
             });
         });
@@ -186,7 +255,7 @@ public final class ActividadPrincipal extends Activity {
         raiz.setOrientation(LinearLayout.VERTICAL);
         raiz.setPadding(dp(20), dp(28), dp(20), dp(24));
         raiz.setBackground(new GradientDrawable(GradientDrawable.Orientation.TL_BR,
-                new int[]{Color.rgb(11, 16, 32), Color.rgb(16, 42, 68), Color.rgb(18, 73, 89)}));
+                new int[]{Color.rgb(243, 247, 250), Color.rgb(232, 241, 243), Color.rgb(243, 247, 250)}));
         ScrollView scroll = new ScrollView(this);
         scroll.setFillViewport(true);
         scroll.setContentDescription("Pantalla de EurekaBank");

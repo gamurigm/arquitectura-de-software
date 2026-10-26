@@ -22,12 +22,18 @@ public class ServletMovimientos extends HttpServlet {
         request.setAttribute("cuenta", cuenta == null ? "" : cuenta);
         try {
             if (cuenta == null || !cuenta.matches("[0-9]{8}")) request.setAttribute("mensaje", "Ingrese una cuenta válida de ocho dígitos.");
-            else request.setAttribute("movimientos", cliente.traerMovimientos(cuenta));
+            else request.setAttribute("movimientos", cliente.traerMovimientos(
+                    (String) request.getSession(false).getAttribute("token"), cuenta));
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             request.setAttribute("mensaje", "La solicitud fue interrumpida.");
             request.setAttribute("error", true);
         } catch (Exception e) {
+            if (e.getMessage() != null && e.getMessage().contains("HTTP 401")) {
+                request.getSession(false).invalidate();
+                response.sendRedirect(request.getContextPath() + "/login?expirada=1");
+                return;
+            }
             request.setAttribute("mensaje", "No se pudieron consultar los movimientos.");
             request.setAttribute("error", true);
         }

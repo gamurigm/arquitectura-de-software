@@ -11,8 +11,12 @@ public final class ConexionDB {
 
     private ConexionDB() {
         MysqlDataSource mysql = new MysqlDataSource();
-        mysql.setURL(System.getenv().getOrDefault("EUREKABANK_DB_URL",
-                "jdbc:mysql://127.0.0.1:3306/eurekabank_gr09?sslMode=DISABLED&allowPublicKeyRetrieval=true"));
+        String url = System.getenv("EUREKABANK_DB_URL");
+        if (url == null || url.isBlank()) {
+            url = System.getProperty("EUREKABANK_DB_URL",
+                    "jdbc:mysql://127.0.0.1:3306/eurekabank_gr09?sslMode=DISABLED&allowPublicKeyRetrieval=true");
+        }
+        mysql.setURL(url);
         fuente = mysql;
     }
 
@@ -26,6 +30,9 @@ public final class ConexionDB {
 
     private static String requerida(String variable) throws SQLException {
         String valor = System.getenv(variable);
+        if (valor == null || valor.isBlank()) {
+            valor = System.getProperty(variable);
+        }
         if (valor == null || valor.isBlank()) {
             throw new SQLException("Falta configurar la variable " + variable + ".");
         }

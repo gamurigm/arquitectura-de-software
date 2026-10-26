@@ -31,9 +31,10 @@ public class ServletDeposito extends HttpServlet {
             if (cuenta == null || !cuenta.matches("[0-9]{8}") || importe.signum() <= 0 || importe.scale() > 2) {
                 mensaje = "La cuenta o el importe no son válidos. Use un importe positivo de hasta dos decimales.";
                 error = true;
-            } else if (cliente.registrarDeposito(cuenta, importe)) {
+            } else if (cliente.registrarDeposito((String) request.getSession(false).getAttribute("token"), cuenta, importe)) {
                 mensaje = "Depósito registrado.";
-                List<Movimiento> movimientos = cliente.traerMovimientos(cuenta);
+                List<Movimiento> movimientos = cliente.traerMovimientos(
+                        (String) request.getSession(false).getAttribute("token"), cuenta);
                 request.setAttribute("movimientos", movimientos);
             } else {
                 mensaje = "No se pudo registrar el depósito. Revise que la cuenta esté activa.";
@@ -47,6 +48,11 @@ public class ServletDeposito extends HttpServlet {
             mensaje = "La solicitud fue interrumpida.";
             error = true;
         } catch (Exception e) {
+            if (e.getMessage() != null && e.getMessage().contains("HTTP 401")) {
+                request.getSession(false).invalidate();
+                response.sendRedirect(request.getContextPath() + "/login?expirada=1");
+                return;
+            }
             mensaje = "No se pudo comunicar con EurekaBank.";
             error = true;
         }

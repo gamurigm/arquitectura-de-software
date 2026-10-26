@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import ec.edu.monster.modelo.Movimiento;
+import ec.edu.monster.modelo.Cuenta;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URI;
@@ -18,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 public final class ClienteEurekaRest {
-    private static final String URL_PREDETERMINADA = "http://127.0.0.1:8080/eurekabank-rest-java-gr09/api/eureka";
+    private static final String URL_PREDETERMINADA = "http://127.0.0.1:8080/WS_EurekaBank_REST_JAVA/api/eureka";
     private final HttpClient http = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(3)).build();
     private final ObjectMapper json = new ObjectMapper().registerModule(new JavaTimeModule());
     private final String baseUrl;
@@ -36,15 +37,23 @@ public final class ClienteEurekaRest {
         return enviar("POST", "/login", Map.of("usuario", usuario, "contrasena", contrasena)).path("token").asText(null);
     }
 
-    public List<Movimiento> traerMovimientos(String cuenta) throws IOException, InterruptedException {
+    public List<Movimiento> traerMovimientos(String token, String cuenta) throws IOException, InterruptedException {
         String url = baseUrl + "/movimientos?cuenta=" + URLEncoder.encode(cuenta, StandardCharsets.UTF_8);
-        HttpResponse<String> respuesta = http.send(HttpRequest.newBuilder(URI.create(url)).timeout(Duration.ofSeconds(8)).GET().build(), HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> respuesta = http.send(HttpRequest.newBuilder(URI.create(url)).timeout(Duration.ofSeconds(8))
+                .header("Authorization", "Bearer " + token).GET().build(), HttpResponse.BodyHandlers.ofString());
         revisar(respuesta);
         return json.readValue(respuesta.body(), new TypeReference<>() { });
     }
 
-    public boolean registrarDeposito(String cuenta, BigDecimal importe) throws IOException, InterruptedException {
-        return enviar("POST", "/depositos", Map.of("cuenta", cuenta, "importe", importe)).path("registrado").asBoolean(false);
+    public List<Cuenta> traerCuentas(String token) throws IOException, InterruptedException {
+        HttpResponse<String> respuesta = http.send(HttpRequest.newBuilder(URI.create(baseUrl + "/cuentas")).timeout(Duration.ofSeconds(8))
+                .header("Authorization", "Bearer " + token).GET().build(), HttpResponse.BodyHandlers.ofString());
+        revisar(respuesta);
+        return json.readValue(respuesta.body(), new TypeReference<>() { });
+    }
+
+    public boolean registrarDeposito(String token, String cuenta, BigDecimal importe) throws IOException, InterruptedException {
+        return enviar(token, "POST", "/depositos", Map.of("cuenta", cuenta, "importe", importe)).path("registrado").asBoolean(false);
     }
 
     public boolean transferir(String token, String origen, String destino, BigDecimal importe, String claveOperacion) throws IOException, InterruptedException {

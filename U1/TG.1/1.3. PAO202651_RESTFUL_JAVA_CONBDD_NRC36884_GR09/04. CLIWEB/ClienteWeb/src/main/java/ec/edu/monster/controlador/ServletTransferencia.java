@@ -34,6 +34,8 @@ public class ServletTransferencia extends HttpServlet {
         String origen = request.getParameter("cuentaOrigen");
         String destino = request.getParameter("cuentaDestino");
         String clave = request.getParameter("claveOperacion");
+        @SuppressWarnings("unchecked") java.util.List<ec.edu.monster.modelo.Cuenta> cuentas =
+                (java.util.List<ec.edu.monster.modelo.Cuenta>) sesion.getAttribute("cuentas");
         request.setAttribute("usuario", sesion.getAttribute("usuario"));
         request.setAttribute("csrfToken", esperado);
         request.setAttribute("claveOperacion", clave);
@@ -41,15 +43,17 @@ public class ServletTransferencia extends HttpServlet {
         try {
             BigDecimal importe = new BigDecimal(request.getParameter("importe"));
             UUID.fromString(clave);
-            if (origen == null || !origen.matches("[0-9]{8}") || destino == null
-                    || !destino.matches("[0-9]{8}") || origen.equals(destino)
+            var cuentaOrigen = cuentas.stream().filter(c -> c.numero().equals(origen)).findFirst().orElse(null);
+            var cuentaDestino = cuentas.stream().filter(c -> c.numero().equals(destino)).findFirst().orElse(null);
+            if (cuentaOrigen == null || cuentaDestino == null || origen.equals(destino)
+                    || !cuentaOrigen.moneda().equals(cuentaDestino.moneda())
                     || importe.signum() <= 0 || importe.scale() > 2 || importe.precision() > 12) {
                 request.setAttribute("mensaje", "Use cuentas distintas de ocho dígitos e importe positivo de hasta dos decimales.");
                 request.setAttribute("error", true);
             } else if (cliente.transferir((String) sesion.getAttribute("token"), origen, destino, importe, clave)) {
                 request.setAttribute("mensaje", "Transferencia registrada: débito y crédito confirmados.");
                 request.setAttribute("claveOperacion", UUID.randomUUID().toString());
-                request.setAttribute("movimientos", cliente.traerMovimientos(destino));
+                request.setAttribute("movimientos", cliente.traerMovimientos((String) sesion.getAttribute("token"), origen));
             } else {
                 request.setAttribute("mensaje", "Transferencia rechazada. Revise cuentas, moneda, saldo e importe.");
                 request.setAttribute("error", true);
@@ -62,6 +66,11 @@ public class ServletTransferencia extends HttpServlet {
             request.setAttribute("mensaje", "No se confirmó el resultado. Reenvíe la misma solicitud para evitar duplicados.");
             request.setAttribute("error", true);
         } catch (Exception e) {
+            if (e.getMessage() != null && e.getMessage().contains("HTTP 401")) {
+                sesion.invalidate();
+                response.sendRedirect(request.getContextPath() + "/login?expirada=1");
+                return;
+            }
             request.setAttribute("mensaje", "No se confirmó el resultado. Reenvíe la misma solicitud para evitar duplicados.");
             request.setAttribute("error", true);
         }

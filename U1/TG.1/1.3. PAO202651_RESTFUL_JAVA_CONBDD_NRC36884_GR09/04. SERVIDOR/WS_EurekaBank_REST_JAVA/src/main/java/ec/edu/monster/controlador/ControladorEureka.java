@@ -1,6 +1,7 @@
 package ec.edu.monster.controlador;
 
 import ec.edu.monster.modelo.Movimiento;
+import ec.edu.monster.modelo.CuentaDto;
 import ec.edu.monster.modelo.RespuestaAutenticacion;
 import ec.edu.monster.modelo.RespuestaDeposito;
 import ec.edu.monster.modelo.RespuestaTransferencia;
@@ -22,7 +23,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-@Path("api/eureka")
+@Path("eureka")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class ControladorEureka {
@@ -43,11 +44,24 @@ public class ControladorEureka {
     }
 
     @GET
+    @Path("cuentas")
+    public Response traerCuentas(@HeaderParam("Authorization") String authorization) {
+        try {
+            List<CuentaDto> cuentas = servicio.traerCuentas(extraerToken(authorization));
+            return cuentas == null ? Response.status(Response.Status.UNAUTHORIZED).build() : Response.ok(cuentas).build();
+        } catch (SQLException | RuntimeException e) {
+            LOGGER.log(Level.SEVERE, "No se pudieron consultar las cuentas.", e);
+            return Response.serverError().entity(List.of()).build();
+        }
+    }
+
+    @GET
     @Path("movimientos")
-    public Response consultarMovimientos(@QueryParam("cuenta") String cuenta) {
+    public Response consultarMovimientos(@HeaderParam("Authorization") String authorization, @QueryParam("cuenta") String cuenta) {
         if (cuenta == null || cuenta.strip().length() != 8) return Response.status(400).entity(List.of()).build();
         try {
-            List<Movimiento> movimientos = servicio.traerMovimientos(cuenta);
+            List<Movimiento> movimientos = servicio.traerMovimientos(extraerToken(authorization), cuenta);
+            if (movimientos == null) return Response.status(Response.Status.UNAUTHORIZED).build();
             return Response.ok(movimientos).build();
         } catch (SQLException | RuntimeException e) {
             LOGGER.log(Level.SEVERE, "No se pudieron consultar los movimientos.", e);
@@ -57,11 +71,12 @@ public class ControladorEureka {
 
     @POST
     @Path("depositos")
-    public Response registrarDeposito(SolicitudDeposito solicitud) {
+    public Response registrarDeposito(@HeaderParam("Authorization") String authorization, SolicitudDeposito solicitud) {
         if (solicitud == null) return Response.status(400).entity(new RespuestaDeposito(false)).build();
         try {
-            return Response.ok(new RespuestaDeposito(
-                    servicio.registrarDeposito(solicitud.getCuenta(), solicitud.getImporte()))).build();
+            Boolean registrado = servicio.registrarDeposito(extraerToken(authorization), solicitud.getCuenta(), solicitud.getImporte());
+            if (registrado == null) return Response.status(Response.Status.UNAUTHORIZED).build();
+            return Response.ok(new RespuestaDeposito(registrado)).build();
         } catch (SQLException | RuntimeException e) {
             LOGGER.log(Level.SEVERE, "No se pudo registrar el depósito.", e);
             return Response.serverError().entity(new RespuestaDeposito(false)).build();

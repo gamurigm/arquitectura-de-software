@@ -6,7 +6,9 @@
     <artifactId>ClienteWebEurekaBankREST</artifactId>
     <version>1.0.0</version>
     <packaging>war</packaging>
+    <name>GR09 - REST - Java - CON BDD - EurekaBank - Cliente Web</name>
     <properties>
+        <netbeans.hint.jdkPlatform>JDK_25</netbeans.hint.jdkPlatform>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>21</maven.compiler.release>
         <jackson.version>2.18.4</jackson.version>

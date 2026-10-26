@@ -2,6 +2,7 @@ package ec.edu.monster.vista;
 
 import ec.edu.monster.controlador.ControladorEscritorio;
 import ec.edu.monster.modelo.Movimiento;
+import ec.edu.monster.modelo.Cuenta;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
@@ -19,6 +20,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -32,18 +34,18 @@ import javax.swing.SwingWorker;
 import javax.swing.table.DefaultTableModel;
 
 public final class VistaEureka {
-    private static final Color AZUL = new Color(18, 48, 89);
-    private static final Color TURQUESA = new Color(17, 142, 155);
+    private static final Color AZUL = new Color(20, 59, 96);
+    private static final Color TURQUESA = new Color(8, 127, 123);
     private final ControladorEscritorio controlador;
     private final JFrame ventana = new JFrame("EurekaBank | Banca personal");
     private final CardLayout tarjetas = new CardLayout();
     private final JPanel contenido = new JPanel(tarjetas);
     private final JTextField usuario = new JTextField(22);
     private final JPasswordField contrasena = new JPasswordField(22);
-    private final JTextField cuenta = new JTextField(12);
+    private final JComboBox<Cuenta> cuenta = new JComboBox<>();
     private final JTextField importe = new JTextField(12);
-    private final JTextField cuentaOrigen = new JTextField(9);
-    private final JTextField cuentaDestino = new JTextField(9);
+    private final JComboBox<Cuenta> cuentaOrigen = new JComboBox<>();
+    private final JComboBox<Cuenta> cuentaDestino = new JComboBox<>();
     private final JTextField importeTransferencia = new JTextField(9);
     private final JLabel estado = new JLabel("Consulta movimientos o registra un depósito.");
     private final DefaultTableModel tablaModelo = new DefaultTableModel(
@@ -85,7 +87,7 @@ public final class VistaEureka {
         contrasena.getAccessibleContext().setAccessibleName("Contraseña");
         JButton ingresar = boton("Iniciar sesión", true);
         ingresar.addActionListener(e -> ejecutar(() -> controlador.iniciarSesion(usuario.getText().strip(), new String(contrasena.getPassword())), ok -> {
-            if (ok) { tarjetas.show(contenido, "principal"); estado.setText("Sesión iniciada para " + controlador.usuarioActual()); }
+            if (ok) { llenarCuentas(); tarjetas.show(contenido, "principal"); estado.setText(controlador.cuentas().isEmpty() ? "No hay cuentas activas asignadas." : "Sesión iniciada para " + controlador.usuarioActual()); }
             else aviso("Usuario o contraseña incorrectos.");
         }));
         agregar(tarjeta, marca, g, 0, 0, 2);
@@ -116,6 +118,12 @@ public final class VistaEureka {
         encabezado.add(salir, BorderLayout.EAST);
         root.add(encabezado, BorderLayout.NORTH);
 
+        JPanel cuentasPanel = new JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 14, 0));
+        cuentasPanel.setOpaque(false);
+        cuentasPanel.add(etiquetaSeccion("MIS CUENTAS · SALDO DISPONIBLE"));
+        controlador.cuentas().forEach(c -> cuentasPanel.add(tarjetaCuenta(c)));
+        root.add(cuentasPanel, BorderLayout.BEFORE_FIRST_LINE);
+
         JPanel centro = new JPanel(new BorderLayout(12, 12));
         centro.setOpaque(false);
         JPanel acciones = new JPanel(new GridBagLayout());
@@ -126,9 +134,9 @@ public final class VistaEureka {
         JLabel lImporte = new JLabel("Importe del depósito");
         lImporte.setLabelFor(importe);
         cuenta.getAccessibleContext().setAccessibleName("Cuenta de ocho dígitos");
-        importe.getAccessibleContext().setAccessibleName("Importe en dólares, hasta dos decimales");
+        importe.getAccessibleContext().setAccessibleName("Importe de depósito, hasta dos decimales");
         JButton consultar = boton("Consultar movimientos", true);
-        consultar.addActionListener(e -> ejecutar(() -> controlador.consultarMovimientos(cuenta.getText().strip()), this::mostrarMovimientos));
+        consultar.addActionListener(e -> ejecutar(() -> controlador.consultarMovimientos(numero(cuenta)), this::mostrarMovimientos));
         JButton depositar = boton("Registrar depósito", false);
         depositar.addActionListener(e -> depositar());
         JButton transferir = boton("Transferir", false);
@@ -137,10 +145,11 @@ public final class VistaEureka {
         agregar(acciones, lCuenta, g, 0, 0, 1); agregar(acciones, cuenta, g, 1, 0, 1);
         agregar(acciones, lImporte, g, 0, 1, 1); agregar(acciones, importe, g, 1, 1, 1);
         agregar(acciones, consultar, g, 0, 2, 2); agregar(acciones, depositar, g, 0, 3, 2);
-        agregar(acciones, new JLabel("Origen / destino / importe"), g, 0, 4, 1);
-        JPanel camposTransferencia = new JPanel(); camposTransferencia.setOpaque(false);
-        camposTransferencia.add(cuentaOrigen); camposTransferencia.add(cuentaDestino); camposTransferencia.add(importeTransferencia);
-        agregar(acciones, camposTransferencia, g, 1, 4, 1); agregar(acciones, transferir, g, 0, 5, 2);
+        agregar(acciones, new JLabel("Cuenta de origen"), g, 0, 4, 1); agregar(acciones, cuentaOrigen, g, 1, 4, 1);
+        agregar(acciones, new JLabel("Cuenta de destino · misma moneda"), g, 0, 5, 1); agregar(acciones, cuentaDestino, g, 1, 5, 1);
+        agregar(acciones, new JLabel("Importe a transferir"), g, 0, 6, 1); agregar(acciones, importeTransferencia, g, 1, 6, 1);
+        agregar(acciones, transferir, g, 0, 7, 2);
+        cuentaOrigen.addActionListener(e -> actualizarDestino());
         centro.add(acciones, BorderLayout.NORTH);
 
         JTable tabla = new JTable(tablaModelo);
@@ -161,9 +170,9 @@ public final class VistaEureka {
         try { valor = new BigDecimal(importe.getText().strip().replace(',', '.')); }
         catch (NumberFormatException e) { aviso("Ingrese un importe válido."); return; }
         if (valor.signum() <= 0 || valor.scale() > 2) { aviso("El importe debe ser positivo y tener hasta dos decimales."); return; }
-        ejecutar(() -> controlador.registrarDeposito(cuenta.getText().strip(), valor), ok -> {
+        ejecutar(() -> controlador.registrarDeposito(numero(cuenta), valor), ok -> {
             estado.setText(ok ? "Depósito registrado." : "No se pudo registrar el depósito.");
-            if (ok) ejecutar(() -> controlador.consultarMovimientos(cuenta.getText().strip()), this::mostrarMovimientos);
+            if (ok) ejecutar(() -> controlador.consultarMovimientos(numero(cuenta)), this::mostrarMovimientos);
         });
     }
 
@@ -171,16 +180,61 @@ public final class VistaEureka {
         BigDecimal valor;
         try { valor = new BigDecimal(importeTransferencia.getText().strip().replace(',', '.')); }
         catch (NumberFormatException e) { aviso("Ingrese un importe válido."); return; }
-        String origen = cuentaOrigen.getText().strip(), destino = cuentaDestino.getText().strip();
-        if (!origen.matches("[0-9]{8}") || !destino.matches("[0-9]{8}") || origen.equals(destino)
+        String origen = numero(cuentaOrigen), destino = numero(cuentaDestino);
+        if (origen.isBlank() || destino.isBlank() || origen.equals(destino)
                 || valor.signum() <= 0 || valor.scale() > 2) {
-            aviso("Use dos cuentas distintas de ocho dígitos e importe positivo con hasta dos decimales."); return;
+            aviso("Seleccione cuentas distintas e importe positivo con hasta dos decimales."); return;
         }
         ejecutar(() -> controlador.transferir(origen, destino, valor), ok -> {
             estado.setText(ok ? "Transferencia registrada: débito y crédito confirmados."
                     : "Transferencia rechazada. Revise cuentas, moneda e importe.");
-            if (ok) ejecutar(() -> controlador.consultarMovimientos(destino), this::mostrarMovimientos);
+            if (ok) { cuenta.setSelectedItem(cuentaOrigen.getSelectedItem()); ejecutar(() -> controlador.consultarMovimientos(origen), this::mostrarMovimientos); }
         });
+    }
+
+    private void llenarCuentas() {
+        cuenta.removeAllItems(); cuentaOrigen.removeAllItems(); cuentaDestino.removeAllItems();
+        controlador.cuentas().forEach(c -> { cuenta.addItem(c); cuentaOrigen.addItem(c); });
+        actualizarDestino();
+    }
+
+    private static String numero(JComboBox<Cuenta> selector) {
+        Cuenta seleccionada = (Cuenta) selector.getSelectedItem();
+        return seleccionada == null ? "" : seleccionada.numero();
+    }
+
+    private void actualizarDestino() {
+        Cuenta origen = (Cuenta) cuentaOrigen.getSelectedItem();
+        String destinoActual = numero(cuentaDestino);
+        cuentaDestino.removeAllItems();
+        controlador.cuentas().stream()
+                .filter(destino -> origen != null && !origen.numero().equals(destino.numero()))
+                .filter(destino -> origen.moneda().equals(destino.moneda()))
+                .forEach(cuentaDestino::addItem);
+        for (int i = 0; i < cuentaDestino.getItemCount(); i++)
+            if (cuentaDestino.getItemAt(i).numero().equals(destinoActual)) cuentaDestino.setSelectedIndex(i);
+        cuentaDestino.setEnabled(cuentaDestino.getItemCount() > 0);
+    }
+
+    private static JLabel etiquetaSeccion(String texto) {
+        JLabel label = new JLabel(texto);
+        label.setForeground(TURQUESA);
+        label.setFont(label.getFont().deriveFont(Font.BOLD, 12f));
+        return label;
+    }
+
+    private static JPanel tarjetaCuenta(Cuenta cuenta) {
+        JPanel panel = new JPanel(new java.awt.GridLayout(0, 1, 0, 4));
+        panel.setBackground(Color.WHITE);
+        panel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(new Color(218, 228, 238)), BorderFactory.createEmptyBorder(10, 14, 10, 14)));
+        JLabel numero = new JLabel(cuenta.numero() + " · " + cuenta.nombreMoneda());
+        numero.setForeground(AZUL);
+        numero.setFont(numero.getFont().deriveFont(Font.BOLD, 13f));
+        JLabel saldo = new JLabel("Saldo  " + cuenta.simbolo() + " " + cuenta.saldoFormateado());
+        saldo.setForeground(TURQUESA);
+        saldo.setFont(saldo.getFont().deriveFont(Font.BOLD, 17f));
+        panel.add(numero); panel.add(saldo);
+        return panel;
     }
 
     private void mostrarMovimientos(List<Movimiento> movimientos) {
