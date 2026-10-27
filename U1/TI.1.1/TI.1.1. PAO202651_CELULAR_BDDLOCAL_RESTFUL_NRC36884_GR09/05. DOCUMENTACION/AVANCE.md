@@ -27,6 +27,7 @@
 - API, consola, WPF, web, MAUI Android y herramienta de administración: compilación correcta, 0 advertencias y 0 errores.
 - API de imagen, sobre `ComercializadoraCelulares_CellQA_20261027` aislada: carga `204`, reemplazo `204`, bytes descargados coinciden, caché `no-store`, eliminación `204`, GET posterior `404`.
 - Smoke de venta y crédito: catálogo CRUD correcto, efectivo `$261,00`, crédito aprobado, reintento sin duplicado y saldo final `$0,00` en amortización.
+- Cliente Android MAUI renovado y revisado en `emulator-5554`: navegación lateral, catálogo con fotos, venta con total previo, búsqueda de facturas, amortización, tema claro/oscuro y cambio de contraste.
 - Word exportado a PDF: ERS 16 páginas, ECUD 19 y manual 5. Portadas, pies, imágenes y paginación revisados; documentos sin contenido heredado de otra solución.
 - PowerPoint conserva 44 diapositivas, 1 patrón y 11 diseños; paquete ZIP validado.
 
