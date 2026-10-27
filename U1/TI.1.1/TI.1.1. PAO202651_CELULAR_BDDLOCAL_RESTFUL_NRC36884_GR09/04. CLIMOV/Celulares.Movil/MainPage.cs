@@ -9,7 +9,6 @@ namespace Celulares.Movil;
 
 public sealed class MainPage : ContentPage
 {
-    private static readonly Color Fondo = Color.FromArgb("#080D18"), Texto = Color.FromArgb("#F5F7FB"), Secundario = Color.FromArgb("#C6D0E0"), Acento = Color.FromArgb("#52E0D2");
     private readonly Image foto = new() { HeightRequest = 190, Aspect = Aspect.AspectFit };
     private readonly Label fotoEstado = new() { Text = "Seleccione un celular para administrar su foto.", LineBreakMode = LineBreakMode.WordWrap };
     private Button? botonTema;
@@ -17,17 +16,16 @@ public sealed class MainPage : ContentPage
     private bool temaClaro;
     private byte[]? fotoPendiente;
     private string? nombreFotoPendiente;
-    private readonly Entry servidor = Campo("Dirección de la comercializadora", "http://10.0.2.2:19102/");
     private readonly Entry nombre = Campo("Nombre del celular"), precio = Campo("Precio de lista"), cedula = Campo("Cédula"), comprador = Campo("Nombre del comprador"), cuotas = Campo("Cuotas de 3 a 18"), cedulaBusqueda = Campo("Cédula del comprador");
-    private readonly Picker catalogo = new() { Title = "Seleccione un celular", TextColor = Texto, TitleColor = Secundario, ItemDisplayBinding = new Binding(nameof(Celular.Nombre)) };
-    private readonly Picker celularVenta = new() { Title = "Seleccione un celular", TextColor = Texto, TitleColor = Secundario, ItemDisplayBinding = new Binding(nameof(Celular.Nombre)) };
-    private readonly Picker forma = new() { Title = "Forma de pago", TextColor = Texto, TitleColor = Secundario, ItemsSource = new[] { "Efectivo", "Crédito directo" }, SelectedIndex = 0 };
-    private readonly Picker facturas = new() { Title = "Seleccione una factura", TextColor = Texto, TitleColor = Secundario, ItemDisplayBinding = new Binding(nameof(Factura.Etiqueta)) };
-    private readonly Label estado = new() { TextColor = Color.FromArgb("#FFCD70"), LineBreakMode = LineBreakMode.WordWrap };
-    private readonly Label elegibilidad = new() { TextColor = Acento, LineBreakMode = LineBreakMode.WordWrap };
-    private readonly Label precioCatalogo = new() { TextColor = Acento, LineBreakMode = LineBreakMode.WordWrap };
-    private readonly Label precioVenta = new() { TextColor = Acento, LineBreakMode = LineBreakMode.WordWrap };
-    private readonly Label detalle = new() { TextColor = Texto, LineBreakMode = LineBreakMode.WordWrap };
+    private readonly Picker catalogo = new() { Title = "Seleccione un celular", ItemDisplayBinding = new Binding(nameof(Celular.Nombre)) };
+    private readonly Picker celularVenta = new() { Title = "Seleccione un celular", ItemDisplayBinding = new Binding(nameof(Celular.Nombre)) };
+    private readonly Picker forma = new() { Title = "Forma de pago", ItemsSource = new[] { "Efectivo", "Crédito directo" }, SelectedIndex = 0 };
+    private readonly Picker facturas = new() { Title = "Seleccione una factura", ItemDisplayBinding = new Binding(nameof(Factura.Etiqueta)) };
+    private readonly Label estado = new() { LineBreakMode = LineBreakMode.WordWrap };
+    private readonly Label elegibilidad = new() { LineBreakMode = LineBreakMode.WordWrap };
+    private readonly Label precioCatalogo = new() { LineBreakMode = LineBreakMode.WordWrap };
+    private readonly Label precioVenta = new() { LineBreakMode = LineBreakMode.WordWrap };
+    private readonly Label detalle = new() { LineBreakMode = LineBreakMode.WordWrap };
     private readonly VerticalStackLayout tabla = new() { Spacing = 6 };
     private ControladorTienda? tienda;
     private HttpClient? http;
@@ -51,7 +49,6 @@ public sealed class MainPage : ContentPage
             selector.SetDynamicResource(Picker.TitleColorProperty, "Secundario");
         }
         precio.Keyboard = cuotas.Keyboard = Keyboard.Numeric;
-        servidor.Keyboard = Keyboard.Url;
         catalogo.SelectedIndexChanged += (_, _) => ActualizarPrecioVenta();
         celularVenta.SelectedIndexChanged += (_, _) => ActualizarPrecioVenta();
         forma.SelectedIndexChanged += (_, _) => ActualizarPrecioVenta();
@@ -61,8 +58,6 @@ public sealed class MainPage : ContentPage
         pagina.Add(ColorDinamico(new Label { Text = "Comercializadora GR09 · BanQuito" }, "Secundario"));
         botonTema = Boton("Tema claro", CambiarTema);
         pagina.Add(botonTema);
-        pagina.Add(Seccion("Conexión", Etiqueta("Dirección de la comercializadora"), servidor,
-            Boton("Conectar y actualizar", async () => await Conectar())));
         pagina.Add(estado);
         botonQuitarFoto = Boton("Quitar foto", QuitarFoto);
         botonQuitarFoto.IsEnabled = false;
@@ -89,9 +84,7 @@ public sealed class MainPage : ContentPage
 
     private async Task Conectar() => await Ejecutar(async () =>
     {
-        var direccion = ClienteComercializadora.Direccion(servidor.Text, "http://10.0.2.2:19102/");
-        if (pendiente is not null && http?.BaseAddress != direccion)
-            throw new InvalidOperationException("Resuelva la venta pendiente antes de cambiar de servidor.");
+        var direccion = ClienteComercializadora.Direccion(MauiProgram.DireccionServidor);
         http?.Dispose();
         http = new HttpClient { BaseAddress = direccion, Timeout = TimeSpan.FromSeconds(30) };
         tienda = new ControladorTienda(new ClienteComercializadora(http));
@@ -247,6 +240,14 @@ public sealed class MainPage : ContentPage
             : new Dictionary<string, Color> { ["Fondo"] = Color.FromArgb("#080D18"), ["Panel"] = Color.FromArgb("#E6121C30"), ["Campo"] = Color.FromArgb("#111B2D"), ["Texto"] = Color.FromArgb("#F5F7FB"), ["Secundario"] = Color.FromArgb("#C6D0E0"), ["Acento"] = Color.FromArgb("#52E0D2"), ["Aviso"] = Color.FromArgb("#FFCD70"), ["TextoBoton"] = Color.FromArgb("#09111F"), ["Borde"] = Color.FromArgb("#52627A") };
         foreach (var (nombre, color) in tonos) Resources[nombre] = color;
         Resources["BordeBrush"] = new SolidColorBrush((Color)Resources["Borde"]);
+#if ANDROID
+        if (Microsoft.Maui.ApplicationModel.Platform.CurrentActivity?.Window is { } ventana &&
+            AndroidX.Core.View.WindowCompat.GetInsetsController(ventana, ventana.DecorView) is { } barras)
+        {
+            barras.AppearanceLightStatusBars = claro;
+            barras.AppearanceLightNavigationBars = claro;
+        }
+#endif
     }
 
     private static Label ColorDinamico(Label etiqueta, string recurso)

@@ -37,7 +37,7 @@ Desde la carpeta del proyecto, en terminales separadas:
 
 BanQuito escucha en `127.0.0.1:19101`, la tienda en `127.0.0.1:19102` y la web en `http://127.0.0.1:19103`. También se puede ejecutar `04. CLICON/Celulares.Consola` o `04. CLIESC/Celulares.Escritorio` con `dotnet run --project` y su archivo `.csproj`.
 
-El emulador Android usa `http://10.0.2.2:19102/`. En teléfono físico, inicie la API de tienda con `-- --urls http://0.0.0.0:19102`, permita el puerto en la red local y escriba la IP del equipo en el cliente móvil. Esto expone la API a la red local; úsela solo en red confiable.
+El cliente móvil conecta automáticamente a `http://10.0.2.2:19102/`, configurado en `MauiProgram.DireccionServidor`; la interfaz no solicita direcciones técnicas. Para un teléfono físico, configure esa constante con la IP local del equipo antes de compilar, inicie la API de tienda con `-- --urls http://0.0.0.0:19102` y permita el puerto en la red local. Esto expone la API a la red local; úsela solo en red confiable.
 
 ## Compilar Android sin instalar
 

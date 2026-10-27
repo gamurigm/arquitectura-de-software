@@ -32,7 +32,7 @@
 
 ## Límite de verificación
 
-La compilación Android no instala la aplicación. En esta revisión no hubo emulador ni teléfono conectado; falta comprobar instalación, inicio de sesión y flujo visual en dispositivo. La prueba de imágenes usó una base QA aislada, no alteró datos de la base principal.
+El APK autónomo Android se instaló y ejecutó en `emulator-5554`. Se verificaron conexión automática, catálogo, temas claro/oscuro, fotos, venta en efectivo y consulta de factura de crédito con amortización. La venta móvil generó la factura QA 3 por `$261,00`. No se probó teléfono físico ni se repitió la emisión de un crédito nuevo desde Android. Todas las operaciones móviles usaron bases QA aisladas; no alteraron las bases principales.
 
 ## Entrega
 

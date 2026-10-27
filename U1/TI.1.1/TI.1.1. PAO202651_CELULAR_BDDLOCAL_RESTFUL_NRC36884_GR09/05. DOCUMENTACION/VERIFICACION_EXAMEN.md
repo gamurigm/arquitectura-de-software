@@ -16,6 +16,7 @@ Fecha de revisión: 27 de octubre de 2026. Este documento cubre la comercializad
 10. **Pruebas automatizadas.** `dotnet test 04. SERVIDOR/Pruebas/Comercializadora.Pruebas.csproj`: 19 aprobadas, 0 fallidas, 0 omitidas.
 11. **Construcción.** API, consola, WPF, MVC web, MAUI Android y herramienta de administración compilaron correctamente; 0 advertencias y 0 errores.
 12. **Imágenes sobre SQL QA aislado.** PUT carga `204`; PUT de reemplazo `204`; GET descarga bytes cuyo SHA-256 coincide; DELETE devuelve `204`; GET siguiente devuelve `404`. Respuesta incluye `Cache-Control: no-store`.
+13. **Ejecución Android.** APK autónomo instalado y abierto en `emulator-5554`, AVD `GR10_Pixel_35`, paquete `ec.edu.monster.celulares.gr09`. Conexión automática a `http://10.0.2.2:19102/`, sin campo editable de servidor. Se comprobaron catálogo, temas claro/oscuro, carga/reemplazo/eliminación de fotos y venta al contado desde la interfaz: factura QA 3 aprobada por `$261,00`. También se abrió la factura de crédito QA 2 y su amortización hasta saldo `$0,00`. Los archivos descargados después de las cargas coincidieron por SHA-256. Bases utilizadas: `ComercializadoraCelulares_CellQA_20261027` y `BanQuitoCore_CellQA_20261027`.
 
 ## Decisiones técnicas
 
@@ -25,4 +26,4 @@ Fecha de revisión: 27 de octubre de 2026. Este documento cubre la comercializad
 
 ## No comprobado en esta revisión
 
-MAUI Android se compiló para `net10.0-android`, sin instalarlo. No había emulador ni teléfono conectado, así que no se comprobó instalación, autenticación ni flujo extremo a extremo en dispositivo. La base usada para el smoke de imágenes fue una base de prueba aislada.
+La ejecución e instalación se comprobaron en emulador Android; no se probó un teléfono físico. La emisión de un crédito nuevo desde el móvil no se repitió: se comprobó la consulta de un crédito existente y su amortización, además del smoke API de crédito ya registrado. Las pruebas móviles usaron bases QA aisladas, sin modificar las bases principales.

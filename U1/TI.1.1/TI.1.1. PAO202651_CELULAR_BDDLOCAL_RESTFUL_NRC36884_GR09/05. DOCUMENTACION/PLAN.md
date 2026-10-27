@@ -33,7 +33,7 @@ Implementar el sistema de la comercializadora descrito en `ExamenComplexivoPract
 - [x] Compilar API, consola, WPF, web, MAUI Android y herramienta de administración: 0 advertencias, 0 errores.
 - [x] Comprobar carga, reemplazo, descarga y eliminación de foto en una base QA aislada.
 - [x] Generar paquete ZIP actualizado fuera del repositorio.
-- [ ] Instalar y ejecutar MAUI en emulador o teléfono; no hubo dispositivo conectado durante esta revisión.
+- [x] Instalar y ejecutar MAUI en emulador Android: conexión automática, temas, fotos, venta en efectivo, consulta de factura y amortización comprobados sobre SQL QA.
 - Publicación: commit y push a `origin/main` autorizados; registrar el SHA remoto en el reporte final.
 
 ## Riesgos y límites
