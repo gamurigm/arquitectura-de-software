@@ -24,6 +24,32 @@ public class TiendaController(ControladorTienda tienda) : Controller
         return RedirectToAction(nameof(Index));
     }
 
+    [HttpPost, ValidateAntiForgeryToken, RequestSizeLimit(5 * 1024 * 1024 + 64 * 1024)]
+    public async Task<IActionResult> GuardarImagen(int id, IFormFile? archivo)
+    {
+        if (archivo is null || archivo.Length is 0 or > 5 * 1024 * 1024)
+        {
+            TempData["Error"] = "Seleccione una imagen de hasta 5 MB.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        try
+        {
+            await using var flujo = archivo.OpenReadStream();
+            await tienda.SubirImagen(id, flujo, Path.GetFileName(archivo.FileName), archivo.ContentType);
+            TempData["Mensaje"] = "Foto del celular guardada.";
+        }
+        catch (Exception error) when (EsErrorEsperado(error)) { TempData["Error"] = Mensaje(error); }
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> QuitarImagen(int id)
+    {
+        try { await tienda.QuitarImagen(id); TempData["Mensaje"] = "Foto del celular eliminada."; }
+        catch (Exception error) when (EsErrorEsperado(error)) { TempData["Error"] = Mensaje(error); }
+        return RedirectToAction(nameof(Index));
+    }
     [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> Eliminar(int id)
     {
@@ -44,6 +70,36 @@ public class TiendaController(ControladorTienda tienda) : Controller
         catch (Exception error) when (EsErrorEsperado(error))
         {
             return await Mostrar(venta, Mensaje(error) + " Si se cortó la conexión, reintente sin cambiar los datos.");
+        }
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Elegibilidad([FromQuery] string cedula)
+    {
+        try { return Json(await tienda.EvaluarCredito(cedula)); }
+        catch (Exception error) when (EsErrorEsperado(error))
+        {
+            var estado = error is HttpRequestException or TaskCanceledException ? 503 : 400;
+            return StatusCode(estado, new { mensaje = Mensaje(error) });
+        }
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> BuscarFacturas(string? cedula)
+    {
+        try
+        {
+            var busqueda = cedula?.Trim() ?? "";
+            var facturas = await tienda.FacturasPorCedula(busqueda);
+            return View("Index", new PaginaTienda
+            {
+                Catalogo = await tienda.Catalogo(), Facturas = facturas,
+                CedulaBusqueda = busqueda, Venta = new SolicitudFactura()
+            });
+        }
+        catch (Exception error) when (EsErrorEsperado(error))
+        {
+            return await Mostrar(new SolicitudFactura(), Mensaje(error));
         }
     }
 

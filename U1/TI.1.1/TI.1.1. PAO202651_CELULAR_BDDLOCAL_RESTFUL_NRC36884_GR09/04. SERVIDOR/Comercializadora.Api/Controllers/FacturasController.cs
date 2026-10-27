@@ -8,6 +8,10 @@ namespace Comercializadora.Api.Controllers;
 [Route("api/facturas")]
 public class FacturasController(ServicioFacturas servicio) : ControllerBase
 {
+    [HttpGet]
+    public Task<IReadOnlyList<Factura>> ListarPorCedula([FromQuery] string? cedula, CancellationToken ct) =>
+        servicio.ListarPorCedula(cedula, ct);
+
     [HttpGet("{id:int}")]
     public Task<Factura> Obtener(int id, CancellationToken ct) => servicio.Obtener(id, ct);
 

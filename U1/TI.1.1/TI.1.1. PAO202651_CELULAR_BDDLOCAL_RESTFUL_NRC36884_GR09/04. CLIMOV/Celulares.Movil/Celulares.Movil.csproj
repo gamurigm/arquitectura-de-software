@@ -7,6 +7,6 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Maui.Controls" Version="10.0.110" />
-    <ProjectReference Include="..\..\00. COMPARTIDO\Celulares.Cliente\Celulares.Cliente.csproj" />
+    <ProjectReference Include="..\..\04. COMPARTIDO\Celulares.Cliente\Celulares.Cliente.csproj" />
   </ItemGroup>
 </Project>

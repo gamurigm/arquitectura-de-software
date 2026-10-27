@@ -4,6 +4,30 @@ namespace Celulares.Consola.Vistas;
 
 internal static class VistaConsola
 {
+    private static bool temaClaro;
+
+    public static void AplicarTema()
+    {
+        if (Console.IsOutputRedirected) return;
+        Console.BackgroundColor = temaClaro ? ConsoleColor.White : ConsoleColor.Black;
+        Console.ForegroundColor = temaClaro ? ConsoleColor.Black : ConsoleColor.Gray;
+    }
+
+    public static void CambiarTema()
+    {
+        temaClaro = !temaClaro;
+        AplicarTema();
+        if (!Console.IsOutputRedirected) Console.Clear();
+    }
+
+    public static void Encabezado()
+    {
+        var color = Console.ForegroundColor;
+        Console.ForegroundColor = temaClaro ? ConsoleColor.DarkCyan : ConsoleColor.Cyan;
+        Console.WriteLine("\nCOMERCIALIZADORA GR09");
+        Console.ForegroundColor = color;
+    }
+
     public static string Texto(string etiqueta)
     {
         Console.Write(etiqueta + ": ");

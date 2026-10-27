@@ -1,27 +1,41 @@
-# Comercializadora de celulares GR09
+# Comercializadora de celulares · GR09
 
-Proyecto REST de la tienda de celulares. La tienda es propietaria del catálogo, las facturas y la base `ComercializadoraCelulares`.
+Sistema .NET 10 para catálogo y facturación de celulares. SQL Server 2025 Express almacena celulares, fotos y facturas. La tienda no maneja inventario.
 
-## Límite con el banco
+## Límites
 
-El crédito pertenece al proyecto bancario independiente `U1/TG.1/1.4. PAO202651_RESTFUL_DOTNET_CONBDD_NRC36884_GR09`. Allí viven la API BanQuito, las reglas financieras, sus pruebas y la base `BanQuitoCore`. La tienda llama al banco por HTTP; no referencia sus ensamblados ni inicializa su base.
+- La comercializadora expone REST en `http://127.0.0.1:19102/`.
+- BanQuito es un sistema separado, en `U1/TG.1/1.4. PAO202651_RESTFUL_DOTNET_CONBDD_NRC36884_GR09`; atiende elegibilidad y crédito por HTTP en `http://127.0.0.1:19101/`.
+- La web MVC usa `http://127.0.0.1:19103/`.
+- La tienda guarda la referencia remota del crédito; no comparte base ni ensamblados con BanQuito.
 
-- API de tienda: `http://127.0.0.1:19102/`.
-- API de crédito del banco: `http://127.0.0.1:19101/`.
-- El precio en efectivo tiene 42% de descuento. El crédito directo usa entre 3 y 18 cuotas.
-- El estado de una factura conserva el identificador de crédito como referencia remota, sin clave foránea entre bases.
+## Ejecutar
 
-## Estado
+1. Instale .NET 10 y SQL Server 2025 Express con instancia `SQLEXPRESS`.
+2. Aplique `03. BDD/01_CrearBases.sql` y `02_DatosPrueba.sql`. Para una base existente, aplique también `03_MigrarImagenes.sql`.
+3. Inicie BanQuito si probará compras a crédito.
+4. Inicie `04. SERVIDOR/Comercializadora.Api/Comercializadora.Api.csproj`.
+5. Inicie uno o más clientes: consola, WPF, MAUI Android o web MVC.
 
-API y cuatro clientes implementados. Bases, ventas y amortización se verificaron en SQL Server; la app móvil se instaló y abrió en el emulador. Consulta `05. DOCUMENTACION/AVANCE.md`, `05. DOCUMENTACION/VERIFICACION_EXAMEN.md` y `05. DOCUMENTACION/ManualTecnico.md`.
+`05. DOCUMENTACION/ManualTecnico.md` explica configuración y comandos. Android compila sin dispositivo con `dotnet build`; instalar requiere un emulador o dispositivo conectado.
 
-## Organización
+## Funciones
 
-- `01. UML`: entregables de la tienda.
-- `02. MER`: modelo de catálogo y facturación.
-- `03. BDD`: scripts exclusivos de `ComercializadoraCelulares`.
-- `04. SERVIDOR`: contratos de tienda, regla de facturación, inicializador y API de comercializadora.
-- `04. CLICON`, `04. CLIESC`, `04. CLIMOV`, `04. CLIWEB`: clientes implementados.
-- `05. DOCUMENTACION`: plan, avance, arquitectura y manual técnico.
+- Catálogo con alta, edición, desactivación y fotos opcionales.
+- Fotos JPEG, PNG o WebP de hasta 5 MiB; se pueden cargar, reemplazar y quitar desde los cuatro clientes.
+- Venta en efectivo con 42% de descuento.
+- Venta a crédito aprobada por BanQuito, consulta de facturas y amortización.
+- Tema claro y oscuro en las interfaces compatibles.
 
-El proyecto de celulares no contiene la API, reglas ni scripts bancarios.
+## Decisiones técnicas
+
+La web usa ASP.NET Core MVC. El servidor separa controladores, servicios y reglas de dominio; usa inyección de dependencias. SQL Server se accede con ADO.NET y comandos parametrizados; no usa Entity Framework Core. El enunciado permite elegir framework y motor de base de datos.
+
+## Estado verificado · 27 de octubre de 2026
+
+- 19/19 pruebas automatizadas aprobadas.
+- API, consola, WPF, web MVC, MAUI Android y herramienta de administración compilaron sin errores ni advertencias.
+- Flujo de imagen comprobado en una base QA aislada: carga y reemplazo `204`, descarga con bytes esperados, eliminación `204` y consulta posterior `404`.
+- No se comprobó instalación ni ejecución en emulador o teléfono en esta revisión.
+
+Consulta `05. DOCUMENTACION/AVANCE.md` y `05. DOCUMENTACION/VERIFICACION_EXAMEN.md` para alcance y evidencias.

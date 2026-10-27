@@ -1,24 +1,39 @@
 # Avance del proyecto de celulares GR09
 
-## Implementación
+## Implementado
 
-- API REST de tienda y cuatro clientes: consola, WPF, MAUI Android y MVC web.
-- BanQuito mantiene la elegibilidad, el crédito y la amortización en su proyecto REST .NET. La tienda conserva solo el identificador remoto del crédito.
-- El modelo ER de tienda está en `02. MER/ModeloDatos.md`; el diagrama de casos de uso y su descripción están en el proyecto BanQuito.
-- Arquitectura completa en `Arquitectura.md`.
+- Comercializadora REST .NET 10, contratos, reglas de facturación, persistencia SQL Server 2025 Express con ADO.NET y consultas parametrizadas.
+- Cuatro clientes MVC por plataforma: consola, escritorio WPF, web ASP.NET Core MVC y Android .NET MAUI.
+- BanQuito integrado por HTTP como aplicación independiente; elegibilidad, crédito y amortización siguen siendo responsabilidad bancaria.
+- Catálogo sin inventario, facturas de contado/crédito, búsqueda de facturas y consulta de amortización.
+- Fotos opcionales con cargar, reemplazar y quitar desde los cuatro clientes. El servidor valida JPEG, PNG y WebP, firma del archivo y límite de 5 MiB; guarda bytes en SQL Server.
+- Interfaces con identidad visual compartida; web, WPF y MAUI tienen tema claro y oscuro.
+- Capas de presentación, controlador, servicio y dominio; ASP.NET Core MVC en web e inyección de dependencias en servidor.
+- Decisión ORM: ADO.NET; no se usa Entity Framework Core. El enunciado permite seleccionar tecnología.
 
-## Verificación local, 26 de octubre de 2026
+## Entregables
 
-- SQL Server Express `SQLEXPRESS`: `BanQuitoCore` tiene 5 clientes, 5 cuentas y 50 movimientos. `ComercializadoraCelulares` tiene 3 celulares activos.
-- Pruebas automatizadas de la tienda: 9 de 9 aprobadas.
-- Consola y WPF compilaron sin errores ni advertencias. MVC respondió HTTP 200 y mostró el catálogo.
-- MAUI compiló con Android SDK 36 en `D:\tools\android-sdk`; se ejecutó en `GR10_Pixel_35`, conectó a la API y cargó 3 celulares.
-- API BanQuito devolvió elegibilidad y monto máximo de $2.310 para el cliente 5.
-- API de tienda registró venta en efectivo de $261 y venta a crédito aprobada. Reintento conservó la factura y el crédito. Amortización: 3 cuotas, saldo final $0.
-- Se ejercitaron alta, edición y desactivación del catálogo. El registro de prueba se retiró después de comprobar la desactivación.
+- `01. UML/01. ERS`: ERS Word basado en la plantilla GR09.
+- `01. UML/02. ECUD`: cinco casos detallados Word, con 15 diagramas incrustados.
+- `01. UML/03. DIAGRAMAS UML`: fuentes editables PowerDesigner y exportaciones para casos de uso, actividad, secuencia, clases y arquitectura.
+- `02. MER`: modelos conceptual, lógico y físico PowerDesigner, con sus vistas exportadas.
+- `03. BDD`: creación de la base, datos de ejemplo y migración de imagen.
+- `05. DOCUMENTACION/01. MANUAL TECNICO`: manual Word y Markdown.
+- `05. DOCUMENTACION/02. PRESENTACION`: presentación PowerPoint de 44 diapositivas basada en la plantilla GR09.
+
+## Verificación local · 27 de octubre de 2026
+
+- Pruebas automatizadas: 19 aprobadas, 0 fallidas, 0 omitidas.
+- API, consola, WPF, web, MAUI Android y herramienta de administración: compilación correcta, 0 advertencias y 0 errores.
+- API de imagen, sobre `ComercializadoraCelulares_CellQA_20261027` aislada: carga `204`, reemplazo `204`, bytes descargados coinciden, caché `no-store`, eliminación `204`, GET posterior `404`.
+- Smoke de venta y crédito: catálogo CRUD correcto, efectivo `$261,00`, crédito aprobado, reintento sin duplicado y saldo final `$0,00` en amortización.
+- Word exportado a PDF: ERS 16 páginas, ECUD 19 y manual 5. Portadas, pies, imágenes y paginación revisados; documentos sin contenido heredado de otra solución.
+- PowerPoint conserva 44 diapositivas, 1 patrón y 11 diseños; paquete ZIP validado.
+
+## Límite de verificación
+
+La compilación Android no instala la aplicación. En esta revisión no hubo emulador ni teléfono conectado; falta comprobar instalación, inicio de sesión y flujo visual en dispositivo. La prueba de imágenes usó una base QA aislada, no alteró datos de la base principal.
 
 ## Entrega
 
-- El emulador se usó para abrir la app móvil; no se probó un teléfono físico.
-- Las fuentes Mermaid son editables y se muestran en GitHub. El diagrama y la descripción de casos de uso de crédito están en el proyecto BanQuito.
-- El equipo no tiene unidad CD/DVD. El paquete para grabación queda en `D:\tools\CelularGR09\Entrega_Examen_GR09.zip`.
+El paquete final se genera fuera del repositorio en `D:\tools\CelularGR09\Entrega_Examen_GR09_2026-10-27.zip`. El equipo no tiene unidad CD/DVD.

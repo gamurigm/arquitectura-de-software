@@ -1,49 +1,41 @@
-# Plan de implementación CELULAR BDDLOCAL RESTFUL GR09
+# Plan de implementación · CELULAR BDDLOCAL RESTFUL GR09
 
-Fuente de requisitos: `ExamenComplexivoPractivo_CELULARES.docx` del repositorio. Referencia de consulta: GR01 de Andrango, Calapaqui y Quilumbaquin. No se modifica ni copia ese proyecto.
+## Alcance
 
-## Alcance y límites
+Implementar el sistema de la comercializadora descrito en `ExamenComplexivoPractivo_CELULARES.docx`. BanQuito es otra aplicación y conserva su propia API, reglas, base y diagramas. La comercializadora consume crédito por HTTP.
 
-Este directorio implementa la comercializadora de celulares: catálogo, facturas, API REST y clientes. El proyecto bancario independiente es `U1/TG.1/1.4. PAO202651_RESTFUL_DOTNET_CONBDD_NRC36884_GR09`; allí viven BanQuito.Api, el dominio de crédito y `BanQuitoCore`. La comercializadora consume el contrato bancario por HTTP y no agrega referencias de proyecto ni scripts bancarios.
+## Decisiones
 
-## Plataforma
+- .NET 10, C# 14, REST, SQL Server 2025 Express (`SQLEXPRESS`).
+- La comercializadora usa ADO.NET parametrizado; no usa Entity Framework Core. El examen deja elegir frameworks y motor.
+- Web en ASP.NET Core MVC. API separa controladores, servicios y dominio, con inyección de dependencias.
+- Cuatro clientes: consola, WPF, MAUI Android y web MVC. Ningún cliente accede directo a SQL Server.
+- Efectivo descuenta 42%. Crédito requiere aprobación del servicio BanQuito.
+- 35% para el cálculo de monto máximo, según decisión del equipo ante la diferencia entre texto y fórmula del enunciado.
+- No hay inventario; cada factura corresponde a un celular.
+- Fotos JPEG, PNG o WebP, hasta 5 MiB, en SQL Server `varbinary(max)`.
 
-.NET 10, C# 14, ASP.NET Core REST y SQL Server 2025. La API de la tienda usa el puerto 19102. La API BanQuito del proyecto bancario usa el puerto 19101. Consola, WPF, MAUI Android y web MVC (19103) consumen la API de la comercializadora.
+## Estructura
 
-`ComercializadoraCelulares` pertenece a este proyecto. `BanQuitoCore` pertenece al proyecto del banco. El destino es SQL Server 2025 Express (`SQLEXPRESS`). Los artefactos se guardan en `D:\tools` y los paquetes en `D:\NuGet\packages`.
+`01. UML` guarda ERS, ECUD y diagramas; `02. MER` tiene modelos conceptual, lógico y físico; `03. BDD` contiene SQL; `04. CLICON`, `CLIESC`, `CLIMOV` y `CLIWEB` son clientes; `04. COMPARTIDO` aloja contratos y transporte; `04. SERVIDOR` contiene API y dominio; `05. DOCUMENTACION` guarda manuales, presentación y evidencias.
 
-## Entregables de la comercializadora
+## Estado · 27 de octubre de 2026
 
-1. Mantener la estructura numerada GR09 y separar MVC y transporte en cada cliente.
-2. Mantener scripts de catálogo y facturación solo en `03. BDD` de este proyecto.
-3. Exponer mantenimiento de catálogo, venta en efectivo y crédito, y consulta de amortización desde la API de tienda.
-4. Implementar consola, WPF, MAUI Android y MVC web consumiendo la misma API de tienda.
-5. Documentar los datos propios de la comercializadora y sus referencias remotas al banco.
+- [x] Mantener el proyecto aislado y no incluir archivos de BanQuito ni GR01.
+- [x] Ajustar estructura numerada y agregar convenciones GR09 en `AGENTS.md`.
+- [x] Completar catálogo, venta, elegibilidad, búsqueda de facturas y amortización en API y clientes.
+- [x] Validar precio autoritativo y reintentos de facturación.
+- [x] Implementar cargar, reemplazar y quitar imágenes desde API y cuatro clientes.
+- [x] Crear migración idempotente para foto y actualizar modelos PowerDesigner.
+- [x] Preparar ERS, ECUD, manual técnico y presentación desde plantillas GR09 existentes.
+- [x] Revisar portadas, pies, diagramas y capturas; retirar referencias heredadas a otra solución.
+- [x] Ejecutar 19 pruebas automatizadas: 19 aprobadas, 0 fallidas, 0 omitidas.
+- [x] Compilar API, consola, WPF, web, MAUI Android y herramienta de administración: 0 advertencias, 0 errores.
+- [x] Comprobar carga, reemplazo, descarga y eliminación de foto en una base QA aislada.
+- [x] Generar paquete ZIP actualizado fuera del repositorio.
+- [ ] Instalar y ejecutar MAUI en emulador o teléfono; no hubo dispositivo conectado durante esta revisión.
+- Publicación: commit y push a `origin/main` autorizados; registrar el SHA remoto en el reporte final.
 
-## Contrato bancario consumido
+## Riesgos y límites
 
-BanQuito.Api, en el proyecto bancario, expone:
-
-- `GET /api/credito/elegibilidad?cedula=...`
-- `GET /api/credito/clientes/{codigoCliente}/monto-maximo`
-- `POST /api/creditos` con `codigoCliente`, `precioTelefono`, `numeroCuotas` y `referenciaVenta`.
-- `GET /api/creditos/{id}/amortizacion`
-
-La API de tienda expone `GET/POST /api/celulares`, `PUT/DELETE /api/celulares/{id}`, `POST /api/facturas` y `GET /api/facturas/{id}/amortizacion`. El cliente HTTP de la tienda mantiene DTOs propios; no comparte ensamblados con el banco.
-
-## Reglas del examen que atraviesan la integración
-
-- El banco requiere cliente existente, depósito en el último mes y ausencia de crédito activo.
-- Si el género es masculino, debe tener al menos 25 años cumplidos.
-- Ventanas móviles inclusivas de uno y tres meses, relativas a la fecha de evaluación.
-- Promedios por valor de movimiento DEP y RET en los últimos tres meses.
-- Máximo = max(0, (promedioDepósitos - promedioRetiros) * 0.35 * 6).
-- El porcentaje elegido fue 35%; el texto del examen contradice su fórmula impresa del 30%.
-- Crédito: precio positivo no superior al máximo; plazo entero entre 3 y 18 meses; tasa anual 16,5%, cuota fija y ajuste final a saldo cero.
-- Efectivo: descuento del 42% sobre precio de lista.
-- Una factura corresponde a un celular. No hay inventario.
-- Un rechazo o indisponibilidad del banco no confirma una venta a crédito.
-
-## Publicación
-
-El usuario autorizó commit y push del avance de CELULAR GR09 para las 18:00 del 26 de octubre de 2026 (America/Guayaquil). Limitar esa publicación a este proyecto y excluir GR01 y el documento original del examen.
+Crédito requiere iniciar BanQuito antes de probarlo. La compilación Android no equivale a instalación o prueba en dispositivo. La API de crédito usa la base independiente de BanQuito; la carpeta de la comercializadora no incluye ese proyecto.

@@ -1,18 +1,28 @@
-# Evidencias de requisitos del examen
+# Verificación de requisitos del examen · celulares GR09
 
-Verificación local: 26 de octubre de 2026. Ejecutada contra SQL Server Express `SQLEXPRESS`.
+Fecha de revisión: 27 de octubre de 2026. Este documento cubre la comercializadora de celulares; BanQuito permanece como sistema REST independiente.
 
-1. Diagrama de casos de uso: [BanQuito](<../../../TG.1/1.4. PAO202651_RESTFUL_DOTNET_CONBDD_NRC36884_GR09/01. UML/CasosUsoCreditoBanQuito.md>), escrito en Mermaid.
-2. Descripción del caso de uso de elegibilidad: sección “Verificar sujeto de crédito” del mismo documento.
-3. Datos centrales: `BanQuitoCore` devuelve 5 clientes, 5 cuentas y 50 movimientos. Incluye `CREDITO` y `AMORTIZACION`.
-4. Modelo ER de la tienda: [ModeloDatos.md](../02. MER/ModeloDatos.md).
-5. Elegibilidad por cédula: `GET /api/credito/elegibilidad?cedula=0506070809` respondió sujeto de crédito para cliente 5.
-6. Monto máximo por código: `GET /api/credito/clientes/5/monto-maximo` devolvió `$2.310,00`.
-7. Crédito y amortización: una venta directa quedó aprobada; repetir su `IdOperacion` devolvió la misma factura y crédito. La consulta devolvió tres cuotas y saldo final `$0,00`.
-8. Catálogo: alta, edición y desactivación vía API confirmadas. El registro temporal se limpió después de verificar el estado inactivo.
-9. Facturación: API confirmó venta en efectivo por `$261,00` y venta directa aprobada por `$450,00`. Consola, WPF, MAUI y MVC compilaron; la web respondió HTTP 200.
-10. Servicio de amortización: `GET /api/facturas/{id}/amortizacion` devolvió las cuotas del crédito aprobado. Los cuatro clientes llaman al mismo servicio.
-11. Consulta desde la tienda: el formulario MVC permite ingresar el número de factura y presenta la amortización. Las vistas de consola, WPF y MAUI también consultan por factura.
-12. Arquitectura: diagrama Mermaid en [Arquitectura.md](Arquitectura.md).
+## Requisitos y evidencia
 
-Las nueve pruebas automatizadas de tienda pasaron. La app MAUI se compiló, instaló y abrió en el emulador `GR10_Pixel_35`; no se usó un teléfono físico.
+1. **Catálogo sin inventario.** La tienda mantiene celulares disponibles, permite alta, edición y desactivación, y no descuenta existencias. Código: `04. SERVIDOR/Comercializadora.Api/Servicios/ServicioCatalogo.cs`.
+2. **Modelo de facturación.** SQL Server guarda catálogo y facturas. Modelo ERS y archivos editables PowerDesigner están en `02. MER`; scripts en `03. BDD`.
+3. **Venta al contado.** Se aplica 42% de descuento al precio de lista. Pruebas de reglas y smoke API confirman total `$261,00` para precio `$450,00`.
+4. **Crédito directo.** La tienda consulta elegibilidad y monto máximo a BanQuito por HTTP. Solo emite la factura después de recibir aprobación; las bases y modelos bancarios siguen fuera de esta carpeta.
+5. **Factura y amortización.** La API conserva la referencia remota del crédito y consulta amortización a BanQuito. El smoke confirmó reintento idempotente y saldo final `$0,00`.
+6. **Clientes.** Consola, WPF, web MVC y MAUI Android consumen la misma API REST. Los cuatro compiladores pasaron sin errores ni advertencias.
+7. **Fotos de celulares.** Cada cliente puede cargar, reemplazar y quitar fotos. API en `/api/celulares/{id}/imagen`: GET, PUT multipart y DELETE. JPEG, PNG o WebP hasta 5 MiB; los bytes se guardan en SQL Server.
+8. **Modelos y diagramas.** Hay ERS, ECUD de cinco casos, 15 diagramas de caso de uso/actividad/secuencia, diagramas de clases y arquitectura. Se incluyen fuentes PowerDesigner y exportaciones. MER incluye modelos conceptual, lógico y físico.
+9. **Documentación.** ERS, ECUD, manual técnico y presentación se generaron usando las plantillas Word y PowerPoint GR09 existentes.
+10. **Pruebas automatizadas.** `dotnet test 04. SERVIDOR/Pruebas/Comercializadora.Pruebas.csproj`: 19 aprobadas, 0 fallidas, 0 omitidas.
+11. **Construcción.** API, consola, WPF, MVC web, MAUI Android y herramienta de administración compilaron correctamente; 0 advertencias y 0 errores.
+12. **Imágenes sobre SQL QA aislado.** PUT carga `204`; PUT de reemplazo `204`; GET descarga bytes cuyo SHA-256 coincide; DELETE devuelve `204`; GET siguiente devuelve `404`. Respuesta incluye `Cache-Control: no-store`.
+
+## Decisiones técnicas
+
+- ASP.NET Core MVC en la interfaz web; controladores, servicios, dominio y dependencias inyectadas en el servidor.
+- Persistencia SQL Server con ADO.NET y parámetros. No se usa Entity Framework Core; la rúbrica del examen no obliga a un ORM específico.
+- BanQuito y comercializadora son aplicaciones separadas, con comunicación REST; no se comparte base ni ensamblados.
+
+## No comprobado en esta revisión
+
+MAUI Android se compiló para `net10.0-android`, sin instalarlo. No había emulador ni teléfono conectado, así que no se comprobó instalación, autenticación ni flujo extremo a extremo en dispositivo. La base usada para el smoke de imágenes fue una base de prueba aislada.

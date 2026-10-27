@@ -7,14 +7,16 @@ namespace Comercializadora.Api.Servicios;
 
 public class ServicioFacturas(IConfiguration configuracion, ServicioBanQuito banco)
 {
-    private const string ColumnasFactura = """
-        SELECT ID_FACTURA,ID_OPERACION,FECHA,CEDULA,NOMBRE_CLIENTE,ID_CELULAR,NOMBRE_CELULAR,
-               FORMA_PAGO,PRECIO,DESCUENTO,TOTAL,COD_CREDITO,NUMERO_CUOTAS,ESTADO
-        FROM dbo.FACTURA
+    private const string ProyeccionFactura = """
+        ID_FACTURA,ID_OPERACION,FECHA,CEDULA,NOMBRE_CLIENTE,ID_CELULAR,NOMBRE_CELULAR,
+        FORMA_PAGO,PRECIO,DESCUENTO,TOTAL,COD_CREDITO,NUMERO_CUOTAS,ESTADO
         """;
 
+    private static string ConsultaFactura(string? top = null) =>
+        $"SELECT {top} {ProyeccionFactura} FROM dbo.FACTURA";
+
     private sealed record DatosSolicitud(Guid IdOperacion, string Cedula, string NombreCliente,
-        int IdCelular, string FormaPago, int? NumeroCuotas);
+        int IdCelular, string FormaPago, int? NumeroCuotas, decimal? PrecioEsperado);
 
     private async Task<SqlConnection> Abrir(CancellationToken ct)
     {
@@ -77,25 +79,43 @@ public class ServicioFacturas(IConfiguration configuracion, ServicioBanQuito ban
         if (forma is not ("EFECTIVO" or "CREDITO_DIRECTO"))
             throw new ErrorNegocio("FormaPago debe ser EFECTIVO o CREDITO_DIRECTO.", 400);
 
-        return new(solicitud.IdOperacion, cedula, nombre, solicitud.IdCelular, forma, solicitud.NumeroCuotas);
+        return new(solicitud.IdOperacion, cedula, nombre, solicitud.IdCelular, forma,
+            solicitud.NumeroCuotas, solicitud.PrecioEsperado);
     }
 
     private static async Task<Factura?> LeerPor(SqlConnection db, SqlTransaction? tx, string columna,
         object valor, bool bloquear, CancellationToken ct)
     {
         var pista = bloquear ? " WITH (UPDLOCK,HOLDLOCK)" : "";
-        await using var cmd = Comando(db, tx, ColumnasFactura + pista + $" WHERE {columna}=@valor", ("@valor", valor));
+        await using var cmd = Comando(db, tx, ConsultaFactura() + pista + $" WHERE {columna}=@valor", ("@valor", valor));
         await using var lector = await cmd.ExecuteReaderAsync(ct);
         return await lector.ReadAsync(ct) ? Leer(lector) : null;
     }
 
     private static void ValidarReintento(Factura factura, DatosSolicitud solicitud)
     {
+        ReglasFacturacion.ValidarPrecioEsperado(factura.Precio, solicitud.PrecioEsperado);
         if (!string.Equals(factura.Cedula, solicitud.Cedula, StringComparison.Ordinal) ||
             !string.Equals(factura.NombreCliente, solicitud.NombreCliente, StringComparison.Ordinal) ||
             factura.IdCelular != solicitud.IdCelular || factura.FormaPago != solicitud.FormaPago ||
             factura.NumeroCuotas != solicitud.NumeroCuotas)
             throw new ErrorNegocio("IdOperacion ya está asociada a una solicitud diferente.", 409);
+    }
+
+    public async Task<IReadOnlyList<Factura>> ListarPorCedula(string? cedula, CancellationToken ct)
+    {
+        var limpia = cedula?.Trim() ?? "";
+        if (limpia.Length is < 1 or > 100)
+            throw new ErrorNegocio("Ingrese una cédula de 1 a 100 caracteres.", 400);
+
+        await using var db = await Abrir(ct);
+        await using var cmd = Comando(db, null,
+            ConsultaFactura("TOP (50)") + " WHERE CEDULA=@cedula ORDER BY FECHA DESC,ID_FACTURA DESC",
+            ("@cedula", limpia));
+        await using var lector = await cmd.ExecuteReaderAsync(ct);
+        var facturas = new List<Factura>();
+        while (await lector.ReadAsync(ct)) facturas.Add(Leer(lector));
+        return facturas;
     }
 
     public async Task<Factura> Crear(SolicitudFactura entrada, CancellationToken ct)
@@ -146,6 +166,7 @@ public class ServicioFacturas(IConfiguration configuracion, ServicioBanQuito ban
                 nombreCelular = lector.GetString(0);
                 precio = lector.GetDecimal(1);
             }
+            ReglasFacturacion.ValidarPrecioEsperado(precio, solicitud.PrecioEsperado);
 
             var total = solicitud.FormaPago == "EFECTIVO" ? ReglasFacturacion.TotalEfectivo(precio) : precio;
             var descuento = precio - total;

@@ -1,3 +1,4 @@
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
 using Celulares.Contratos;
@@ -15,12 +16,31 @@ public sealed class ClienteComercializadora(HttpClient http)
         return uri;
     }
 
-    public Task<Celular[]> Listar(CancellationToken ct = default) =>
-        Leer<Celular[]>(http.GetAsync("api/celulares", ct), ct);
+    public async Task<Celular[]> Listar(CancellationToken ct = default) =>
+        (await Leer<Celular[]>(http.GetAsync("api/celulares", ct), ct)).Select(ConUrlImagen).ToArray();
 
-    public Task<Celular> Guardar(int? id, GuardarCelular celular, CancellationToken ct = default) =>
-        Leer<Celular>(id is null ? http.PostAsJsonAsync("api/celulares", celular, ct)
-            : http.PutAsJsonAsync($"api/celulares/{id}", celular, ct), ct);
+    public async Task<Celular> Guardar(int? id, GuardarCelular celular, CancellationToken ct = default) =>
+        ConUrlImagen(await Leer<Celular>(id is null ? http.PostAsJsonAsync("api/celulares", celular, ct)
+            : http.PutAsJsonAsync($"api/celulares/{id}", celular, ct), ct));
+
+    public async Task SubirImagen(int id, Stream datos, string nombre, string tipo, CancellationToken ct = default)
+    {
+        using var form = new MultipartFormDataContent();
+        using var archivo = new StreamContent(datos);
+        archivo.Headers.ContentType = new MediaTypeHeaderValue(tipo);
+        form.Add(archivo, "archivo", Path.GetFileName(nombre));
+        using var respuesta = await http.PutAsync($"api/celulares/{id}/imagen", form, ct);
+        await Comprobar(respuesta, ct);
+    }
+
+    public async Task QuitarImagen(int id, CancellationToken ct = default)
+    {
+        using var respuesta = await http.DeleteAsync($"api/celulares/{id}/imagen", ct);
+        await Comprobar(respuesta, ct);
+    }
+
+    public Task<byte[]> DescargarImagen(Celular celular, CancellationToken ct = default) =>
+        celular.ImagenUrl is null ? Task.FromResult(Array.Empty<byte>()) : http.GetByteArrayAsync(celular.ImagenUrl, ct);
 
     public async Task Eliminar(int id, CancellationToken ct = default)
     {
@@ -31,11 +51,20 @@ public sealed class ClienteComercializadora(HttpClient http)
     public Task<Factura> Facturar(SolicitudFactura factura, CancellationToken ct = default) =>
         Leer<Factura>(http.PostAsJsonAsync("api/facturas", factura, ct), ct);
 
+    public Task<EvaluacionCredito> EvaluarCredito(string cedula, CancellationToken ct = default) =>
+        Leer<EvaluacionCredito>(http.GetAsync($"api/credito/elegibilidad?cedula={Uri.EscapeDataString(cedula?.Trim() ?? "")}", ct), ct);
+
+    public Task<Factura[]> FacturasPorCedula(string cedula, CancellationToken ct = default) =>
+        Leer<Factura[]>(http.GetAsync($"api/facturas?cedula={Uri.EscapeDataString(cedula?.Trim() ?? "")}", ct), ct);
+
     public Task<Factura> ObtenerFactura(int id, CancellationToken ct = default) =>
         Leer<Factura>(http.GetAsync($"api/facturas/{id}", ct), ct);
 
     public Task<Cuota[]> Amortizacion(int id, CancellationToken ct = default) =>
         Leer<Cuota[]>(http.GetAsync($"api/facturas/{id}/amortizacion", ct), ct);
+
+    private Celular ConUrlImagen(Celular celular) => celular.ImagenUrl is null ? celular :
+        celular with { ImagenUrl = new Uri(http.BaseAddress!, celular.ImagenUrl).AbsoluteUri };
 
     private static async Task<T> Leer<T>(Task<HttpResponseMessage> enviar, CancellationToken ct)
     {

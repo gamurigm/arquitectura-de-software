@@ -18,11 +18,19 @@ public sealed class ControladorTienda(ClienteComercializadora api)
         return precio;
     }
 
+    public static decimal TotalEfectivo(decimal precio) =>
+        decimal.Round(precio * 0.58m, 2, MidpointRounding.AwayFromZero);
+
     public Task<Celular[]> Catalogo() => api.Listar();
     public Task<Celular> Guardar(int? id, string nombre, decimal precio) =>
         api.Guardar(id, new GuardarCelular { Nombre = nombre.Trim(), Precio = precio, Activo = true });
+    public Task SubirImagen(int id, Stream datos, string nombre, string tipo) => api.SubirImagen(id, datos, nombre, tipo);
+    public Task QuitarImagen(int id) => api.QuitarImagen(id);
+    public Task<byte[]> DescargarImagen(Celular celular) => api.DescargarImagen(celular);
     public Task Eliminar(int id) => api.Eliminar(id);
     public Task<Factura> Facturar(SolicitudFactura solicitud) => api.Facturar(solicitud);
+    public Task<EvaluacionCredito> EvaluarCredito(string cedula) => api.EvaluarCredito(cedula);
+    public Task<Factura[]> FacturasPorCedula(string cedula) => api.FacturasPorCedula(cedula);
     public Task<Factura> Factura(int id) => api.ObtenerFactura(id);
     public Task<Cuota[]> Amortizacion(int facturaId) => api.Amortizacion(facturaId);
 }

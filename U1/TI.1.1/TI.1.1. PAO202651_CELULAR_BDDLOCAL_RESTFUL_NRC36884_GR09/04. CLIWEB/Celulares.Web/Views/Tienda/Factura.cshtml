@@ -1,17 +1,20 @@
 @model PaginaFactura
-<a asp-action="Index">Volver al catálogo</a>
-<h1>Factura @Model.Factura.Id</h1>
-<section class="panel">
-    <p><strong>Estado:</strong> @Model.Factura.Estado</p>
-    <p><strong>Cliente:</strong> @Model.Factura.NombreCliente · @Model.Factura.Cedula</p>
-    <p><strong>Celular:</strong> @Model.Factura.Celular</p>
-    <p><strong>Pago:</strong> @Model.Factura.FormaPago</p>
-    <p><strong>Precio:</strong> $@Model.Factura.Precio.ToString("F2") · <strong>Descuento:</strong> $@Model.Factura.Descuento.ToString("F2")</p>
-    <p class="total"><strong>Total:</strong> $@Model.Factura.Total.ToString("F2")</p>
-    @if (Model.Cuotas.Count > 0) {
-        <h2>Tabla de amortización</h2>
+<a class="back-link" asp-action="Index">← Volver a celulares</a>
+<section class="hero invoice-hero"><div><span class="eyebrow">COMPROBANTE · @Model.Factura.Fecha.ToString("yyyy-MM-dd")</span><h1>Factura #@Model.Factura.Id</h1><p>La operación quedó registrada en la comercializadora.</p></div><span class="badge state-badge">@Model.Factura.Estado</span></section>
+<section class="panel invoice-detail">
+    <div class="invoice-grid">
+        <div><span class="eyebrow">COMPRADOR</span><p><strong>@Model.Factura.NombreCliente</strong><br />Cédula @Model.Factura.Cedula</p></div>
+        <div><span class="eyebrow">CELULAR</span><p><strong>@Model.Factura.Celular</strong><br />@Model.Factura.FormaPago</p></div>
+    </div>
+    <div class="amounts"><p>Precio de lista <strong>@Model.Factura.Precio.ToString("C2")</strong></p><p>Descuento <strong>@Model.Factura.Descuento.ToString("C2")</strong></p><p class="grand-total">Total <strong>@Model.Factura.Total.ToString("C2")</strong></p></div>
+    @if (Model.Factura.FormaPago == "CREDITO_DIRECTO" && Model.Cuotas.Count > 0) {
+        <div class="section-heading"><span class="eyebrow">PLAN DE PAGOS</span><h2>Amortización</h2></div>
         <div class="table-wrap"><table><thead><tr><th>Cuota</th><th>Fecha</th><th>Valor</th><th>Interés</th><th>Capital</th><th>Saldo</th></tr></thead><tbody>
-        @foreach (var c in Model.Cuotas) { <tr><td>@c.NumeroCuota</td><td>@c.FechaPago.ToString("yyyy-MM-dd")</td><td>@c.ValorCuota.ToString("F2")</td><td>@c.InteresPagado.ToString("F2")</td><td>@c.CapitalPagado.ToString("F2")</td><td>@c.Saldo.ToString("F2")</td></tr> }
+        @foreach (var cuota in Model.Cuotas) { <tr><td>@cuota.NumeroCuota</td><td>@cuota.FechaPago.ToString("yyyy-MM-dd")</td><td>@cuota.ValorCuota.ToString("C2")</td><td>@cuota.InteresPagado.ToString("C2")</td><td>@cuota.CapitalPagado.ToString("C2")</td><td>@cuota.Saldo.ToString("C2")</td></tr> }
         </tbody></table></div>
+    } else if (Model.Factura.FormaPago == "CREDITO_DIRECTO" && Model.Factura.Estado == "PENDIENTE") {
+        <p class="notice" role="status">El crédito está pendiente de confirmación de BanQuito. Consulte la factura nuevamente.</p>
+    } else if (Model.Factura.FormaPago == "CREDITO_DIRECTO" && Model.Factura.Estado == "RECHAZADA") {
+        <p class="notice error" role="alert">BanQuito rechazó la venta. No se emitió un crédito.</p>
     }
 </section>

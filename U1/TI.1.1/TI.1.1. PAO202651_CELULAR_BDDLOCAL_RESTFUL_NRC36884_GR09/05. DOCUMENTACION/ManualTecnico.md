@@ -1,6 +1,6 @@
 # Manual técnico
 
-.NET SDK 10 está en `D:\tools\dotnet10`; los paquetes se guardan en `D:\NuGet\packages`. El destino es SQL Server 2025 Express en `SQLEXPRESS`. En este equipo, las dos bases quedaron inicializadas con sus scripts de creación y datos de prueba.
+.NET SDK 10 está en `D:\tools\dotnet10`; los paquetes se guardan en `D:\NuGet\packages`. La base de datos requerida es SQL Server 2025 Express en `SQLEXPRESS`. La comercializadora persiste con ADO.NET y parámetros SQL; no usa Entity Framework Core. La web sigue ASP.NET Core MVC; la API separa controladores, servicios y dominio, con inyección de dependencias.
 
 ## Instalar SQL Server
 
@@ -23,7 +23,7 @@ $banco = '..\..\TG.1\1.4. PAO202651_RESTFUL_DOTNET_CONBDD_NRC36884_GR09'
 & $dotnet run --project '.\04. SERVIDOR\Administracion\Administracion.csproj' -- --aplicar '.\03. BDD\01_CrearBases.sql' '.\03. BDD\02_DatosPrueba.sql'
 ```
 
-Los inicializadores usan autenticación Windows y `SQLEXPRESS`. Los scripts son idempotentes; revise los datos existentes antes de aplicarlos.
+Los inicializadores usan autenticación Windows y `SQLEXPRESS`. Los scripts son idempotentes; revise los datos existentes antes de aplicarlos. Si la base comercializadora ya existe, ejecute `03. BDD/03_MigrarImagenes.sql` para añadir columnas de imagen.
 
 ## Iniciar servicios y clientes
 
@@ -37,17 +37,31 @@ Desde la carpeta del proyecto, en terminales separadas:
 
 BanQuito escucha en `127.0.0.1:19101`, la tienda en `127.0.0.1:19102` y la web en `http://127.0.0.1:19103`. También se puede ejecutar `04. CLICON/Celulares.Consola` o `04. CLIESC/Celulares.Escritorio` con `dotnet run --project` y su archivo `.csproj`.
 
-El emulador Android utiliza `http://10.0.2.2:19102/`. Para un teléfono físico, iniciar la API de tienda con `-- --urls http://0.0.0.0:19102`, permitir el puerto en la red local y escribir la IP del equipo en el cliente móvil. Esta opción expone la API en la red local; utilizar solo una red confiable.
+El emulador Android usa `http://10.0.2.2:19102/`. En teléfono físico, inicie la API de tienda con `-- --urls http://0.0.0.0:19102`, permita el puerto en la red local y escriba la IP del equipo en el cliente móvil. Esto expone la API a la red local; úsela solo en red confiable.
 
-## Compilar e instalar Android
+## Compilar Android sin instalar
 
-El SDK Android 36 está en `D:\tools\android-sdk`. En Debug, Fast Deployment instala ensamblados auxiliares junto con la app. Para probar en un emulador, usa el objetivo `Run` de MSBuild:
+`dotnet build` compila MAUI y no requiere dispositivo conectado. Use:
+
+```powershell
+& 'D:\tools\dotnet10\dotnet.exe' build '.\04. CLIMOV\Celulares.Movil\Celulares.Movil.csproj' -f net10.0-android -p:AndroidSdkDirectory='D:\tools\android-sdk'
+```
+
+Para instalar y abrir en emulador, primero confirme un destino en `adb devices`, luego ejecute MSBuild `Run`:
 
 ```powershell
 & 'D:\tools\android-sdk\platform-tools\adb.exe' devices
 & 'D:\tools\dotnet10\dotnet.exe' build '.\04. CLIMOV\Celulares.Movil\Celulares.Movil.csproj' -t:Run -p:AndroidSdkDirectory='D:\tools\android-sdk'
 ```
 
-En el emulador, la aplicación se conecta a `10.0.2.2:19102`. Una instalación manual del APK Debug omite los ensamblados Fast Deployment; ejecuta desde MSBuild o usa una compilación Release.
+Sin emulador o teléfono conectado, no ejecute `-t:Run`; la compilación independiente funciona sin destino. Una instalación manual de APK Debug puede omitir los ensamblados Fast Deployment.
 
-Los clientes permiten catálogo, ventas y consulta de facturas y amortización. Una venta pendiente debe reintentarse sin cambiar sus datos para conservar su identificador de operación.
+## Imágenes
+
+`GET /api/celulares/{id}/imagen` descarga la foto; `PUT` recibe `multipart/form-data` y carga o reemplaza; `DELETE` quita solo la foto. El servidor valida JPEG, PNG o WebP, firma del archivo y máximo de 5 MiB. Los bytes y tipo MIME se guardan en SQL Server.
+
+Los cuatro clientes permiten administrar fotos. Si falla una carga, revise la migración, tamaño, formato, permisos SQL y disponibilidad de la API.
+
+## Operación
+
+La API expone catálogo, facturas, elegibilidad y amortización. BanQuito debe estar disponible para validar compras de crédito. Una operación pendiente debe reintentarse con el mismo identificador para evitar duplicados. No registre credenciales, cadenas de conexión ni datos personales en capturas o logs.
