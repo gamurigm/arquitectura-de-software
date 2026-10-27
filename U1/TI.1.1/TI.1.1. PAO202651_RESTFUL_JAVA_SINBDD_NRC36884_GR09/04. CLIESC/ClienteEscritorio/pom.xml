@@ -8,10 +8,11 @@
     <artifactId>ClienteEscritorio</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <name>ClienteEscritorio</name>
+    <name>GR09 - REST - Java - SIN BDD - Conversiones - Cliente Escritorio</name>
     <description>Cliente de escritorio (Java Swing) que consume la API REST de Conversion de Unidades Monster</description>
 
     <properties>
+        <netbeans.hint.jdkPlatform>JDK_25</netbeans.hint.jdkPlatform>
         <maven.compiler.release>21</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <jackson.version>2.19.2</jackson.version>

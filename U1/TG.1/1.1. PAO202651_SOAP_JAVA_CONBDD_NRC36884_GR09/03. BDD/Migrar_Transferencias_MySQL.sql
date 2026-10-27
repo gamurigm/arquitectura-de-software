@@ -1,10 +1,20 @@
 USE eurekabank_gr09;
 
-ALTER TABLE Credenciales
-    ADD COLUMN chr_cliecodigo CHAR(5) NULL,
-    ADD CONSTRAINT FK_Credenciales_Cliente FOREIGN KEY (chr_cliecodigo)
-        REFERENCES Cliente (chr_cliecodigo)
-        ON DELETE RESTRICT ON UPDATE RESTRICT;
+SET @ddl = IF(
+    EXISTS (SELECT 1 FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE()
+        AND TABLE_NAME = 'Credenciales' AND COLUMN_NAME = 'chr_cliecodigo'),
+    'SELECT 1',
+    'ALTER TABLE Credenciales ADD COLUMN chr_cliecodigo CHAR(5) NULL'
+);
+PREPARE stmt FROM @ddl; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+SET @ddl = IF(
+    EXISTS (SELECT 1 FROM information_schema.REFERENTIAL_CONSTRAINTS WHERE CONSTRAINT_SCHEMA = DATABASE()
+        AND TABLE_NAME = 'Credenciales' AND CONSTRAINT_NAME = 'FK_Credenciales_Cliente'),
+    'SELECT 1',
+    'ALTER TABLE Credenciales ADD CONSTRAINT FK_Credenciales_Cliente FOREIGN KEY (chr_cliecodigo) REFERENCES Cliente (chr_cliecodigo) ON DELETE RESTRICT ON UPDATE RESTRICT'
+);
+PREPARE stmt FROM @ddl; EXECUTE stmt; DEALLOCATE PREPARE stmt;
 
 CREATE TABLE Transferencias (
     id_transferencia CHAR(36) NOT NULL,

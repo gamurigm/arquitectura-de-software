@@ -1,5 +1,6 @@
 using System.Globalization;
 using EurekaBank.Cliente.Controladores;
+using EurekaBank.Cliente.Modelos;
 
 namespace EurekaBank.ClienteConsola.Vistas;
 
@@ -14,7 +15,6 @@ public sealed class MenuPrincipal(EurekaBankController controlador)
             {
                 return;
             }
-
             Console.WriteLine($"\nSesión: {controlador.UsuarioActivo}");
             Console.WriteLine("1. Consultar movimientos");
             Console.WriteLine("2. Registrar depósito");
@@ -47,7 +47,20 @@ public sealed class MenuPrincipal(EurekaBankController controlador)
             var contrasena = LeerContrasena();
             try
             {
-                if (await controlador.IniciarSesionAsync(usuario, contrasena)) return true;
+                if (await controlador.IniciarSesionAsync(usuario, contrasena))
+                {
+                    if (controlador.Cuentas.Count == 0)
+                    {
+                        Console.WriteLine("No tiene cuentas activas asignadas.");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Cuentas activas:");
+                        foreach (var cuenta in controlador.Cuentas)
+                            Console.WriteLine($"- {cuenta.Etiqueta}");
+                    }
+                    return true;
+                }
                 Console.WriteLine("Credenciales incorrectas o cuenta sin asociación habilitada.");
             }
             catch (HttpRequestException)
@@ -59,11 +72,11 @@ public sealed class MenuPrincipal(EurekaBankController controlador)
 
     private async Task ConsultarMovimientosAsync()
     {
-        Console.Write("Cuenta: ");
-        var cuenta = Console.ReadLine()?.Trim() ?? string.Empty;
+        var cuenta = SeleccionarCuenta("consultar");
+        if (cuenta is null) return;
         try
         {
-            var movimientos = await controlador.ConsultarMovimientosAsync(cuenta);
+            var movimientos = await controlador.ConsultarMovimientosAsync(cuenta.Numero);
             foreach (var movimiento in movimientos)
             {
                 Console.WriteLine(
@@ -76,12 +89,13 @@ public sealed class MenuPrincipal(EurekaBankController controlador)
         {
             Console.WriteLine("No se pudo consultar la API. Revise la conexión.");
         }
+        catch (UnauthorizedAccessException error) { Console.WriteLine(error.Message); }
     }
 
     private async Task RegistrarDepositoAsync()
     {
-        Console.Write("Cuenta: ");
-        var cuenta = Console.ReadLine()?.Trim() ?? string.Empty;
+        var cuenta = SeleccionarCuenta("depositar");
+        if (cuenta is null) return;
         Console.Write("Importe: ");
         var texto = Console.ReadLine();
         if (!decimal.TryParse(texto, NumberStyles.Number, CultureInfo.CurrentCulture, out var importe))
@@ -92,7 +106,7 @@ public sealed class MenuPrincipal(EurekaBankController controlador)
 
         try
         {
-            Console.WriteLine(await controlador.RegistrarDepositoAsync(cuenta, importe)
+            Console.WriteLine(await controlador.RegistrarDepositoAsync(cuenta.Numero, importe)
                 ? "Depósito registrado."
                 : "Depósito rechazado. Revise cuenta e importe.");
         }
@@ -100,12 +114,13 @@ public sealed class MenuPrincipal(EurekaBankController controlador)
         {
             Console.WriteLine("No se pudo registrar el depósito. Revise la conexión.");
         }
+        catch (UnauthorizedAccessException error) { Console.WriteLine(error.Message); }
     }
 
     private async Task TransferirAsync()
     {
-        Console.Write("Cuenta origen: ");
-        var origen = Console.ReadLine()?.Trim() ?? string.Empty;
+        var cuentaOrigen = SeleccionarCuenta("transferir");
+        if (cuentaOrigen is null) return;
         Console.Write("Cuenta destino: ");
         var destino = Console.ReadLine()?.Trim() ?? string.Empty;
         Console.Write("Importe: ");
@@ -117,7 +132,7 @@ public sealed class MenuPrincipal(EurekaBankController controlador)
 
         try
         {
-            Console.WriteLine(await controlador.TransferirAsync(origen, destino, importe, Guid.NewGuid())
+            Console.WriteLine(await controlador.TransferirAsync(cuentaOrigen.Numero, destino, importe, Guid.NewGuid())
                 ? "Transferencia registrada: débito y crédito confirmados."
                 : "Transferencia rechazada. Revise cuentas, moneda, saldo e importe.");
         }
@@ -125,6 +140,25 @@ public sealed class MenuPrincipal(EurekaBankController controlador)
         {
             Console.WriteLine("No se confirmó el resultado. Reintente con la misma clave de operación.");
         }
+        catch (UnauthorizedAccessException error) { Console.WriteLine(error.Message); }
+    }
+
+    private CuentaDto? SeleccionarCuenta(string operacion)
+    {
+        if (controlador.Cuentas.Count == 0)
+        {
+            Console.WriteLine("No tiene cuentas activas asignadas.");
+            return null;
+        }
+
+        Console.WriteLine($"Seleccione cuenta para {operacion}:");
+        for (var i = 0; i < controlador.Cuentas.Count; i++)
+            Console.WriteLine($"{i + 1}. {controlador.Cuentas[i].Etiqueta}");
+        Console.Write("Opción: ");
+        if (int.TryParse(Console.ReadLine(), out var indice) && indice > 0 && indice <= controlador.Cuentas.Count)
+            return controlador.Cuentas[indice - 1];
+        Console.WriteLine("Seleccione una opción válida.");
+        return null;
     }
 
     private static string LeerContrasena()

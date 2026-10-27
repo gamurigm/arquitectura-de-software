@@ -12,6 +12,7 @@ public sealed class EurekaBankController(IEurekaSoapClient servicio)
 
     public bool SesionActiva { get; private set; }
     public IReadOnlyList<Movimiento> Movimientos { get; private set; } = Array.Empty<Movimiento>();
+    public IReadOnlyList<Cuenta> Cuentas { get; private set; } = Array.Empty<Cuenta>();
     public decimal Saldo => Movimientos.Sum(movimiento =>
         movimiento.Accion.Equals("SALIDA", StringComparison.OrdinalIgnoreCase) ? -movimiento.Importe : movimiento.Importe);
 
@@ -21,6 +22,7 @@ public sealed class EurekaBankController(IEurekaSoapClient servicio)
             return false;
         _token = await _servicio.CrearSesionAsync(usuario.Trim(), contrasena, cancellationToken);
         if (string.IsNullOrWhiteSpace(_token)) return false;
+        Cuentas = await _servicio.TraerCuentasAsync(_token, cancellationToken);
         SesionActiva = true;
         return true;
     }
@@ -32,7 +34,7 @@ public sealed class EurekaBankController(IEurekaSoapClient servicio)
         if (cuentaValidada.Length is < 1 or > 8)
             throw new ArgumentException("Ingrese una cuenta válida.", nameof(cuenta));
         _cuenta = cuentaValidada;
-        Movimientos = await _servicio.TraerMovimientosAsync(_cuenta, cancellationToken);
+        Movimientos = await ConSesionAsync(() => _servicio.TraerMovimientosAsync(_token!, _cuenta, cancellationToken));
     }
 
     public async Task<bool> RegistrarDepositoAsync(decimal importe, CancellationToken cancellationToken = default)
@@ -42,7 +44,7 @@ public sealed class EurekaBankController(IEurekaSoapClient servicio)
             throw new InvalidOperationException("Consulte una cuenta antes de registrar un depósito.");
         if (importe <= 0 || decimal.Round(importe, 2) != importe)
             return false;
-        return await _servicio.RegistrarDepositoAsync(_cuenta, importe, cancellationToken) == 1;
+        return await ConSesionAsync(async () => await _servicio.RegistrarDepositoAsync(_token!, _cuenta, importe, cancellationToken) == 1);
     }
 
     public async Task<bool> TransferirAsync(string origen, string destino, decimal importe,
@@ -55,7 +57,7 @@ public sealed class EurekaBankController(IEurekaSoapClient servicio)
         if (_transferenciaPendiente is not { } pendiente || !pendiente.Coincide(origen, destino, importe))
             _transferenciaPendiente = new TransferenciaPendiente(origen, destino, importe, Guid.NewGuid());
         var actual = _transferenciaPendiente!;
-        var resultado = await _servicio.TransferirAsync(_token, origen, destino, importe, actual.Clave, cancellationToken) == 1;
+        var resultado = await ConSesionAsync(async () => await _servicio.TransferirAsync(_token!, origen, destino, importe, actual.Clave, cancellationToken) == 1);
         _transferenciaPendiente = null;
         return resultado;
     }
@@ -67,6 +69,7 @@ public sealed class EurekaBankController(IEurekaSoapClient servicio)
         SesionActiva = false;
         _cuenta = null;
         Movimientos = Array.Empty<Movimiento>();
+        Cuentas = Array.Empty<Cuenta>();
         if (token is not null) await _servicio.CerrarSesionAsync(token, cancellationToken);
     }
 
@@ -74,6 +77,21 @@ public sealed class EurekaBankController(IEurekaSoapClient servicio)
     {
         if (!SesionActiva)
             throw new InvalidOperationException("Inicie sesión primero.");
+    }
+
+    private async Task<T> ConSesionAsync<T>(Func<Task<T>> operacion)
+    {
+        try { return await operacion(); }
+        catch (InvalidOperationException error) when (error.Message.Contains("Token ausente, inválido o caducado", StringComparison.OrdinalIgnoreCase))
+        {
+            _token = null;
+            SesionActiva = false;
+            _cuenta = null;
+            Movimientos = Array.Empty<Movimiento>();
+            Cuentas = Array.Empty<Cuenta>();
+            _transferenciaPendiente = null;
+            throw new UnauthorizedAccessException("La sesión caducó. Inicie sesión nuevamente.", error);
+        }
     }
 
     private sealed record TransferenciaPendiente(string Origen, string Destino, decimal Importe, Guid Clave)

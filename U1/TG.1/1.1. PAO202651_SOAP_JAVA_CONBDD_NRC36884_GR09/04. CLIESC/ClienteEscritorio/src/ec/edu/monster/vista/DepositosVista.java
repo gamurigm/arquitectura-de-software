@@ -1,9 +1,12 @@
 package ec.edu.monster.vista;
 
+import ec.edu.monster.modelo.Cuenta;
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
+import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -11,13 +14,15 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 public final class DepositosVista extends JDialog {
-    private final JTextField cuenta = new JTextField(20);
+    private final JComboBox<Cuenta> cuenta = new JComboBox<>();
     private final JTextField importe = new JTextField(20);
     private final JButton depositar = new JButton("Registrar depósito");
     private final JLabel estado = new JLabel("Ingrese la cuenta y el importe del depósito.");
 
-    public DepositosVista(JFrame propietario) {
+    public DepositosVista(JFrame propietario, List<Cuenta> cuentas) {
         super(propietario, "EurekaBank GR09 · Depósitos", true);
+        cuentas.forEach(cuenta::addItem);
+        if (cuentas.isEmpty()) estado.setText("No hay cuentas activas asignadas.");
         TemaEureka.Tarjeta contenido = new TemaEureka.Tarjeta(new BorderLayout(16, 20));
         JPanel campos = new JPanel(new GridLayout(0, 1, 6, 8));
         campos.setOpaque(false);
@@ -49,7 +54,7 @@ public final class DepositosVista extends JDialog {
         setLocationRelativeTo(propietario);
     }
 
-    public String cuenta() { return cuenta.getText(); }
+    public String cuenta() { return cuenta.getSelectedItem() instanceof Cuenta seleccionada ? seleccionada.numero() : ""; }
     public String importe() { return importe.getText(); }
     public void limpiarImporte() { importe.setText(""); }
     public void alDepositar(Runnable accion) { depositar.addActionListener(evento -> accion.run()); }

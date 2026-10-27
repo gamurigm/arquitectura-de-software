@@ -11,6 +11,8 @@ import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.Map;
 import java.util.UUID;
+import ec.edu.monster.modelo.Movimiento;
+import ec.edu.monster.modelo.Cuenta;
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.stream.XMLOutputFactory;
@@ -36,6 +38,37 @@ final class SoapOperacionesSeguras {
         String resultado = texto(invocar("transferir", Map.of("token", token, "cuentaOrigen", origen,
                 "cuentaDestino", destino, "importe", importe.toPlainString(), "claveOperacion", clave.toString())), "resultado");
         return "1".equals(resultado);
+    }
+
+    java.util.List<Movimiento> traerMovimientos(String token, String cuenta) throws IOException {
+        Document documento = invocar("traerMovimientos", Map.of("token", token, "cuenta", cuenta));
+        NodeList nodos = documento.getElementsByTagNameNS("*", "movimiento");
+        java.util.List<Movimiento> movimientos = new java.util.ArrayList<>(nodos.getLength());
+        for (int i = 0; i < nodos.getLength(); i++) {
+            var fila = (org.w3c.dom.Element) nodos.item(i);
+            var fecha = fecha(fila);
+            movimientos.add(new Movimiento(texto(fila, "cuenta"), Integer.parseInt(texto(fila, "nromov")), fecha,
+                    texto(fila, "tipo"), texto(fila, "accion"), new BigDecimal(texto(fila, "importe"))));
+        }
+        return java.util.List.copyOf(movimientos);
+    }
+
+    java.util.List<Cuenta> traerCuentas(String token) throws IOException {
+        Document documento = invocar("traerCuentas", Map.of("token", token));
+        NodeList nodos = documento.getElementsByTagNameNS("*", "cuenta");
+        java.util.List<Cuenta> cuentas = new java.util.ArrayList<>(nodos.getLength());
+        for (int i = 0; i < nodos.getLength(); i++) {
+            var fila = (org.w3c.dom.Element) nodos.item(i);
+            if (fila.getElementsByTagNameNS("*", "numero").getLength() > 0)
+                cuentas.add(new Cuenta(texto(fila, "numero"), texto(fila, "moneda"), new BigDecimal(texto(fila, "saldo"))));
+        }
+        return java.util.List.copyOf(cuentas);
+    }
+
+    int regDeposito(String token, String cuenta, BigDecimal importe) throws IOException {
+        String resultado = texto(invocar("regDeposito", Map.of("token", token, "cuenta", cuenta,
+                "importe", importe.toPlainString())), "resultado");
+        return Integer.parseInt(resultado);
     }
 
     void cerrarSesion(String token) throws IOException {
@@ -71,7 +104,10 @@ final class SoapOperacionesSeguras {
             fabrica.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
             Document documento = fabrica.newDocumentBuilder().parse(new InputSource(new StringReader(respuesta.body())));
             String fallo = textoOpcional(documento, "Fault");
-            if (!fallo.isBlank()) throw new IOException("EurekaBank rechazó la operación SOAP.");
+            if (!fallo.isBlank()) {
+                String mensaje = textoOpcional(documento, "faultstring");
+                throw new IOException(mensaje.isBlank() ? "EurekaBank rechazó la operación SOAP." : mensaje);
+            }
             if (respuesta.statusCode() < 200 || respuesta.statusCode() >= 300)
                 throw new IOException("El servicio SOAP respondió HTTP " + respuesta.statusCode() + ".");
             return documento;
@@ -89,6 +125,19 @@ final class SoapOperacionesSeguras {
         String valor = textoOpcional(documento, nombre);
         if (valor.isBlank()) throw new IOException("Respuesta SOAP incompleta: " + nombre);
         return valor;
+    }
+
+    private static String texto(org.w3c.dom.Element elemento, String nombre) throws IOException {
+        NodeList hijos = elemento.getElementsByTagNameNS("*", nombre);
+        if (hijos.getLength() == 0) throw new IOException("Respuesta SOAP incompleta: " + nombre);
+        return hijos.item(0).getTextContent().strip();
+    }
+
+    private static java.time.LocalDateTime fecha(org.w3c.dom.Element elemento) throws IOException {
+        try {
+            return javax.xml.datatype.DatatypeFactory.newInstance().newXMLGregorianCalendar(texto(elemento, "fecha"))
+                    .toGregorianCalendar().toZonedDateTime().toLocalDateTime();
+        } catch (Exception e) { throw new IOException("Fecha de movimiento SOAP inválida.", e); }
     }
 
     private static String textoOpcional(Document documento, String nombre) {

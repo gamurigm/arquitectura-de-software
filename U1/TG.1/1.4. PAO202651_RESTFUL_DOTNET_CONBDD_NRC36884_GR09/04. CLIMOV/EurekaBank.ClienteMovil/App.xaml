@@ -3,10 +3,23 @@
              x:Class="EurekaBank.ClienteMovil.App">
     <Application.Resources>
         <ResourceDictionary>
-            <Color x:Key="Fondo">#0B1020</Color>
-            <Color x:Key="Superficie">#121C30</Color>
-            <Color x:Key="Acento">#52E0D2</Color>
-            <Color x:Key="Texto">#F5F7FB</Color>
+            <Color x:Key="Fondo">#F3F7FA</Color>
+            <Color x:Key="Superficie">#FFFFFF</Color>
+            <Color x:Key="Acento">#087F7B</Color>
+            <Color x:Key="Texto">#17324D</Color>
+            <Style TargetType="Entry">
+                <Setter Property="TextColor" Value="#17324D" />
+                <Setter Property="PlaceholderColor" Value="#667B8E" />
+                <Setter Property="BackgroundColor" Value="White" />
+                <Setter Property="Margin" Value="0,4,0,10" />
+            </Style>
+            <Style TargetType="Button">
+                <Setter Property="BackgroundColor" Value="#087F7B" />
+                <Setter Property="TextColor" Value="White" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="CornerRadius" Value="9" />
+                <Setter Property="MinimumHeightRequest" Value="46" />
+            </Style>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

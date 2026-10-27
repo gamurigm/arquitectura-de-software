@@ -5,7 +5,7 @@
     <artifactId>TI-1.1-PAO202651-SOAP-JAVA-SINBBDD-NRC36884-GR09</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>TI.1.1 SOAP Java GR09</name>
+    <name>GR09 - SOAP - Java - SIN BDD - Conversiones - Agregador</name>
     <description>Proyecto agregador Maven para los módulos Java de la entrega GR09.</description>
 
     <modules>

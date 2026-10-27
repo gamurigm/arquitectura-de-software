@@ -32,8 +32,13 @@ public final class MovimientosServlet extends ControladorProtegido {
         }
         try {
             request.setAttribute("cuenta", cuenta.strip());
-            request.setAttribute("movimientos", servicio.traerMovimientos(cuenta.strip()));
+            request.setAttribute("movimientos", servicio.traerMovimientos(
+                    (String) request.getSession(false).getAttribute("token"), cuenta.strip()));
+        } catch (IOException e) {
+            if (!cerrarSesionExpirada(request, response, e)) throw e;
+            return;
         } catch (RuntimeException e) {
+            if (cerrarSesionExpirada(request, response, e)) return;
             request.setAttribute("error", "No se pudieron consultar los movimientos.");
         }
         request.getRequestDispatcher("/WEB-INF/jsp/movimientos.jsp").forward(request, response);

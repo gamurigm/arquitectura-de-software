@@ -61,6 +61,8 @@ public final class MenuPrincipal {
             String token = login.iniciarSesion(usuario.strip(), new String(contrasena));
             if (token != null && !token.isBlank()) {
                 controlador.iniciarSesion(token);
+                if (controlador.cuentas().isEmpty()) System.out.println("No hay cuentas activas asignadas.");
+                else controlador.cuentas().forEach(cuenta -> System.out.println("  " + cuenta));
                 System.out.println(estilo("  Sesión iniciada.", "32"));
                 return true;
             }
@@ -98,13 +100,16 @@ public final class MenuPrincipal {
     }
 
     private void consultarMovimientos(Scanner entrada, Console consola) {
-        String cuenta = leerLinea(entrada, consola, "Número de cuenta: ");
+        String cuenta = seleccionarCuenta(entrada, consola);
+        if (cuenta == null) return;
         if (cuenta == null || cuenta.isBlank()) {
             System.out.println("Cuenta vacía.");
             return;
         }
 
-        List<Movimiento> movimientos = controlador.consultarMovimientos(cuenta.strip());
+        List<Movimiento> movimientos;
+        try { movimientos = controlador.consultarMovimientos(cuenta.strip()); }
+        catch (java.io.IOException e) { System.out.println("No se pudieron consultar los movimientos. Revise la sesión y el servidor."); return; }
         if (movimientos.isEmpty()) {
             System.out.println("No hay movimientos para esa cuenta.");
             return;
@@ -122,7 +127,8 @@ public final class MenuPrincipal {
     }
 
     private void registrarDeposito(Scanner entrada, Console consola) {
-        String cuenta = leerLinea(entrada, consola, "Número de cuenta: ");
+        String cuenta = seleccionarCuenta(entrada, consola);
+        if (cuenta == null) return;
         if (cuenta == null || cuenta.isBlank()) {
             System.out.println("Cuenta vacía.");
             return;
@@ -141,13 +147,16 @@ public final class MenuPrincipal {
             return;
         }
 
-        System.out.println(controlador.registrarDeposito(cuenta.strip(), importe)
-                ? estilo("  Depósito registrado.", "32")
-                : estilo("  No se pudo registrar el depósito.", "31"));
+        try {
+            System.out.println(controlador.registrarDeposito(cuenta.strip(), importe)
+                    ? estilo("  Depósito registrado.", "32")
+                    : estilo("  No se pudo registrar el depósito.", "31"));
+        } catch (java.io.IOException e) { System.out.println("Sesión caducada o servicio no disponible. Inicie sesión nuevamente."); }
     }
 
     private void transferir(Scanner entrada, Console consola) {
-        String origen = leerLinea(entrada, consola, "Cuenta origen: ");
+        String origen = seleccionarCuenta(entrada, consola);
+        if (origen == null) return;
         String destino = leerLinea(entrada, consola, "Cuenta destino: ");
         BigDecimal importe;
         try { importe = new BigDecimal(leerLinea(entrada, consola, "Importe: ").strip().replace(',', '.')); }
@@ -171,6 +180,16 @@ public final class MenuPrincipal {
         }
         System.out.print(mensaje);
         return entrada.hasNextLine() ? entrada.nextLine() : null;
+    }
+
+    private String seleccionarCuenta(Scanner entrada, Console consola) {
+        List<ec.edu.monster.modelo.Cuenta> cuentas = controlador.cuentas();
+        if (cuentas.isEmpty()) { System.out.println("No hay cuentas activas asignadas."); return null; }
+        for (int i = 0; i < cuentas.size(); i++) System.out.println((i + 1) + ". " + cuentas.get(i));
+        try {
+            int opcion = Integer.parseInt(leerLinea(entrada, consola, "Seleccione cuenta: ").strip());
+            return opcion > 0 && opcion <= cuentas.size() ? cuentas.get(opcion - 1).numero() : null;
+        } catch (NumberFormatException e) { return null; }
     }
 
     private String estilo(String texto, String codigo) {

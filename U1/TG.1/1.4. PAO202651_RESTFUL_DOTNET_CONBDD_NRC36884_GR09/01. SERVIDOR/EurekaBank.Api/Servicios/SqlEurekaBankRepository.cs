@@ -20,8 +20,23 @@ public sealed class SqlEurekaBankRepository(ISqlConnectionFactory connectionFact
             : null;
     }
 
+    public async Task<IReadOnlyList<CuentaResponse>> ConsultarCuentasAsync(string codigoCliente, CancellationToken cancellationToken)
+    {
+        const string sql = "SELECT chr_cuencodigo, chr_monecodigo, dec_cuensaldo FROM dbo.Cuenta WHERE chr_cliecodigo = @cliente AND vch_cuenestado = N'ACTIVO' ORDER BY chr_cuencodigo;";
+        var cuentas = new List<CuentaResponse>();
+        await using var connection = connectionFactory.CreateConnection();
+        await connection.OpenAsync(cancellationToken);
+        await using var command = new SqlCommand(sql, connection);
+        command.Parameters.Add("@cliente", SqlDbType.Char, 5).Value = codigoCliente;
+        await using var reader = await command.ExecuteReaderAsync(cancellationToken);
+        while (await reader.ReadAsync(cancellationToken))
+            cuentas.Add(new CuentaResponse(reader.GetString(0).TrimEnd(), reader.GetString(1).TrimEnd(), reader.GetDecimal(2)));
+        return cuentas;
+    }
+
     public async Task<IReadOnlyList<MovimientoResponse>> ConsultarMovimientosAsync(
         string cuenta,
+        string codigoCliente,
         CancellationToken cancellationToken)
     {
         const string sql = """
@@ -29,7 +44,8 @@ public sealed class SqlEurekaBankRepository(ISqlConnectionFactory connectionFact
                    t.vch_tipodescripcion, t.vch_tipoaccion, m.dec_moviimporte
             FROM dbo.Movimiento AS m
             INNER JOIN dbo.TipoMovimiento AS t ON t.chr_tipocodigo = m.chr_tipocodigo
-            WHERE m.chr_cuencodigo = @cuenta
+            INNER JOIN dbo.Cuenta AS c ON c.chr_cuencodigo = m.chr_cuencodigo
+            WHERE m.chr_cuencodigo = @cuenta AND c.chr_cliecodigo = @cliente AND c.vch_cuenestado = N'ACTIVO'
             ORDER BY m.int_movinumero DESC;
             """;
         var movimientos = new List<MovimientoResponse>();
@@ -38,6 +54,7 @@ public sealed class SqlEurekaBankRepository(ISqlConnectionFactory connectionFact
         await connection.OpenAsync(cancellationToken);
         await using var command = new SqlCommand(sql, connection);
         command.Parameters.Add("@cuenta", SqlDbType.Char, 8).Value = cuenta;
+        command.Parameters.Add("@cliente", SqlDbType.Char, 5).Value = codigoCliente;
         await using var reader = await command.ExecuteReaderAsync(cancellationToken);
         while (await reader.ReadAsync(cancellationToken))
         {
@@ -56,6 +73,7 @@ public sealed class SqlEurekaBankRepository(ISqlConnectionFactory connectionFact
     public async Task<bool> RegistrarDepositoAsync(
         string cuenta,
         decimal importe,
+        string codigoCliente,
         CancellationToken cancellationToken)
     {
         await using var connection = connectionFactory.CreateConnection();
@@ -67,10 +85,11 @@ public sealed class SqlEurekaBankRepository(ISqlConnectionFactory connectionFact
         {
             await using var saldoCommand = new SqlCommand(
                 "SELECT dec_cuensaldo FROM dbo.Cuenta WITH (UPDLOCK, HOLDLOCK) " +
-                "WHERE chr_cuencodigo = @cuenta AND vch_cuenestado = N'ACTIVO';",
+                "WHERE chr_cuencodigo = @cuenta AND chr_cliecodigo = @cliente AND vch_cuenestado = N'ACTIVO';",
                 connection,
                 transaction);
             saldoCommand.Parameters.Add("@cuenta", SqlDbType.Char, 8).Value = cuenta;
+            saldoCommand.Parameters.Add("@cliente", SqlDbType.Char, 5).Value = codigoCliente;
             var saldoResult = await saldoCommand.ExecuteScalarAsync(cancellationToken);
             if (saldoResult is null or DBNull)
             {

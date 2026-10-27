@@ -32,16 +32,34 @@ public sealed class EurekaBankRepository(ConexionDb conexiones)
             : null;
     }
 
-    public async Task<List<Movimiento>> TraerMovimientosAsync(string cuenta)
+    public async Task<List<Cuenta>> TraerCuentasAsync(string codigoCliente)
+    {
+        const string sql = "SELECT chr_cuencodigo, chr_monecodigo, dec_cuensaldo FROM dbo.Cuenta "
+            + "WHERE chr_cliecodigo = @cliente AND vch_cuenestado = 'ACTIVO' ORDER BY chr_cuencodigo";
+        var cuentas = new List<Cuenta>();
+        await using var conexion = conexiones.CrearConexion();
+        await conexion.OpenAsync();
+        await using var comando = new SqlCommand(sql, conexion);
+        comando.Parameters.Add("@cliente", SqlDbType.Char, 5).Value = codigoCliente;
+        await using var lector = await comando.ExecuteReaderAsync();
+        while (await lector.ReadAsync())
+            cuentas.Add(new Cuenta(lector.GetString(0).TrimEnd(), lector.GetString(1).TrimEnd(), lector.GetDecimal(2)));
+        return cuentas;
+    }
+
+    public async Task<List<Movimiento>> TraerMovimientosAsync(string cuenta, string codigoCliente)
     {
         const string sql = "SELECT m.chr_cuencodigo, m.int_movinumero, m.dtt_movifecha, t.vch_tipodescripcion, t.vch_tipoaccion, m.dec_moviimporte "
             + "FROM dbo.Movimiento m INNER JOIN dbo.TipoMovimiento t ON t.chr_tipocodigo = m.chr_tipocodigo "
-            + "WHERE m.chr_cuencodigo = @cuenta ORDER BY m.int_movinumero DESC";
+            + "INNER JOIN dbo.Cuenta c ON c.chr_cuencodigo = m.chr_cuencodigo "
+            + "WHERE m.chr_cuencodigo = @cuenta AND c.chr_cliecodigo = @cliente AND c.vch_cuenestado = 'ACTIVO' "
+            + "ORDER BY m.int_movinumero DESC";
         var movimientos = new List<Movimiento>();
         await using var conexion = conexiones.CrearConexion();
         await conexion.OpenAsync();
         await using var comando = new SqlCommand(sql, conexion);
         comando.Parameters.Add("@cuenta", System.Data.SqlDbType.Char, 8).Value = cuenta;
+        comando.Parameters.Add("@cliente", System.Data.SqlDbType.Char, 5).Value = codigoCliente;
         await using var lector = await comando.ExecuteReaderAsync();
         while (await lector.ReadAsync())
         {
@@ -58,7 +76,7 @@ public sealed class EurekaBankRepository(ConexionDb conexiones)
         return movimientos;
     }
 
-    public async Task RegistrarDepositoAsync(string cuenta, decimal importe)
+    public async Task RegistrarDepositoAsync(string cuenta, decimal importe, string codigoCliente)
     {
         await using var conexion = conexiones.CrearConexion();
         await conexion.OpenAsync();
@@ -66,9 +84,10 @@ public sealed class EurekaBankRepository(ConexionDb conexiones)
         try
         {
             decimal saldo;
-            await using (var comando = new SqlCommand("SELECT dec_cuensaldo FROM dbo.Cuenta WITH (UPDLOCK, HOLDLOCK) WHERE chr_cuencodigo = @cuenta AND vch_cuenestado = 'ACTIVO'", conexion, transaccion))
+            await using (var comando = new SqlCommand("SELECT dec_cuensaldo FROM dbo.Cuenta WITH (UPDLOCK, HOLDLOCK) WHERE chr_cuencodigo = @cuenta AND chr_cliecodigo = @cliente AND vch_cuenestado = 'ACTIVO'", conexion, transaccion))
             {
                 comando.Parameters.Add("@cuenta", System.Data.SqlDbType.Char, 8).Value = cuenta;
+                comando.Parameters.Add("@cliente", System.Data.SqlDbType.Char, 5).Value = codigoCliente;
                 var resultado = await comando.ExecuteScalarAsync();
                 if (resultado is null or DBNull) throw new InvalidOperationException("La cuenta no existe o no está activa.");
                 saldo = (decimal)resultado;

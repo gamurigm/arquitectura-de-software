@@ -38,7 +38,7 @@ public final class DepositoServlet extends ControladorProtegido {
             if (importe.signum() <= 0 || importe.precision() > 12) {
                 throw new IllegalArgumentException("El importe debe ser positivo y no superar 10 dígitos.");
             }
-            if (!servicio.registrarDeposito(cuenta.strip(), importe)) {
+            if (!servicio.registrarDeposito((String) request.getSession(false).getAttribute("token"), cuenta.strip(), importe)) {
                 throw new IllegalArgumentException("El servidor rechazó el depósito.");
             }
             response.sendRedirect(request.getContextPath() + "/depositos?resultado=registrado");
@@ -47,7 +47,11 @@ public final class DepositoServlet extends ControladorProtegido {
             request.setAttribute("error", "Ingrese un importe válido con máximo dos decimales.");
         } catch (IllegalArgumentException e) {
             request.setAttribute("error", e.getMessage());
+        } catch (IOException e) {
+            if (!cerrarSesionExpirada(request, response, e)) throw e;
+            return;
         } catch (RuntimeException e) {
+            if (cerrarSesionExpirada(request, response, e)) return;
             request.setAttribute("error", "No se confirmó el resultado del depósito. Revise movimientos antes de reintentar.");
         }
         request.getRequestDispatcher("/WEB-INF/jsp/depositos.jsp").forward(request, response);

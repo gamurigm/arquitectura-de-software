@@ -5,5 +5,5 @@ dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories { google(); mavenCentral() }
 }
-rootProject.name = 'EurekaBankMovil'
+rootProject.name = 'GR09 - SOAP - Java - CON BDD - EurekaBank - Cliente Móvil'
 include ':app'

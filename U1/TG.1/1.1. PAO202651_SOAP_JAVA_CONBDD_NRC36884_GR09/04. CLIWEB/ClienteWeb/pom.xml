@@ -6,10 +6,13 @@
     <artifactId>cliente-web-eurekabank</artifactId>
     <version>1.0.0</version>
     <packaging>war</packaging>
+    <name>GR09 - SOAP - Java - CON BDD - EurekaBank - Cliente Web</name>
     <properties>
+        <netbeans.hint.jdkPlatform>JDK_25</netbeans.hint.jdkPlatform>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>21</maven.compiler.release>
         <metro.version>4.0.4</metro.version>
+        <eurekabank.build.directory>${user.home}/Documents/ESPE VIII SII2026/tools/build-cache/eurekabank-gr09/cliente-web</eurekabank.build.directory>
         <netbeans.hint.deploy.server>pfv5ee8</netbeans.hint.deploy.server>
     </properties>
     <dependencies>
@@ -26,7 +29,7 @@
         </dependency>
     </dependencies>
     <build>
-        <directory>${project.basedir}/target</directory>
+        <directory>${eurekabank.build.directory}</directory>
         <finalName>ClienteWebEurekaBank</finalName>
         <plugins>
             <plugin>

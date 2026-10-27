@@ -26,5 +26,6 @@ public sealed class CuentaViewModel
     public Guid ClaveOperacion { get; set; }
 
     public string? Mensaje { get; set; }
+    public IReadOnlyList<CuentaDto> Cuentas { get; set; } = [];
     public IReadOnlyList<MovimientoDto> Movimientos { get; set; } = [];
 }

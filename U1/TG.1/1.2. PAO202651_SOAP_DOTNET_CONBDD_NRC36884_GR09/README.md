@@ -7,7 +7,7 @@ Sistema bancario SOAP con servidor CoreWCF, SQL Server 2025 y clientes de consol
 1. Use la base SQL Server existente y compartida por los servicios bancarios .NET.
 2. Defina `EUREKABANK_DB_CONNECTION_STRING` en el `.env` común de `U1/TG.1`, apuntando a esa base. Mantenga credenciales reales solo en ese archivo local, ignorado por Git.
 3. El formato recomendado de cadena es `Server=localhost,1433;Database=<base-compartida>;User ID=<usuario>;Password=<contraseña>;Encrypt=True;TrustServerCertificate=True;`. Use una cuenta SQL limitada a la base y los permisos de lectura, actualización e inserción requeridos.
-4. Genere un hash con `04. SERVIDOR/crear-hash.ps1` y agregue usuario y hash a `dbo.Credenciales` en SQL Server.
+4. Para la prueba local, ejecute una vez `03. BDD/Cargar_Datos_SQLServer.sql` sobre la base vacía. Carga los datos de ejemplo y vincula `Monster` al cliente `00005`, con cuentas `00100001` y `00100002`. Para otros usuarios, genere el hash con `04. SERVIDOR/crear-hash.ps1` y asocie el cliente correcto.
 
 El servicio queda en `http://localhost:5080/WSEureka`; su WSDL se publica en `http://localhost:5080/WSEureka?wsdl`. Para clientes locales, `EUREKABANK_SOAP_DOTNET_URL` cambia el endpoint. El cliente Android usa `http://10.0.2.2:5080/WSEureka` por defecto; su pantalla permite editarlo.
 

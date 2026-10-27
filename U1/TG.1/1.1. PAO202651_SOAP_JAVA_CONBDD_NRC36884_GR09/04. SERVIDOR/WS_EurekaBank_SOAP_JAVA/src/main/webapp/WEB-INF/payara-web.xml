@@ -1,4 +1,2 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<payara-web-app>
-    <context-root>/WS_EurekaBank_SOAP_JAVA_GR09</context-root>
-</payara-web-app>
+<payara-web-app />

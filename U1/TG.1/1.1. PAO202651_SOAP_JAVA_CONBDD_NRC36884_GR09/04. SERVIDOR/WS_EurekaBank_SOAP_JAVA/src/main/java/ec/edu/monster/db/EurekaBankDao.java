@@ -1,6 +1,7 @@
 package ec.edu.monster.db;
 
 import ec.edu.monster.modelo.Movimiento;
+import ec.edu.monster.modelo.CuentaDto;
 import ec.edu.monster.modelo.SolicitudTransferencia;
 import ec.edu.monster.seguridad.PasswordHasher;
 import java.math.BigDecimal;
@@ -52,20 +53,36 @@ public final class EurekaBankDao {
         }
     }
 
-    public List<Movimiento> traerMovimientos(String cuenta) throws SQLException {
+    public List<CuentaDto> traerCuentas(String codigoCliente) throws SQLException {
+        List<CuentaDto> cuentas = new ArrayList<>();
+        String sql = "SELECT chr_cuencodigo, chr_monecodigo, dec_cuensaldo FROM Cuenta "
+                + "WHERE chr_cliecodigo = ? AND vch_cuenestado = 'ACTIVO' ORDER BY chr_cuencodigo";
+        try (Connection cn = ConexionDB.getInstancia().getConnection();
+                PreparedStatement ps = cn.prepareStatement(sql)) {
+            ps.setString(1, codigoCliente);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) cuentas.add(new CuentaDto(rs.getString(1).strip(), rs.getString(2).strip(), rs.getBigDecimal(3)));
+            }
+        }
+        return cuentas;
+    }
+
+    public List<Movimiento> traerMovimientos(String cuenta, String codigoCliente) throws SQLException {
         String sql = "SELECT m.chr_cuencodigo AS cuenta, "
                 + "m.int_movinumero AS nromov, m.dtt_movifecha AS fecha, "
                 + "t.vch_tipodescripcion AS tipo, t.vch_tipoaccion AS accion, "
                 + "m.dec_moviimporte AS importe "
                 + "FROM Movimiento m "
                 + "INNER JOIN TipoMovimiento t ON t.chr_tipocodigo = m.chr_tipocodigo "
-                + "WHERE m.chr_cuencodigo = ? "
+                + "INNER JOIN Cuenta c ON c.chr_cuencodigo = m.chr_cuencodigo "
+                + "WHERE m.chr_cuencodigo = ? AND c.chr_cliecodigo = ? AND c.vch_cuenestado = 'ACTIVO' "
                 + "ORDER BY m.int_movinumero DESC";
         List<Movimiento> movimientos = new ArrayList<>();
 
         try (Connection cn = ConexionDB.getInstancia().getConnection();
                 PreparedStatement ps = cn.prepareStatement(sql)) {
             ps.setString(1, cuenta);
+            ps.setString(2, codigoCliente);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     Movimiento movimiento = new Movimiento();
@@ -83,7 +100,7 @@ public final class EurekaBankDao {
         return movimientos;
     }
 
-    public void registrarDeposito(String cuenta, BigDecimal importe, String codigoEmpleado)
+    public void registrarDeposito(String cuenta, BigDecimal importe, String codigoEmpleado, String codigoCliente)
             throws SQLException {
         try (Connection cn = ConexionDB.getInstancia().getConnection()) {
             cn.setAutoCommit(false);
@@ -91,9 +108,10 @@ public final class EurekaBankDao {
                 BigDecimal saldo;
                 try (PreparedStatement ps = cn.prepareStatement(
                         "SELECT dec_cuensaldo FROM Cuenta "
-                        + "WHERE chr_cuencodigo = ? AND vch_cuenestado = 'ACTIVO' "
+                        + "WHERE chr_cuencodigo = ? AND chr_cliecodigo = ? AND vch_cuenestado = 'ACTIVO' "
                         + "FOR UPDATE")) {
                     ps.setString(1, cuenta);
+                    ps.setString(2, codigoCliente);
                     try (ResultSet rs = ps.executeQuery()) {
                         if (!rs.next()) {
                             throw new SQLException("La cuenta no existe o no está activa.");

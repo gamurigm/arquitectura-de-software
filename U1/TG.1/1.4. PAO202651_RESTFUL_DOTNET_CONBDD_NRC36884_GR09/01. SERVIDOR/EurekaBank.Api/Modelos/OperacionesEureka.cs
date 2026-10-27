@@ -21,6 +21,7 @@ public sealed class DepositoRequest
 
 public sealed record CredencialUsuario(string Hash, string? CodigoCliente);
 public sealed record LoginResponse(bool Autenticado, string? Token);
+public sealed record CuentaResponse(string Numero, string Moneda, decimal Saldo);
 public sealed record DepositoResponse(bool Registrado);
 public sealed record TransferenciaRequest(
     string CuentaOrigen,

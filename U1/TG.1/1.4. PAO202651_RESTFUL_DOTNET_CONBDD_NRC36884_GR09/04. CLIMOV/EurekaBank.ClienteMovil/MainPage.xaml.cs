@@ -1,5 +1,6 @@
 using System.Globalization;
 using EurekaBank.Cliente.Controladores;
+using EurekaBank.Cliente.Modelos;
 
 namespace EurekaBank.ClienteMovil;
 
@@ -19,7 +20,12 @@ public partial class MainPage(EurekaBankController controlador) : ContentPage
             LoginPanel.IsVisible = false;
             BancoPanel.IsVisible = true;
             SaludoLabel.Text = $"Bienvenido, {controlador.UsuarioActivo}";
-            MostrarMensaje(string.Empty);
+            foreach (var selector in new[] { CuentaConsultaPicker, CuentaDepositoPicker, CuentaOrigenTransferenciaPicker })
+            {
+                selector.ItemsSource = controlador.Cuentas.ToList();
+                selector.SelectedIndex = controlador.Cuentas.Count > 0 ? 0 : -1;
+            }
+            MostrarMensaje(controlador.Cuentas.Count == 0 ? "No tiene cuentas activas asignadas." : string.Empty);
         }
         catch (HttpRequestException)
         {
@@ -32,13 +38,14 @@ public partial class MainPage(EurekaBankController controlador) : ContentPage
         try
         {
             MovimientosList.ItemsSource = await controlador.ConsultarMovimientosAsync(
-                CuentaConsultaEntry.Text?.Trim() ?? string.Empty);
+                (CuentaConsultaPicker.SelectedItem as CuentaDto)?.Numero ?? string.Empty);
             MostrarMensaje("Consulta completada.");
         }
         catch (HttpRequestException)
         {
             MostrarMensaje("No se pudieron consultar los movimientos.");
         }
+        catch (UnauthorizedAccessException) { MostrarLoginPorCaducidad(); }
     }
 
     private async void Depositar_Click(object sender, EventArgs e)
@@ -52,7 +59,7 @@ public partial class MainPage(EurekaBankController controlador) : ContentPage
         try
         {
             MostrarMensaje(await controlador.RegistrarDepositoAsync(
-                    CuentaDepositoEntry.Text?.Trim() ?? string.Empty, importe)
+                    (CuentaDepositoPicker.SelectedItem as CuentaDto)?.Numero ?? string.Empty, importe)
                 ? "Depósito registrado."
                 : "Depósito rechazado. Revise cuenta e importe.");
         }
@@ -60,6 +67,7 @@ public partial class MainPage(EurekaBankController controlador) : ContentPage
         {
             MostrarMensaje("No se pudo registrar el depósito.");
         }
+        catch (UnauthorizedAccessException) { MostrarLoginPorCaducidad(); }
     }
 
     private async void Transferir_Click(object sender, EventArgs e)
@@ -72,7 +80,7 @@ public partial class MainPage(EurekaBankController controlador) : ContentPage
         try
         {
             MostrarMensaje(await controlador.TransferirAsync(
-                    CuentaOrigenTransferenciaEntry.Text?.Trim() ?? string.Empty,
+                    (CuentaOrigenTransferenciaPicker.SelectedItem as CuentaDto)?.Numero ?? string.Empty,
                     CuentaDestinoTransferenciaEntry.Text?.Trim() ?? string.Empty, importe, Guid.NewGuid())
                 ? "Transferencia registrada: débito y crédito confirmados."
                 : "Transferencia rechazada. Revise cuentas, moneda, saldo e importe.");
@@ -81,6 +89,7 @@ public partial class MainPage(EurekaBankController controlador) : ContentPage
         {
             MostrarMensaje("No se confirmó el resultado. Reintente con la misma clave de operación.");
         }
+        catch (UnauthorizedAccessException) { MostrarLoginPorCaducidad(); }
     }
 
     private async void CerrarSesion_Click(object sender, EventArgs e)
@@ -95,4 +104,12 @@ public partial class MainPage(EurekaBankController controlador) : ContentPage
     }
 
     private void MostrarMensaje(string texto) => MensajeLabel.Text = texto;
+
+    private void MostrarLoginPorCaducidad()
+    {
+        MovimientosList.ItemsSource = null;
+        BancoPanel.IsVisible = false;
+        LoginPanel.IsVisible = true;
+        MostrarMensaje("La sesión caducó. Inicie sesión nuevamente.");
+    }
 }

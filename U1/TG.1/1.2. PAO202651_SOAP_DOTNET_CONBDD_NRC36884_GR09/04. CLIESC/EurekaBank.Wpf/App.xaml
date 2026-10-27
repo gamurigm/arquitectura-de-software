@@ -3,16 +3,23 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              StartupUri="Vistas/MainWindow.xaml">
     <Application.Resources>
-        <SolidColorBrush x:Key="Fondo" Color="#0B1020" />
-        <SolidColorBrush x:Key="Superficie" Color="#121C30" />
-        <SolidColorBrush x:Key="Acento" Color="#52E0D2" />
+        <SolidColorBrush x:Key="Fondo" Color="#F3F7FA" />
+        <SolidColorBrush x:Key="Superficie" Color="#FFFFFF" />
+        <SolidColorBrush x:Key="Acento" Color="#087F7B" />
         <Style TargetType="TextBox">
+            <Setter Property="Margin" Value="0,6,0,14" />
+            <Setter Property="Padding" Value="10" />
+        </Style>
+        <Style TargetType="PasswordBox">
             <Setter Property="Margin" Value="0,6,0,14" />
             <Setter Property="Padding" Value="10" />
         </Style>
         <Style TargetType="Button">
             <Setter Property="Margin" Value="0,6,8,6" />
             <Setter Property="Padding" Value="12,8" />
+            <Setter Property="Background" Value="#087F7B" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="FontWeight" Value="Bold" />
         </Style>
     </Application.Resources>
 </Application>

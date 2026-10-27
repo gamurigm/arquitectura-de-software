@@ -1,12 +1,14 @@
 package ec.edu.monster.vista;
 
 import ec.edu.monster.modelo.Movimiento;
+import ec.edu.monster.modelo.Cuenta;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -18,7 +20,7 @@ import javax.swing.table.DefaultTableModel;
 
 public final class MovimientosVista extends JDialog {
     private static final DateTimeFormatter FECHA = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-    private final JTextField cuenta = new JTextField(12);
+    private final JComboBox<Cuenta> cuenta = new JComboBox<>();
     private final JButton buscar = new JButton("Buscar");
     private final JLabel estado = new JLabel("Ingrese la cuenta que desea consultar.");
     private final DefaultTableModel datos = new DefaultTableModel(
@@ -27,8 +29,10 @@ public final class MovimientosVista extends JDialog {
         public boolean isCellEditable(int fila, int columna) { return false; }
     };
 
-    public MovimientosVista(JFrame propietario) {
+    public MovimientosVista(JFrame propietario, List<Cuenta> cuentas) {
         super(propietario, "EurekaBank GR09 · Movimientos", true);
+        cuentas.forEach(cuenta::addItem);
+        if (cuentas.isEmpty()) estado.setText("No hay cuentas activas asignadas.");
         TemaEureka.Tarjeta contenido = new TemaEureka.Tarjeta(new BorderLayout(12, 16));
         JPanel filtro = new JPanel();
         filtro.setOpaque(false);
@@ -65,7 +69,7 @@ public final class MovimientosVista extends JDialog {
         setLocationRelativeTo(propietario);
     }
 
-    public String cuenta() { return cuenta.getText(); }
+    public String cuenta() { return cuenta.getSelectedItem() instanceof Cuenta seleccionada ? seleccionada.numero() : ""; }
     public void alBuscar(Runnable accion) { buscar.addActionListener(evento -> accion.run()); }
     public void mostrarMensaje(String mensaje) { estado.setText(mensaje); }
     public void limpiar() { datos.setRowCount(0); }

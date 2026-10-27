@@ -24,7 +24,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Prueba de integración de extremo a extremo: inicio de sesión, autorización por token y conversiones.
  */
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+        properties = "server.servlet.context-path=/WS_ConUni_Java_REST")
 class PruebaApiConversion {
 
     @Autowired

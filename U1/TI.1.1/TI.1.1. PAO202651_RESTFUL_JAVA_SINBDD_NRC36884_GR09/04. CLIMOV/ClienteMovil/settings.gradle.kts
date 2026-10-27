@@ -14,5 +14,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "ClienteMovil"
+rootProject.name = "GR09 - REST - Java - SIN BDD - Conversiones - Cliente Móvil"
 include(":app")

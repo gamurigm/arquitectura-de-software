@@ -2,6 +2,7 @@ package ec.edu.monster.service;
 
 import ec.edu.monster.BuildConfig;
 import ec.edu.monster.modelo.Movimiento;
+import ec.edu.monster.modelo.Cuenta;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
@@ -46,8 +47,8 @@ public final class EurekaService {
         invocar("cerrarSesion", "<token>" + xml(token) + "</token>");
     }
 
-    public List<Movimiento> traerMovimientos(String cuenta) throws IOException {
-        Document doc = invocar("<traerMovimientos><cuenta>" + xml(cuenta)
+    public List<Movimiento> traerMovimientos(String token, String cuenta) throws IOException {
+        Document doc = invocar("<traerMovimientos><token>" + xml(token) + "</token><cuenta>" + xml(cuenta)
                 + "</cuenta></traerMovimientos>");
         NodeList nodos = doc.getElementsByTagNameNS(NS, "movimiento");
         List<Movimiento> resultado = new ArrayList<>(nodos.getLength());
@@ -60,8 +61,20 @@ public final class EurekaService {
         return List.copyOf(resultado);
     }
 
-    public boolean registrarDeposito(String cuenta, BigDecimal importe) throws IOException {
-        String body = "<regDeposito><cuenta>" + xml(cuenta) + "</cuenta><importe>"
+    public List<Cuenta> traerCuentas(String token) throws IOException {
+        Document doc = invocar("traerCuentas", "<token>" + xml(token) + "</token>");
+        NodeList nodos = doc.getElementsByTagNameNS("*", "cuenta");
+        List<Cuenta> resultado = new ArrayList<>(nodos.getLength());
+        for (int i = 0; i < nodos.getLength(); i++) {
+            Element cuenta = (Element) nodos.item(i);
+            if (cuenta.getElementsByTagNameNS(NS, "numero").getLength() > 0)
+                resultado.add(new Cuenta(texto(cuenta, "numero"), texto(cuenta, "moneda"), new BigDecimal(texto(cuenta, "saldo"))));
+        }
+        return List.copyOf(resultado);
+    }
+
+    public boolean registrarDeposito(String token, String cuenta, BigDecimal importe) throws IOException {
+        String body = "<regDeposito><token>" + xml(token) + "</token><cuenta>" + xml(cuenta) + "</cuenta><importe>"
                 + importe.toPlainString() + "</importe></regDeposito>";
         return "1".equals(texto(invocar(body), "resultado"));
     }
@@ -99,7 +112,11 @@ public final class EurekaService {
                 fabrica.setXIncludeAware(false);
                 fabrica.setExpandEntityReferences(false);
                 Document respuesta = fabrica.newDocumentBuilder().parse(stream);
-                if (estado >= 400) throw new IOException("El servicio EurekaBank rechazó la operación.");
+                if (estado >= 400) {
+                    NodeList fallos = respuesta.getElementsByTagNameNS("*", "faultstring");
+                    String detalle = fallos.getLength() == 0 ? "" : fallos.item(0).getTextContent().strip();
+                    throw new IOException(detalle.isBlank() ? "El servicio EurekaBank rechazó la operación." : detalle);
+                }
                 return respuesta;
             }
         } catch (IOException e) {

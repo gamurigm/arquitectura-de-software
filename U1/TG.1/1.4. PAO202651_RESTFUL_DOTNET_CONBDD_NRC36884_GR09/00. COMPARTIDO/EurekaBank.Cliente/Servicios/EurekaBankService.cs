@@ -10,6 +10,9 @@ public sealed class EurekaBankService(IEurekaBankApiClient apiClient) : IEurekaB
         CancellationToken cancellationToken = default) =>
         apiClient.LoginAsync(new LoginRequest(usuario, contrasena), cancellationToken);
 
+    public Task<IReadOnlyList<CuentaDto>> ConsultarCuentasAsync(string token, CancellationToken cancellationToken = default) =>
+        apiClient.ConsultarCuentasAsync(token, cancellationToken);
+
     public Task<IReadOnlyList<MovimientoDto>> ConsultarMovimientosAsync(
         string cuenta,
         string? token = null,

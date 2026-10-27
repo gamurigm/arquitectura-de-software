@@ -39,6 +39,10 @@ public partial class MainPage : ContentPage
                 UsuarioEtiqueta.Text = $"Hola, {Usuario.Text?.Trim()}";
                 Contrasena.Text = "";
                 Mensaje.Text = "Sesión iniciada.";
+                Cuenta.ItemsSource = _controlador.Cuentas.ToList();
+                CuentaOrigenTransferencia.ItemsSource = _controlador.Cuentas.ToList();
+                Cuenta.SelectedIndex = CuentaOrigenTransferencia.SelectedIndex = _controlador.Cuentas.Count > 0 ? 0 : -1;
+                if (_controlador.Cuentas.Count == 0) Mensaje.Text = "No hay cuentas activas asignadas.";
                 await ConsultarAsync();
             }
             else Mensaje.Text = "Credenciales inválidas.";
@@ -52,7 +56,8 @@ public partial class MainPage : ContentPage
     {
         try
         {
-            await _controlador!.ConsultarMovimientosAsync(Cuenta.Text ?? "");
+            if (Cuenta.SelectedItem is not ec.edu.monster.Modelos.Cuenta cuenta) { Mensaje.Text = "Seleccione una cuenta activa."; return false; }
+            await _controlador!.ConsultarMovimientosAsync(cuenta.Numero);
             Saldo.Text = $"Saldo calculado: {_controlador.Saldo:N2}";
             ListaMovimientos.Text = _controlador.Movimientos.Count == 0
                 ? "No hay movimientos para esta cuenta."
@@ -60,6 +65,7 @@ public partial class MainPage : ContentPage
             Mensaje.Text = "";
             return true;
         }
+        catch (UnauthorizedAccessException error) { MostrarLoginCaducado(error.Message); return false; }
         catch (Exception error) { Mensaje.Text = error.Message; return false; }
     }
 
@@ -80,6 +86,7 @@ public partial class MainPage : ContentPage
                     ? "Depósito registrado; movimientos actualizados."
                     : "Depósito registrado; no se pudieron actualizar los movimientos.";
         }
+        catch (UnauthorizedAccessException error) { MostrarLoginCaducado(error.Message); }
         catch (Exception error) { Mensaje.Text = $"No se pudo registrar el depósito: {error.Message}"; }
     }
 
@@ -97,7 +104,7 @@ public partial class MainPage : ContentPage
 
     private async void Transferir_Clicked(object? sender, EventArgs e)
     {
-        var origen = CuentaOrigenTransferencia.Text?.Trim() ?? "";
+        var origen = (CuentaOrigenTransferencia.SelectedItem as ec.edu.monster.Modelos.Cuenta)?.Numero ?? "";
         var destino = CuentaDestinoTransferencia.Text?.Trim() ?? "";
         if (!decimal.TryParse(ImporteTransferencia.Text, NumberStyles.Number, CultureInfo.CurrentCulture, out var importe)
             || origen.Length != 8 || !origen.All(char.IsAsciiDigit) || destino.Length != 8
@@ -109,10 +116,21 @@ public partial class MainPage : ContentPage
             Mensaje.Text = registrada ? "Transferencia registrada: débito y crédito confirmados." : "Transferencia rechazada. Revise cuentas, moneda e importe.";
             if (registrada)
             {
-                Cuenta.Text = destino;
+                Cuenta.SelectedItem = _controlador.Cuentas.FirstOrDefault(c => c.Numero == origen);
                 await ConsultarAsync();
             }
         }
+        catch (UnauthorizedAccessException error) { MostrarLoginCaducado(error.Message); }
         catch (Exception error) { Mensaje.Text = $"No se confirmó. Reenvíe la misma solicitud. {error.Message}"; }
+    }
+
+    private void MostrarLoginCaducado(string mensaje)
+    {
+        BancoPanel.IsVisible = false;
+        LoginPanel.IsVisible = true;
+        ListaMovimientos.Text = "Consulte una cuenta para ver movimientos.";
+        Saldo.Text = "Saldo: --";
+        UsuarioEtiqueta.Text = "Inicie sesión para continuar";
+        Mensaje.Text = mensaje;
     }
 }

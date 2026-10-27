@@ -19,7 +19,7 @@ public final class ConexionDB {
     public Connection getConnection() throws SQLException {
         String url = System.getenv("EUREKABANK_DB_URL");
         if (url == null || url.isBlank()) {
-            url = URL_POR_DEFECTO;
+            url = System.getProperty("EUREKABANK_DB_URL", URL_POR_DEFECTO);
         }
 
         try {
@@ -36,6 +36,9 @@ public final class ConexionDB {
 
     private static String requiredEnvironment(String name) throws SQLException {
         String value = System.getenv(name);
+        if (value == null || value.isBlank()) {
+            value = System.getProperty(name);
+        }
         if (value == null || value.isBlank()) {
             throw new SQLException("Falta configurar la variable " + name + ".");
         }

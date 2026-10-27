@@ -25,13 +25,18 @@ public interface IContratoEureka
         [MessageParameter(Name = "usuario")] string usuario,
         [MessageParameter(Name = "contrasena")] string contrasena);
 
+    [OperationContract(Name = "traerCuentas", Action = "")]
+    [return: MessageParameter(Name = "cuenta")]
+    Task<List<Cuenta>> TraerCuentasAsync([MessageParameter(Name = "token")] string token);
+
     [OperationContract(Name = "traerMovimientos", Action = "")]
     [return: MessageParameter(Name = "movimiento")]
-    Task<List<Movimiento>> TraerMovimientosAsync([MessageParameter(Name = "cuenta")] string cuenta);
+    Task<List<Movimiento>> TraerMovimientosAsync([MessageParameter(Name = "token")] string token, [MessageParameter(Name = "cuenta")] string cuenta);
 
     [OperationContract(Name = "regDeposito", Action = "")]
     [return: MessageParameter(Name = "resultado")]
     Task<int> RegistrarDepositoAsync(
+        [MessageParameter(Name = "token")] string token,
         [MessageParameter(Name = "cuenta")] string cuenta,
         [MessageParameter(Name = "importe")] decimal importe);
 

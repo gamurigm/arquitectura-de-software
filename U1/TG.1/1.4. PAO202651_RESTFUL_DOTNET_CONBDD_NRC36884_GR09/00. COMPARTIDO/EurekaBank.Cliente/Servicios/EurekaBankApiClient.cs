@@ -14,6 +14,15 @@ public sealed class EurekaBankApiClient(HttpClient httpClient) : IEurekaBankApiC
             ?? throw new InvalidDataException("El servidor devolvió una respuesta de inicio de sesión vacía.");
     }
 
+    public async Task<IReadOnlyList<CuentaDto>> ConsultarCuentasAsync(string token, CancellationToken cancellationToken = default)
+    {
+        using var request = CrearSolicitud(HttpMethod.Get, "api/eureka/cuentas", token);
+        using var response = await httpClient.SendAsync(request, cancellationToken);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<List<CuentaDto>>(cancellationToken: cancellationToken)
+            ?? throw new InvalidDataException("El servidor devolvió una lista de cuentas vacía.");
+    }
+
     public async Task<IReadOnlyList<MovimientoDto>> ConsultarMovimientosAsync(
         string cuenta,
         string? token = null,

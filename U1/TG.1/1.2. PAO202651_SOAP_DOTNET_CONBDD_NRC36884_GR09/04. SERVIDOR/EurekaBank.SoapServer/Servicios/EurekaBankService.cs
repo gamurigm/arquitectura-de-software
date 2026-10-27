@@ -20,29 +20,41 @@ public sealed class EurekaBankService(EurekaBankRepository repositorio, Sesiones
             return null;
         var credencial = await repositorio.ObtenerCredencialAsync(usuario.Trim());
         if (credencial is null || !PasswordHasher.Verificar(contrasena, credencial.Hash)) return null;
-        return sesiones.Crear(usuario.Trim(), credencial.CodigoCliente);
+        return credencial.CodigoCliente is null ? null : sesiones.Crear(usuario.Trim(), credencial.CodigoCliente);
     }
 
-    public Task<List<Movimiento>> TraerMovimientosAsync(string? cuenta)
+    public Task<List<Cuenta>> TraerCuentasAsync(string? token)
     {
+        if (!sesiones.TryObtener(token, out var sesion) || sesion.CodigoCliente is null)
+            throw new UnauthorizedAccessException();
+        return repositorio.TraerCuentasAsync(sesion.CodigoCliente);
+    }
+
+    public Task<List<Movimiento>> TraerMovimientosAsync(string? token, string? cuenta)
+    {
+        if (!sesiones.TryObtener(token, out var sesion) || sesion.CodigoCliente is null)
+            throw new UnauthorizedAccessException();
         if (string.IsNullOrWhiteSpace(cuenta) || cuenta.Trim().Length > 8)
             return Task.FromResult(new List<Movimiento>());
-        return repositorio.TraerMovimientosAsync(cuenta.Trim());
+        return repositorio.TraerMovimientosAsync(cuenta.Trim(), sesion.CodigoCliente);
     }
 
-    public async Task<bool> RegistrarDepositoAsync(string? cuenta, decimal importe)
+    public async Task<bool> RegistrarDepositoAsync(string? token, string? cuenta, decimal importe)
     {
+        if (!sesiones.TryObtener(token, out var sesion) || sesion.CodigoCliente is null)
+            throw new UnauthorizedAccessException();
         if (string.IsNullOrWhiteSpace(cuenta) || cuenta.Trim().Length > 8 || importe <= 0
             || importe > 9_999_999_999.99m || decimal.Round(importe, 2) != importe)
             return false;
-        await repositorio.RegistrarDepositoAsync(cuenta.Trim(), importe);
+        await repositorio.RegistrarDepositoAsync(cuenta.Trim(), importe, sesion.CodigoCliente);
         return true;
     }
 
     public async Task<bool> TransferirAsync(string? token, string? origen, string? destino,
         decimal importe, string? claveOperacion)
     {
-        if (!sesiones.TryObtener(token, out var sesion) || sesion.CodigoCliente is null
+        if (!sesiones.TryObtener(token, out var sesion)) throw new UnauthorizedAccessException();
+        if (sesion.CodigoCliente is null
             || !TransferenciaValidator.TryValidate(origen, destino, importe, claveOperacion, out var solicitud))
             return false;
         return await repositorio.TransferirAsync(sesion.Usuario, sesion.CodigoCliente, solicitud);

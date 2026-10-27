@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Net.Http;
 using System.Windows;
+using EurekaBank.Cliente.Modelos;
 using EurekaBank.Cliente.Controladores;
 
 namespace EurekaBank.ClienteEscritorio;
@@ -28,7 +29,14 @@ public partial class MainWindow : Window
             LoginPanel.Visibility = Visibility.Collapsed;
             BancoPanel.Visibility = Visibility.Visible;
             SaludoText.Text = $"Bienvenido, {controlador.UsuarioActivo}";
-            Mensaje(string.Empty);
+            foreach (var selector in new[] { CuentaConsultaBox, CuentaDepositoBox, CuentaOrigenBox })
+            {
+                selector.ItemsSource = controlador.Cuentas;
+                selector.DisplayMemberPath = nameof(CuentaDto.Etiqueta);
+                selector.SelectedValuePath = nameof(CuentaDto.Numero);
+                selector.SelectedIndex = controlador.Cuentas.Count > 0 ? 0 : -1;
+            }
+            Mensaje(controlador.Cuentas.Count == 0 ? "No tiene cuentas activas asignadas." : string.Empty);
         }
         catch (HttpRequestException)
         {
@@ -40,13 +48,15 @@ public partial class MainWindow : Window
     {
         try
         {
-            MovimientosGrid.ItemsSource = await controlador.ConsultarMovimientosAsync(CuentaConsultaBox.Text.Trim());
+            if (CuentaConsultaBox.SelectedValue is not string cuenta) { Mensaje("Seleccione una cuenta."); return; }
+            MovimientosGrid.ItemsSource = await controlador.ConsultarMovimientosAsync(cuenta);
             Mensaje("Consulta completada.");
         }
         catch (HttpRequestException)
         {
             Mensaje("No se pudieron consultar los movimientos.");
         }
+        catch (UnauthorizedAccessException) { MostrarLoginPorCaducidad(); }
     }
 
     private async void Depositar_Click(object sender, RoutedEventArgs e)
@@ -59,7 +69,8 @@ public partial class MainWindow : Window
 
         try
         {
-            Mensaje(await controlador.RegistrarDepositoAsync(CuentaDepositoBox.Text.Trim(), importe)
+            if (CuentaDepositoBox.SelectedValue is not string cuenta) { Mensaje("Seleccione una cuenta."); return; }
+            Mensaje(await controlador.RegistrarDepositoAsync(cuenta, importe)
                 ? "Depósito registrado."
                 : "Depósito rechazado. Revise cuenta e importe.");
         }
@@ -67,6 +78,7 @@ public partial class MainWindow : Window
         {
             Mensaje("No se pudo registrar el depósito.");
         }
+        catch (UnauthorizedAccessException) { MostrarLoginPorCaducidad(); }
     }
 
     private async void Transferir_Click(object sender, RoutedEventArgs e)
@@ -78,7 +90,8 @@ public partial class MainWindow : Window
         }
         try
         {
-            Mensaje(await controlador.TransferirAsync(CuentaOrigenBox.Text.Trim(), CuentaDestinoBox.Text.Trim(),
+            if (CuentaOrigenBox.SelectedValue is not string origen) { Mensaje("Seleccione una cuenta de origen."); return; }
+            Mensaje(await controlador.TransferirAsync(origen, CuentaDestinoBox.Text.Trim(),
                 importe, Guid.NewGuid())
                 ? "Transferencia registrada: débito y crédito confirmados."
                 : "Transferencia rechazada. Revise cuentas, moneda, saldo e importe.");
@@ -87,6 +100,7 @@ public partial class MainWindow : Window
         {
             Mensaje("No se confirmó el resultado. Reintente con la misma clave de operación.");
         }
+        catch (UnauthorizedAccessException) { MostrarLoginPorCaducidad(); }
     }
 
     private async void CerrarSesion_Click(object sender, RoutedEventArgs e)
@@ -101,4 +115,12 @@ public partial class MainWindow : Window
     }
 
     private void Mensaje(string texto) => MensajeText.Text = texto;
+
+    private void MostrarLoginPorCaducidad()
+    {
+        MovimientosGrid.ItemsSource = null;
+        BancoPanel.Visibility = Visibility.Collapsed;
+        LoginPanel.Visibility = Visibility.Visible;
+        Mensaje("La sesión caducó. Inicie sesión nuevamente.");
+    }
 }

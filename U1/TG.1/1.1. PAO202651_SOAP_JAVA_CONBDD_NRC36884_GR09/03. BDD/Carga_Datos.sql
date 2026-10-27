@@ -279,5 +279,5 @@ insert into Contador Values( 'Cliente', 20, 5 );
 
 -- Tabla Credenciales
 
-INSERT INTO Credenciales (usuario, contrasena)
-VALUES ('Monster', 'pbkdf2-sha256$600000$5cV5Rt7hgFTlKOdg0I25uA$XVGksBT2fPaLTMjHEbMEIiOa-2o8LU9dEzEFcUCEj7o');
+INSERT INTO Credenciales (usuario, contrasena, chr_cliecodigo)
+VALUES ('Monster', 'pbkdf2-sha256$600000$5cV5Rt7hgFTlKOdg0I25uA$XVGksBT2fPaLTMjHEbMEIiOa-2o8LU9dEzEFcUCEj7o', '00005');

@@ -7,8 +7,10 @@
     <groupId>ec.edu.monster</groupId>
     <artifactId>cliente-escritorio-eurekabank</artifactId>
     <version>1.0.0</version>
+    <name>GR09 - SOAP - Java - CON BDD - EurekaBank - Cliente Escritorio</name>
 
     <properties>
+        <netbeans.hint.jdkPlatform>JDK_25</netbeans.hint.jdkPlatform>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>25</maven.compiler.release>
         <metro.version>4.0.4</metro.version>

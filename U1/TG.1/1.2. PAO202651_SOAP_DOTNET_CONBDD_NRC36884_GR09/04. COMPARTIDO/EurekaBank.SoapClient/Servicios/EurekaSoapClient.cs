@@ -48,9 +48,13 @@ public sealed class EurekaSoapClient : IEurekaSoapClient, IDisposable
         return string.IsNullOrWhiteSpace(token) ? null : token;
     }
 
-    public async Task<IReadOnlyList<Movimiento>> TraerMovimientosAsync(string cuenta, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<Movimiento>> TraerMovimientosAsync(string token, string cuenta, CancellationToken cancellationToken = default)
     {
-        var response = await EnviarAsync("traerMovimientos", writer => EscribirParametro(writer, "cuenta", cuenta), cancellationToken);
+        var response = await EnviarAsync("traerMovimientos", writer =>
+        {
+            EscribirParametro(writer, "token", token);
+            EscribirParametro(writer, "cuenta", cuenta);
+        }, cancellationToken);
         var movimientos = response.Descendants()
             .Where(elemento => elemento.Name.LocalName.Equals("movimiento", StringComparison.OrdinalIgnoreCase)
                 || elemento.Name.LocalName.Equals("Movimiento", StringComparison.OrdinalIgnoreCase))
@@ -60,10 +64,22 @@ public sealed class EurekaSoapClient : IEurekaSoapClient, IDisposable
         return movimientos;
     }
 
-    public async Task<int> RegistrarDepositoAsync(string cuenta, decimal importe, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<Cuenta>> TraerCuentasAsync(string token, CancellationToken cancellationToken = default)
+    {
+        var response = await EnviarAsync("traerCuentas", writer => EscribirParametro(writer, "token", token), cancellationToken);
+        return response.Descendants()
+            .Where(e => e.Name.LocalName.Equals("cuenta", StringComparison.OrdinalIgnoreCase))
+            .Where(e => e.Elements().Any(child => child.Name.LocalName.Equals("numero", StringComparison.OrdinalIgnoreCase)))
+            .Select(e => new Cuenta(
+                LeerTexto(e, "numero"), LeerTexto(e, "moneda"), LeerDecimal(e, "saldo")))
+            .ToArray();
+    }
+
+    public async Task<int> RegistrarDepositoAsync(string token, string cuenta, decimal importe, CancellationToken cancellationToken = default)
     {
         var response = await EnviarAsync("regDeposito", writer =>
         {
+            EscribirParametro(writer, "token", token);
             EscribirParametro(writer, "cuenta", cuenta);
             EscribirParametro(writer, "importe", importe.ToString("0.00", CultureInfo.InvariantCulture));
         }, cancellationToken);

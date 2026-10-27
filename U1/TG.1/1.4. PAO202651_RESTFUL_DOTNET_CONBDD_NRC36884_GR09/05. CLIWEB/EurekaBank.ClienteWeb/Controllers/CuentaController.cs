@@ -7,9 +7,9 @@ namespace EurekaBank.ClienteWeb.Controllers;
 public sealed class CuentaController(IEurekaBankService servicio) : Controller
 {
     [HttpGet]
-    public IActionResult Login() => HttpContext.Session.GetString("usuario") is null
-        ? View(new LoginViewModel())
-        : RedirectToAction(nameof(Index));
+    public IActionResult Login() => ExigirSesion()
+        ? RedirectToAction(nameof(Index))
+        : View(new LoginViewModel());
 
     [HttpPost]
     [ValidateAntiForgeryToken]
@@ -38,9 +38,13 @@ public sealed class CuentaController(IEurekaBankService servicio) : Controller
     }
 
     [HttpGet]
-    public IActionResult Index() => HttpContext.Session.GetString("usuario") is null
-        ? RedirectToAction(nameof(Login))
-        : View(new CuentaViewModel { Usuario = HttpContext.Session.GetString("usuario")!, ClaveOperacion = Guid.NewGuid() });
+    public async Task<IActionResult> Index()
+    {
+        if (!ExigirSesion()) return RedirectToAction(nameof(Login));
+        var modelo = new CuentaViewModel { Usuario = HttpContext.Session.GetString("usuario")!, ClaveOperacion = Guid.NewGuid() };
+        if (!await CargarCuentasAsync(modelo)) return RedirectToAction(nameof(Login));
+        return View(modelo);
+    }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
@@ -53,11 +57,13 @@ public sealed class CuentaController(IEurekaBankService servicio) : Controller
             modelo.Movimientos = await servicio.ConsultarMovimientosAsync(modelo.Cuenta, Token());
             modelo.Mensaje = "Consulta completada.";
         }
-        catch (HttpRequestException)
+        catch (HttpRequestException error)
         {
+            if (Expirada(error)) { HttpContext.Session.Clear(); return RedirectToAction(nameof(Login)); }
             modelo.Mensaje = "No se pudieron consultar los movimientos.";
         }
 
+        if (!await CargarCuentasAsync(modelo)) return RedirectToAction(nameof(Login));
         return View("Index", modelo);
     }
 
@@ -78,11 +84,13 @@ public sealed class CuentaController(IEurekaBankService servicio) : Controller
             var registrado = await servicio.RegistrarDepositoAsync(modelo.CuentaDeposito, modelo.Importe, Token());
             modelo.Mensaje = registrado ? "Depósito registrado." : "Depósito rechazado. Revise cuenta e importe.";
         }
-        catch (HttpRequestException)
+        catch (HttpRequestException error)
         {
+            if (Expirada(error)) { HttpContext.Session.Clear(); return RedirectToAction(nameof(Login)); }
             modelo.Mensaje = "No se pudo registrar el depósito.";
         }
 
+        if (!await CargarCuentasAsync(modelo)) return RedirectToAction(nameof(Login));
         return View("Index", modelo);
     }
 
@@ -111,10 +119,12 @@ public sealed class CuentaController(IEurekaBankService servicio) : Controller
                 : "Transferencia rechazada. Revise cuentas, moneda, saldo e importe.";
             if (registrada) modelo.ClaveOperacion = Guid.NewGuid();
         }
-        catch (HttpRequestException)
+        catch (HttpRequestException error)
         {
+            if (Expirada(error)) { HttpContext.Session.Clear(); return RedirectToAction(nameof(Login)); }
             modelo.Mensaje = "No se confirmó el resultado. Reenvíe la misma solicitud para evitar duplicados.";
         }
+        if (!await CargarCuentasAsync(modelo)) return RedirectToAction(nameof(Login));
         return View("Index", modelo);
     }
 
@@ -128,7 +138,20 @@ public sealed class CuentaController(IEurekaBankService servicio) : Controller
         return RedirectToAction(nameof(Login));
     }
 
-    private bool ExigirSesion() => HttpContext.Session.GetString("usuario") is not null;
+    private bool ExigirSesion() => HttpContext.Session.GetString("usuario") is not null
+        && HttpContext.Session.GetString("token") is not null;
+    private async Task<bool> CargarCuentasAsync(CuentaViewModel modelo)
+    {
+        try { modelo.Cuentas = await servicio.ConsultarCuentasAsync(Token()!); }
+        catch (HttpRequestException error)
+        {
+            if (Expirada(error)) { HttpContext.Session.Clear(); return false; }
+            modelo.Cuentas = [];
+            modelo.Mensaje ??= "No se pudieron cargar las cuentas.";
+        }
+        return true;
+    }
+    private static bool Expirada(HttpRequestException error) => error.StatusCode == System.Net.HttpStatusCode.Unauthorized;
     private string? Token() => HttpContext.Session.GetString("token");
     private static bool CuentaValida(string? cuenta) => cuenta is { Length: 8 } && cuenta.All(char.IsAsciiDigit);
     private static bool ImporteValido(decimal importe) => importe > 0m

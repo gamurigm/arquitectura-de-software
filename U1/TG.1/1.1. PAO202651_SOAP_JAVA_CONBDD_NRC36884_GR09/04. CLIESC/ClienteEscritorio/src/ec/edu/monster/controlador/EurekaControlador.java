@@ -1,6 +1,7 @@
 package ec.edu.monster.controlador;
 
 import ec.edu.monster.modelo.Movimiento;
+import ec.edu.monster.modelo.Cuenta;
 import ec.edu.monster.service.EurekaService;
 import ec.edu.monster.vista.DepositosVista;
 import ec.edu.monster.vista.LoginVista;
@@ -22,6 +23,7 @@ public final class EurekaControlador {
     private final EurekaService servicio;
     private boolean autenticado;
     private String token;
+    private List<Cuenta> cuentas = List.of();
     private TransferenciaPendiente transferenciaPendiente;
 
     public EurekaControlador(EurekaService servicio) {
@@ -55,7 +57,7 @@ public final class EurekaControlador {
     private void abrirMenu(String usuario, LoginVista login) {
         MenuVista menu = new MenuVista(usuario);
         menu.alConsultar(() -> {
-            MovimientosVista vista = new MovimientosVista(menu);
+            MovimientosVista vista = new MovimientosVista(menu, cuentas());
             vista.alBuscar(() -> {
                 String cuenta = vista.cuenta();
                 vista.limpiar();
@@ -66,7 +68,7 @@ public final class EurekaControlador {
             vista.setVisible(true);
         });
         menu.alDepositar(() -> {
-            DepositosVista vista = new DepositosVista(menu);
+            DepositosVista vista = new DepositosVista(menu, cuentas());
             vista.alDepositar(() -> {
                 String cuenta = vista.cuenta();
                 String importe = vista.importe();
@@ -84,7 +86,7 @@ public final class EurekaControlador {
             vista.setVisible(true);
         });
         menu.alTransferir(() -> {
-            TransferenciasVista vista = new TransferenciasVista(menu);
+            TransferenciasVista vista = new TransferenciasVista(menu, cuentas());
             vista.alTransferir(() -> {
                 String origen = vista.origen(), destino = vista.destino(), importe = vista.importe();
                 ejecutar(vista::ocupada, vista::mostrarMensaje,
@@ -140,6 +142,14 @@ public final class EurekaControlador {
             }
             try {
                 token = servicio.crearSesion(usuario.strip(), new String(contrasena));
+                if (token != null && !token.isBlank()) {
+                    try { cuentas = servicio.traerCuentas(token); }
+                    catch (IOException e) {
+                        try { servicio.cerrarSesion(token); } catch (IOException cierre) { e.addSuppressed(cierre); }
+                        token = null;
+                        throw new IllegalStateException("No se pudieron cargar las cuentas asignadas.", e);
+                    }
+                }
             } catch (IOException e) {
                 throw new IllegalStateException("No se pudo conectar con EurekaBank.", e);
             }
@@ -154,12 +164,14 @@ public final class EurekaControlador {
 
     public List<Movimiento> consultarMovimientos(String cuenta) {
         exigirSesion();
-        return servicio.traerMovimientos(validarCuenta(cuenta));
+        String numero = cuentaAsignada(cuenta);
+        try { return servicio.traerMovimientos(token, numero); }
+        catch (IOException e) { expirar(e); throw new IllegalStateException("No se pudieron consultar los movimientos.", e); }
     }
 
     public boolean registrarDeposito(String cuenta, String textoImporte) {
         exigirSesion();
-        String numero = validarCuenta(cuenta);
+        String numero = cuentaAsignada(cuenta);
         if (textoImporte == null || !textoImporte.strip().matches("[0-9]+(?:[.,][0-9]{1,2})?")) {
             throw new IllegalArgumentException("Ingrese un importe positivo con hasta dos decimales.");
         }
@@ -167,12 +179,13 @@ public final class EurekaControlador {
         if (importe.signum() <= 0 || importe.precision() > 12) {
             throw new IllegalArgumentException("El importe debe estar entre 0,01 y 9.999.999.999,99.");
         }
-        return servicio.regDeposito(numero, importe) == 1;
+        try { return servicio.regDeposito(token, numero, importe) == 1; }
+        catch (IOException e) { expirar(e); throw new IllegalStateException("No se confirmó el depósito.", e); }
     }
 
     public boolean transferir(String origen, String destino, String textoImporte) {
         exigirSesion();
-        String origenValido = validarCuenta(origen), destinoValido = validarCuenta(destino);
+        String origenValido = cuentaAsignada(origen), destinoValido = validarCuenta(destino);
         if (origenValido.length() != 8 || destinoValido.length() != 8 || origenValido.equals(destinoValido))
             throw new IllegalArgumentException("Use dos cuentas distintas de ocho dígitos.");
         if (textoImporte == null || !textoImporte.strip().matches("[0-9]+(?:[.,][0-9]{1,2})?"))
@@ -186,11 +199,11 @@ public final class EurekaControlador {
             boolean registrada = servicio.transferir(token, origenValido, destinoValido, importe, transferenciaPendiente.clave());
             transferenciaPendiente = null;
             return registrada;
-        } catch (java.io.IOException e) { throw new IllegalStateException("No se confirmó. Reenvíe la misma solicitud.", e); }
+        } catch (java.io.IOException e) { expirar(e); throw new IllegalStateException("No se confirmó. Reenvíe la misma solicitud.", e); }
     }
 
     public void cerrarSesion() {
-        String actual = token; token = null; transferenciaPendiente = null;
+        String actual = token; token = null; transferenciaPendiente = null; cuentas = List.of();
         autenticado = false;
         try { if (actual != null) servicio.cerrarSesion(actual); }
         catch (java.io.IOException e) { throw new IllegalStateException("Sesión cerrada localmente; el servidor la expirará.", e); }
@@ -206,10 +219,28 @@ public final class EurekaControlador {
         }
     }
 
+    private void expirar(IOException error) {
+        if (error.getMessage() != null && error.getMessage().contains("Token ausente, inválido o caducado")) {
+            token = null;
+            cuentas = List.of();
+            autenticado = false;
+            transferenciaPendiente = null;
+        }
+    }
+
     private String validarCuenta(String cuenta) {
         if (cuenta == null || !cuenta.strip().matches("[0-9]{1,8}")) {
             throw new IllegalArgumentException("Ingrese una cuenta de hasta ocho dígitos.");
         }
         return cuenta.strip();
+    }
+
+    public List<Cuenta> cuentas() { return cuentas; }
+
+    private String cuentaAsignada(String cuenta) {
+        String numero = validarCuenta(cuenta);
+        if (cuentas.stream().noneMatch(actual -> actual.numero().equals(numero)))
+            throw new IllegalArgumentException("Seleccione una cuenta activa asignada.");
+        return numero;
     }
 }

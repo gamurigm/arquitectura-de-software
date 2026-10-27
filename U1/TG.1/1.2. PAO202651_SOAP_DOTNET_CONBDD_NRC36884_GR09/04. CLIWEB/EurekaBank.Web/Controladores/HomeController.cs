@@ -27,13 +27,25 @@ public sealed class HomeController(IEurekaSoapClient servicio) : Controller
         {
             try
             {
-                modelo.Movimientos = await _servicio.TraerMovimientosAsync(modelo.Cuenta);
+                modelo.Movimientos = await _servicio.TraerMovimientosAsync(
+                    HttpContext.Session.GetString(ClaveToken)!, modelo.Cuenta);
                 modelo.Saldo = modelo.Movimientos.Sum(movimiento =>
                     movimiento.Accion.Equals("SALIDA", StringComparison.OrdinalIgnoreCase) ? -movimiento.Importe : movimiento.Importe);
             }
             catch (Exception error)
             {
+                if (Expirada(error)) { HttpContext.Session.Clear(); return RedirectToAction(nameof(Index)); }
                 modelo.Mensaje ??= $"No se pudieron actualizar los movimientos: {error.Message}";
+                modelo.EsError = true;
+            }
+        }
+        if (!string.IsNullOrEmpty(modelo.Usuario))
+        {
+            try { modelo.Cuentas = await _servicio.TraerCuentasAsync(HttpContext.Session.GetString(ClaveToken)!); }
+            catch (Exception error)
+            {
+                if (Expirada(error)) { HttpContext.Session.Clear(); return RedirectToAction(nameof(Index)); }
+                modelo.Mensaje ??= $"No se pudieron consultar las cuentas: {error.Message}";
                 modelo.EsError = true;
             }
         }
@@ -97,12 +109,14 @@ public sealed class HomeController(IEurekaSoapClient servicio) : Controller
         }
         try
         {
-            var registrado = await _servicio.RegistrarDepositoAsync(cuenta, importe) == 1;
+            var registrado = await _servicio.RegistrarDepositoAsync(
+                HttpContext.Session.GetString(ClaveToken)!, cuenta, importe) == 1;
             TempData["Mensaje"] = registrado ? "Depósito registrado." : "No se pudo registrar el depósito.";
             TempData["EsError"] = !registrado;
         }
         catch (Exception error)
         {
+            if (Expirada(error)) { HttpContext.Session.Clear(); return RedirectToAction(nameof(Index)); }
             TempData["Mensaje"] = $"No se pudo confirmar el depósito: {error.Message}";
             TempData["EsError"] = true;
         }
@@ -129,12 +143,13 @@ public sealed class HomeController(IEurekaSoapClient servicio) : Controller
             var registrada = await _servicio.TransferirAsync(token!, cuentaOrigen.Trim(), cuentaDestino.Trim(), importe, clave) == 1;
             TempData["Mensaje"] = registrada ? "Transferencia registrada: débito y crédito confirmados." : "Transferencia rechazada. Revise cuentas, moneda e importe.";
             TempData["EsError"] = !registrada;
-            if (registrada) HttpContext.Session.SetString(ClaveCuenta, cuentaDestino.Trim());
+            if (registrada) HttpContext.Session.SetString(ClaveCuenta, cuentaOrigen.Trim());
             else TempData["ClaveOperacion"] = clave.ToString();
             if (registrada) TempData["ClaveOperacion"] = Guid.NewGuid().ToString();
         }
         catch (Exception error)
         {
+            if (Expirada(error)) { HttpContext.Session.Clear(); return RedirectToAction(nameof(Index)); }
             TempData["Mensaje"] = $"No se confirmó. Reenvíe la misma solicitud. {error.Message}";
             TempData["EsError"] = true;
             TempData["ClaveOperacion"] = clave.ToString();
@@ -154,7 +169,10 @@ public sealed class HomeController(IEurekaSoapClient servicio) : Controller
         return RedirectToAction(nameof(Index));
     }
 
-    private bool TieneSesion() => !string.IsNullOrEmpty(HttpContext.Session.GetString(ClaveUsuario));
+    private bool TieneSesion() => !string.IsNullOrEmpty(HttpContext.Session.GetString(ClaveUsuario))
+        && !string.IsNullOrEmpty(HttpContext.Session.GetString(ClaveToken));
+    private static bool Expirada(Exception error) =>
+        error.ToString().Contains("Token ausente, inválido o caducado", StringComparison.OrdinalIgnoreCase);
     private static bool CuentaValida(string? cuenta) => cuenta is { Length: 8 } && cuenta.All(char.IsAsciiDigit);
 
     private IActionResult RedirigirSinSesion()

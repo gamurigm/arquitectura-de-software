@@ -24,6 +24,18 @@ abstract class ControladorProtegido extends HttpServlet {
         return true;
     }
 
+    boolean cerrarSesionExpirada(HttpServletRequest request, HttpServletResponse response, Throwable error) throws IOException {
+        for (Throwable actual = error; actual != null; actual = actual.getCause()) {
+            if (actual.getMessage() != null && actual.getMessage().contains("Token ausente, inválido o caducado")) {
+                var sesion = request.getSession(false);
+                if (sesion != null) sesion.invalidate();
+                response.sendRedirect(request.getContextPath() + "/login?expirada=1");
+                return true;
+            }
+        }
+        return false;
+    }
+
     String tokenCsrf(HttpServletRequest request) {
         var sesion = request.getSession(true);
         String token = (String) sesion.getAttribute("csrf");

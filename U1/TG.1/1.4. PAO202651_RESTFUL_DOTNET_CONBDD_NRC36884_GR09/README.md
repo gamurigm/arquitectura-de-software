@@ -6,6 +6,8 @@ Configure localmente EUREKABANK_DB_CONNECTION_STRING para el servidor y EUREKABA
 
 `run-api.ps1` carga la configuración local y arranca la API. La base de datos ya debe existir; el servidor no crea ni inicializa tablas o datos.
 
+Para cargar datos de prueba en una base vacía, ejecute una vez `..\1.2. PAO202651_SOAP_DOTNET_CONBDD_NRC36884_GR09\03. BDD\Cargar_Datos_SQLServer.sql`. `Monster` / `Monster9` queda asociado al cliente `00005` y muestra las cuentas `00100001` y `00100002`.
+
 Las credenciales existentes usan hashes pbkdf2-sha256 con 600 000 iteraciones, 16 bytes de sal y 32 bytes de salida. El inicio de sesión responde autenticado; los depósitos responden registrado; los movimientos contienen numero, cuenta, fecha ISO 8601, tipo, accion e importe. No se emiten tokens.
 
 El contrato expone `POST /api/eureka/login` con `usuario` y `contrasena`, `GET /api/eureka/movimientos?cuenta=...` y `POST /api/eureka/depositos` con `cuenta` e `importe`. El importe debe ser positivo y tener como máximo dos decimales. Las aplicaciones mantienen el inicio de sesión local solo después de una respuesta autenticada y limpian ese estado al cerrar sesión.

@@ -6,12 +6,13 @@ import android.text.InputType;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Spinner;
 import ec.edu.monster.controlador.EurekaControlador;
 import java.util.UUID;
 
 public final class TransferenciasActivity extends VistaBaseActivity {
     private final EurekaControlador controlador = new EurekaControlador();
-    private EditText origen;
+    private Spinner origen;
     private EditText destino;
     private EditText importe;
     private Button enviar;
@@ -22,9 +23,8 @@ public final class TransferenciasActivity extends VistaBaseActivity {
     @Override protected void onCreate(Bundle state) {
         super.onCreate(state);
         encabezado("Transferir", "El débito y el crédito se registran en una sola operación.");
-        origen = campo("Cuenta de origen", InputType.TYPE_CLASS_NUMBER);
-        origen.setFilters(new InputFilter[]{new InputFilter.LengthFilter(8)});
-        destino = campo("Cuenta de destino", InputType.TYPE_CLASS_NUMBER);
+        origen = selectorCuentas();
+        destino = campo("Cuenta destino (beneficiario)", InputType.TYPE_CLASS_NUMBER);
         destino.setFilters(new InputFilter[]{new InputFilter.LengthFilter(8)});
         importe = campo("Importe (USD)", InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
         enviar = accion("Transferir", this::transferir);
@@ -43,7 +43,7 @@ public final class TransferenciasActivity extends VistaBaseActivity {
     }
 
     private void transferir() {
-        String desde = origen.getText().toString().strip();
+        String desde = cuentaSeleccionada(origen);
         String hacia = destino.getText().toString().strip();
         String valor = importe.getText().toString().strip();
         String huella = desde + "|" + hacia + "|" + valor;

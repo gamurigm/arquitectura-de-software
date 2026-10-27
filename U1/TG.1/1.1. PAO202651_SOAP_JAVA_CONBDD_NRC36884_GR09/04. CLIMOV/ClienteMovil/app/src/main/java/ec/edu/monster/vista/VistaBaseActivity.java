@@ -11,13 +11,15 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
+import android.widget.Spinner;
+import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
 abstract class VistaBaseActivity extends Activity {
     private LinearLayout contenido;
-    private final int menta = Color.rgb(85, 196, 187);
-    private final int texto = Color.rgb(237, 243, 255);
+    private final int menta = Color.rgb(8, 127, 123);
+    private final int texto = Color.rgb(23, 50, 77);
 
     @Override protected void onCreate(Bundle state) {
         super.onCreate(state);
@@ -26,7 +28,7 @@ abstract class VistaBaseActivity extends Activity {
         contenido = new LinearLayout(this);
         contenido.setOrientation(LinearLayout.VERTICAL);
         contenido.setPadding(dp(24), dp(30), dp(24), dp(28));
-        contenido.setBackgroundColor(Color.rgb(7, 19, 35));
+        contenido.setBackgroundColor(Color.rgb(243, 247, 250));
         scroll.addView(contenido);
         setContentView(scroll);
     }
@@ -43,7 +45,7 @@ abstract class VistaBaseActivity extends Activity {
         h.setText(titulo); h.setTextColor(texto); h.setTextSize(27); h.setTypeface(null, Typeface.BOLD);
         contenido.addView(h, margen(dp(8)));
         TextView sub = new TextView(this);
-        sub.setText(detalle); sub.setTextColor(Color.rgb(169, 186, 208)); sub.setTextSize(15);
+        sub.setText(detalle); sub.setTextColor(Color.rgb(102, 123, 142)); sub.setTextSize(15);
         contenido.addView(sub, margen(dp(22)));
     }
 
@@ -51,15 +53,33 @@ abstract class VistaBaseActivity extends Activity {
         TextView label = new TextView(this); label.setText(etiqueta); label.setTextColor(texto);
         label.setTextSize(14); label.setTypeface(null, Typeface.BOLD); contenido.addView(label, margen(dp(7)));
         EditText field = new EditText(this); field.setHint(etiqueta); field.setSingleLine(true);
-        field.setTextColor(texto); field.setHintTextColor(Color.rgb(155, 171, 192));
+        field.setTextColor(texto); field.setHintTextColor(Color.rgb(102, 123, 142));
         field.setTextSize(16); field.setInputType(tipo); field.setPadding(dp(13), dp(6), dp(13), dp(6));
-        field.setBackground(fondo(Color.rgb(9, 23, 40), Color.rgb(52, 75, 101)));
+        field.setBackground(fondo(Color.WHITE, Color.rgb(185, 202, 215)));
         field.setMinHeight(dp(52)); contenido.addView(field, margen(dp(6)));
         return field;
     }
 
+    final Spinner selectorCuentas() {
+        String[] etiquetas = getIntent().getStringArrayExtra(MenuActivity.ETIQUETAS_CUENTAS);
+        if (etiquetas == null || etiquetas.length == 0) etiquetas = new String[]{"No hay cuentas activas asignadas"};
+        Spinner selector = new Spinner(this);
+        ArrayAdapter<String> adaptador = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, etiquetas);
+        adaptador.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        selector.setAdapter(adaptador);
+        selector.setContentDescription("Cuenta bancaria activa");
+        contenido.addView(selector, margen(dp(8)));
+        return selector;
+    }
+
+    final String cuentaSeleccionada(Spinner selector) {
+        String[] cuentas = getIntent().getStringArrayExtra(MenuActivity.CUENTAS);
+        int indice = selector.getSelectedItemPosition();
+        return cuentas != null && indice >= 0 && indice < cuentas.length ? cuentas[indice] : "";
+    }
+
     final Button accion(String etiqueta, Runnable tarea) {
-        Button button = new Button(this); button.setText(etiqueta); button.setTextColor(Color.rgb(6, 32, 38));
+        Button button = new Button(this); button.setText(etiqueta); button.setTextColor(Color.WHITE);
         button.setTextSize(15); button.setTypeface(null, Typeface.BOLD); button.setAllCaps(false);
         button.setBackground(fondo(menta, menta)); button.setMinHeight(dp(52));
         button.setOnClickListener(v -> tarea.run()); contenido.addView(button, margen(dp(18)));
@@ -68,14 +88,14 @@ abstract class VistaBaseActivity extends Activity {
 
     final Button botonSecundario(String etiqueta, Runnable tarea) {
         Button button = accion(etiqueta, tarea); button.setTextColor(texto);
-        button.setBackground(fondo(Color.rgb(17, 31, 50), Color.rgb(52, 75, 101)));
+        button.setBackground(fondo(Color.rgb(234, 243, 244), Color.rgb(217, 228, 236)));
         return button;
     }
 
     final TextView salida() {
         TextView view = new TextView(this); view.setTextColor(texto); view.setTextSize(15);
         view.setLineSpacing(dp(5), 1f); view.setPadding(dp(14), dp(12), dp(14), dp(12));
-        view.setBackground(fondo(Color.rgb(17, 31, 50), Color.rgb(38, 59, 83)));
+        view.setBackground(fondo(Color.WHITE, Color.rgb(217, 228, 236)));
         contenido.addView(view, margen(dp(15))); return view;
     }
 

@@ -61,16 +61,13 @@ public final class EurekaService {
 
     public void cerrarSesion(String token) throws java.io.IOException { seguras.cerrarSesion(token); }
 
-    public List<Movimiento> traerMovimientos(String cuenta) {
-        return nuevoPuerto().traerMovimientos(cuenta).stream()
-                .map(m -> new Movimiento(m.getCuenta(), m.getNromov(),
-                        m.getFecha() == null ? null
-                                : m.getFecha().toGregorianCalendar().toZonedDateTime().toLocalDateTime(),
-                        m.getTipo(), m.getAccion(), m.getImporte()))
-                .toList();
+    public List<Movimiento> traerMovimientos(String token, String cuenta) throws java.io.IOException {
+        return seguras.traerMovimientos(token, cuenta);
     }
 
-    public boolean registrarDeposito(String cuenta, BigDecimal importe) {
-        return nuevoPuerto().regDeposito(cuenta, importe) == 1;
+    public List<ec.edu.monster.modelo.Cuenta> traerCuentas(String token) throws java.io.IOException { return seguras.traerCuentas(token); }
+
+    public boolean registrarDeposito(String token, String cuenta, BigDecimal importe) throws java.io.IOException {
+        return seguras.regDeposito(token, cuenta, importe) == 1;
     }
 }

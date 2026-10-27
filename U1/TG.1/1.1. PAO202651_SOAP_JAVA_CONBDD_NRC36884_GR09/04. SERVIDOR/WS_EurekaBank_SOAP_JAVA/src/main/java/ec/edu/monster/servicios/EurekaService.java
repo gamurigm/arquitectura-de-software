@@ -2,6 +2,7 @@ package ec.edu.monster.servicios;
 
 import ec.edu.monster.db.EurekaBankDao;
 import ec.edu.monster.modelo.Movimiento;
+import ec.edu.monster.modelo.CuentaDto;
 import ec.edu.monster.modelo.SolicitudTransferencia;
 import ec.edu.monster.seguridad.SesionesActivas;
 import java.math.BigDecimal;
@@ -24,13 +25,23 @@ public final class EurekaService {
     public String crearSesion(String usuario, String contrasena) throws SQLException {
         if (!iniciarSesion(usuario, contrasena)) return null;
         String usuarioNormalizado = usuario.strip();
-        return SesionesActivas.getInstancia().crear(usuarioNormalizado, dao.obtenerCodigoCliente(usuarioNormalizado));
+        String codigoCliente = dao.obtenerCodigoCliente(usuarioNormalizado);
+        return codigoCliente == null ? null : SesionesActivas.getInstancia().crear(usuarioNormalizado, codigoCliente);
+    }
+
+    public List<CuentaDto> traerCuentas(String token) {
+        SesionesActivas.Sesion sesion = SesionesActivas.getInstancia().obtener(token);
+        if (sesion == null) throw new SecurityException("Token ausente, inválido o caducado.");
+        if (sesion.codigoCliente() == null) return List.of();
+        try { return dao.traerCuentas(sesion.codigoCliente()); }
+        catch (SQLException e) { throw new IllegalStateException("No se pudieron consultar las cuentas.", e); }
     }
 
     public boolean transferir(String token, String origen, String destino, BigDecimal importe, String claveOperacion)
             throws SQLException {
         SesionesActivas.Sesion sesion = SesionesActivas.getInstancia().obtener(token);
-        if (sesion == null || sesion.codigoCliente() == null) return false;
+        if (sesion == null) throw new SecurityException("Token ausente, inválido o caducado.");
+        if (sesion.codigoCliente() == null) return false;
         SolicitudTransferencia solicitud = new SolicitudTransferencia();
         solicitud.setCuentaOrigen(origen);
         solicitud.setCuentaDestino(destino);
@@ -42,14 +53,20 @@ public final class EurekaService {
 
     public void cerrarSesion(String token) { SesionesActivas.getInstancia().revocar(token); }
 
-    public List<Movimiento> traerMovimientos(String cuenta) throws SQLException {
+    public List<Movimiento> traerMovimientos(String token, String cuenta) throws SQLException {
+        SesionesActivas.Sesion sesion = SesionesActivas.getInstancia().obtener(token);
+        if (sesion == null) throw new SecurityException("Token ausente, inválido o caducado.");
+        if (sesion.codigoCliente() == null) return List.of();
         if (cuenta == null || cuenta.isBlank() || cuenta.strip().length() > 8) {
             return List.of();
         }
-        return dao.traerMovimientos(cuenta.strip());
+        return dao.traerMovimientos(cuenta.strip(), sesion.codigoCliente());
     }
 
-    public int registrarDeposito(String cuenta, BigDecimal importe) throws SQLException {
+    public int registrarDeposito(String token, String cuenta, BigDecimal importe) throws SQLException {
+        SesionesActivas.Sesion sesion = SesionesActivas.getInstancia().obtener(token);
+        if (sesion == null) throw new SecurityException("Token ausente, inválido o caducado.");
+        if (sesion.codigoCliente() == null) return -1;
         if (cuenta == null || cuenta.isBlank() || cuenta.strip().length() > 8 || importe == null) {
             return -1;
         }
@@ -65,7 +82,7 @@ public final class EurekaService {
             return -1;
         }
 
-        dao.registrarDeposito(cuenta.strip(), importeNormalizado, EMPLEADO_DEPOSITO);
+        dao.registrarDeposito(cuenta.strip(), importeNormalizado, EMPLEADO_DEPOSITO, sesion.codigoCliente());
         return 1;
     }
 }

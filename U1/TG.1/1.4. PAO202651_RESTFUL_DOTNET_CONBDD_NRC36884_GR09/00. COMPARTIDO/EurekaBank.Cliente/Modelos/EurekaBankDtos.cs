@@ -2,6 +2,10 @@ namespace EurekaBank.Cliente.Modelos;
 
 public sealed record LoginRequest(string Usuario, string Contrasena);
 public sealed record LoginResponse(bool Autenticado, string? Token);
+public sealed record CuentaDto(string Numero, string Moneda, decimal Saldo)
+{
+    public string Etiqueta => $"{Numero} · {Moneda} {Saldo:N2}";
+}
 public sealed record DepositoRequest(string Cuenta, decimal Importe);
 public sealed record DepositoResponse(bool Registrado);
 public sealed record TransferenciaRequest(string CuentaOrigen, string CuentaDestino, decimal Importe, Guid ClaveOperacion);

@@ -15,10 +15,12 @@
     <artifactId>WS_ConUni_Java_REST</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>war</packaging>
-    <name>WS_ConUni_Java_REST</name>
+    <name>GR09 - REST - Java - SIN BDD - Conversiones - Servidor</name>
     <description>API REST de conversion de unidades (Monster) - JDK 25, bytecode Java 21 + Spring Boot sin base de datos</description>
 
     <properties>
+        <netbeans.hint.jdkPlatform>JDK_25</netbeans.hint.jdkPlatform>
+        <netbeans.hint.deploy.server>pfv5ee8</netbeans.hint.deploy.server>
         <java.version>21</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <springdoc.version>2.8.9</springdoc.version>

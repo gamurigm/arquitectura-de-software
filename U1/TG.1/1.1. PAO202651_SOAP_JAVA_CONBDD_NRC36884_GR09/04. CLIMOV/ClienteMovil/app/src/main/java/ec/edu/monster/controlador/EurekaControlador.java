@@ -1,6 +1,7 @@
 package ec.edu.monster.controlador;
 
 import ec.edu.monster.modelo.Movimiento;
+import ec.edu.monster.modelo.Cuenta;
 import ec.edu.monster.service.EurekaService;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -33,7 +34,7 @@ public final class EurekaControlador {
         });
     }
 
-    public void traerMovimientos(String cuenta, Consumer<List<Movimiento>> respuesta,
+    public void traerMovimientos(String token, String cuenta, Consumer<List<Movimiento>> respuesta,
                                  Consumer<String> error) {
         if (cuenta == null || cuenta.isBlank() || cuenta.strip().length() > 8) {
             error.accept("Ingrese una cuenta válida de hasta 8 caracteres.");
@@ -41,15 +42,26 @@ public final class EurekaControlador {
         }
         RED.execute(() -> {
             try {
-                List<Movimiento> resultado = servicio.traerMovimientos(cuenta.strip());
+                List<Movimiento> resultado = servicio.traerMovimientos(token, cuenta.strip());
                 UI.post(() -> respuesta.accept(resultado));
             } catch (IOException | RuntimeException e) {
-                UI.post(() -> error.accept("No se pudieron consultar los movimientos."));
+                UI.post(() -> error.accept(tokenExpirado(e) ? "La sesión caducó. Inicie sesión nuevamente." : "No se pudieron consultar los movimientos."));
             }
         });
     }
 
-    public void registrarDeposito(String cuenta, String texto, Consumer<Boolean> respuesta,
+    public void traerCuentas(String token, Consumer<List<Cuenta>> respuesta, Consumer<String> error) {
+        RED.execute(() -> {
+            try {
+                List<Cuenta> cuentas = servicio.traerCuentas(token);
+                UI.post(() -> respuesta.accept(cuentas));
+            } catch (IOException | RuntimeException e) {
+                UI.post(() -> error.accept(tokenExpirado(e) ? "La sesión caducó. Inicie sesión nuevamente." : "No se pudieron cargar las cuentas."));
+            }
+        });
+    }
+
+    public void registrarDeposito(String token, String cuenta, String texto, Consumer<Boolean> respuesta,
                                   Consumer<String> error) {
         try {
             if (cuenta == null || cuenta.isBlank() || cuenta.strip().length() > 8)
@@ -59,11 +71,11 @@ public final class EurekaControlador {
                 throw new IllegalArgumentException("El importe debe ser positivo y no superar 10 dígitos.");
             RED.execute(() -> {
                 try {
-                    boolean resultado = servicio.registrarDeposito(cuenta.strip(), importe);
+                    boolean resultado = servicio.registrarDeposito(token, cuenta.strip(), importe);
                     UI.post(() -> respuesta.accept(resultado));
                 }
                 catch (IOException | RuntimeException e) {
-                    UI.post(() -> error.accept("Resultado incierto. Consulte movimientos antes de reintentar."));
+                    UI.post(() -> error.accept(tokenExpirado(e) ? "La sesión caducó. Inicie sesión nuevamente." : "Resultado incierto. Consulte movimientos antes de reintentar."));
                 }
             });
         } catch (NumberFormatException | ArithmeticException e) {
@@ -87,7 +99,7 @@ public final class EurekaControlador {
                     boolean resultado = servicio.transferir(token, origen, destino, importe, clave);
                     UI.post(() -> respuesta.accept(resultado));
                 } catch (IOException | RuntimeException e) {
-                    UI.post(() -> error.accept("No se confirmó la transferencia. Reintente sin cambiar los datos."));
+                    UI.post(() -> error.accept(tokenExpirado(e) ? "La sesión caducó. Inicie sesión nuevamente." : "No se confirmó la transferencia. Reintente sin cambiar los datos."));
                 }
             });
         } catch (NumberFormatException | ArithmeticException e) {
@@ -97,5 +109,11 @@ public final class EurekaControlador {
 
     public void cerrarSesion(String token) {
         RED.execute(() -> { try { servicio.cerrarSesion(token); } catch (IOException ignored) { } });
+    }
+
+    private static boolean tokenExpirado(Throwable error) {
+        for (Throwable actual = error; actual != null; actual = actual.getCause())
+            if (actual.getMessage() != null && actual.getMessage().contains("Token ausente, inválido o caducado")) return true;
+        return false;
     }
 }

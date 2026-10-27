@@ -47,7 +47,7 @@ public class FiltroAutenticacion extends OncePerRequestFilter {
     protected void doFilterInternal(@NonNull HttpServletRequest solicitud, @NonNull HttpServletResponse respuesta, @NonNull FilterChain cadenaFiltros)
             throws ServletException, IOException {
 
-        String ruta = solicitud.getRequestURI();
+        String ruta = solicitud.getRequestURI().substring(solicitud.getContextPath().length());
 
         if (esPublico(ruta) || "OPTIONS".equalsIgnoreCase(solicitud.getMethod())) {
             cadenaFiltros.doFilter(solicitud, respuesta);

@@ -2,7 +2,8 @@
 <actions>
     <action>
         <actionName>run</actionName>
-        <goals><goal>spring-boot:run</goal></goals>
+        <goals><goal>package</goal></goals>
+        <properties><netbeans.deploy>true</netbeans.deploy></properties>
     </action>
     <action>
         <actionName>build</actionName>

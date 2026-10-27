@@ -6,6 +6,7 @@ import android.text.InputType;
 import android.widget.Button;
 import android.widget.EditText;
 import ec.edu.monster.controlador.EurekaControlador;
+import ec.edu.monster.modelo.Cuenta;
 
 public final class LoginActivity extends VistaBaseActivity {
     private final EurekaControlador controlador = new EurekaControlador();
@@ -26,10 +27,17 @@ public final class LoginActivity extends VistaBaseActivity {
         controlador.iniciarSesion(usuario.getText().toString(), contrasena.getText().toString(), token -> {
             listo(ingresar, "Ingresar");
             if (token != null && !token.isBlank()) {
-                startActivity(new Intent(this, MenuActivity.class)
-                        .putExtra(MenuActivity.USUARIO, usuario.getText().toString().strip())
-                        .putExtra(MenuActivity.TOKEN, token));
-                finish();
+                ingresar.setEnabled(false);
+                controlador.traerCuentas(token, cuentas -> {
+                    String[] numeros = cuentas.stream().map(Cuenta::numero).toArray(String[]::new);
+                    String[] etiquetas = cuentas.stream().map(Cuenta::toString).toArray(String[]::new);
+                    startActivity(new Intent(this, MenuActivity.class)
+                            .putExtra(MenuActivity.USUARIO, usuario.getText().toString().strip())
+                            .putExtra(MenuActivity.TOKEN, token)
+                            .putExtra(MenuActivity.CUENTAS, numeros)
+                            .putExtra(MenuActivity.ETIQUETAS_CUENTAS, etiquetas));
+                    finish();
+                }, error -> { listo(ingresar, "Ingresar"); mensaje(error); });
             } else mensaje("Credenciales incorrectas o servicio no disponible.");
             contrasena.setText("");
         });

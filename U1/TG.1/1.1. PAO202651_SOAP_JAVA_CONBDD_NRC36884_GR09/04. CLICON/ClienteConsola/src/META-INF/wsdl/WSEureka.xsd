@@ -12,9 +12,12 @@
 
 <xs:element name="traerMovimientosResponse" type="tns:traerMovimientosResponse"/>
 
+<xs:element name="traerCuentas" type="tns:traerCuentas"/>
+<xs:element name="traerCuentasResponse" type="tns:traerCuentasResponse"/>
+
 <xs:complexType name="regDeposito">
 <xs:sequence>
-<xs:element name="cuenta" type="xs:string" minOccurs="0"/>
+<xs:element name="token" type="xs:string" minOccurs="0"/><xs:element name="cuenta" type="xs:string" minOccurs="0"/>
 <xs:element name="importe" type="xs:decimal" minOccurs="0"/>
 </xs:sequence>
 </xs:complexType>
@@ -40,7 +43,7 @@
 
 <xs:complexType name="traerMovimientos">
 <xs:sequence>
-<xs:element name="cuenta" type="xs:string" minOccurs="0"/>
+<xs:element name="token" type="xs:string" minOccurs="0"/><xs:element name="cuenta" type="xs:string" minOccurs="0"/>
 </xs:sequence>
 </xs:complexType>
 
@@ -60,4 +63,4 @@
 <xs:element name="tipo" type="xs:string" minOccurs="0"/>
 </xs:sequence>
 </xs:complexType>
-</xs:schema>
+<xs:complexType name="traerCuentas"><xs:sequence><xs:element name="token" type="xs:string" minOccurs="0"/></xs:sequence></xs:complexType><xs:complexType name="traerCuentasResponse"><xs:sequence><xs:element name="cuenta" type="tns:cuenta" minOccurs="0" maxOccurs="unbounded"/></xs:sequence></xs:complexType><xs:complexType name="cuenta"><xs:sequence><xs:element name="numero" type="xs:string" minOccurs="0"/><xs:element name="moneda" type="xs:string" minOccurs="0"/><xs:element name="saldo" type="xs:decimal" minOccurs="0"/></xs:sequence></xs:complexType></xs:schema>

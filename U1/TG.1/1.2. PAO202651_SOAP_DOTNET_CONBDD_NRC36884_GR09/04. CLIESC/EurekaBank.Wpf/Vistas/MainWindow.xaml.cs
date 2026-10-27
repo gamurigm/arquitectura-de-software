@@ -26,6 +26,10 @@ public partial class MainWindow : Window
                 PanelLogin.Visibility = Visibility.Collapsed;
                 PanelBanco.Visibility = Visibility.Visible;
                 Contrasena.Clear();
+                Cuenta.ItemsSource = _controlador.Cuentas;
+                CuentaOrigen.ItemsSource = _controlador.Cuentas;
+                Cuenta.SelectedIndex = CuentaOrigen.SelectedIndex = _controlador.Cuentas.Count > 0 ? 0 : -1;
+                if (_controlador.Cuentas.Count == 0) MensajeBanco.Text = "No hay cuentas activas asignadas.";
                 await ConsultarAsync();
             }
             else MensajeLogin.Text = "Credenciales inválidas.";
@@ -39,12 +43,14 @@ public partial class MainWindow : Window
     {
         try
         {
-            await _controlador.ConsultarMovimientosAsync(Cuenta.Text);
+            if (Cuenta.SelectedValue is not string codigo) { MensajeBanco.Text = "Seleccione una cuenta activa."; return false; }
+            await _controlador.ConsultarMovimientosAsync(codigo);
             TablaMovimientos.ItemsSource = _controlador.Movimientos;
             Saldo.Text = $"Saldo calculado: {_controlador.Saldo:N2}";
             MensajeBanco.Text = "Movimientos actualizados.";
             return true;
         }
+        catch (UnauthorizedAccessException error) { MostrarLoginCaducado(error.Message); return false; }
         catch (Exception error) { MensajeBanco.Text = error.Message; return false; }
     }
 
@@ -65,6 +71,7 @@ public partial class MainWindow : Window
                     ? "Depósito registrado; movimientos actualizados."
                     : "Depósito registrado; no se pudieron actualizar los movimientos.";
         }
+        catch (UnauthorizedAccessException error) { MostrarLoginCaducado(error.Message); }
         catch (Exception error) { MensajeBanco.Text = $"No se pudo registrar el depósito: {error.Message}"; }
     }
 
@@ -86,7 +93,7 @@ public partial class MainWindow : Window
 
     private async void Transferir_Click(object sender, RoutedEventArgs e)
     {
-        var origen = CuentaOrigen.Text.Trim();
+        var origen = CuentaOrigen.SelectedValue as string ?? "";
         var destino = CuentaDestino.Text.Trim();
         if (!decimal.TryParse(ImporteTransferencia.Text, NumberStyles.Number, CultureInfo.CurrentCulture, out var importe)
             || !origen.All(char.IsAsciiDigit) || origen.Length != 8 || !destino.All(char.IsAsciiDigit)
@@ -98,10 +105,20 @@ public partial class MainWindow : Window
             MensajeBanco.Text = registrada ? "Transferencia registrada: débito y crédito confirmados." : "Transferencia rechazada. Revise cuentas, moneda e importe.";
             if (registrada)
             {
-                Cuenta.Text = destino;
+                Cuenta.SelectedValue = origen;
                 await ConsultarAsync();
             }
         }
+        catch (UnauthorizedAccessException error) { MostrarLoginCaducado(error.Message); }
         catch (Exception error) { MensajeBanco.Text = $"No se confirmó. Reenvíe la misma solicitud. {error.Message}"; }
+    }
+
+    private void MostrarLoginCaducado(string mensaje)
+    {
+        TablaMovimientos.ItemsSource = null;
+        Saldo.Text = "";
+        PanelBanco.Visibility = Visibility.Collapsed;
+        PanelLogin.Visibility = Visibility.Visible;
+        MensajeLogin.Text = mensaje;
     }
 }

@@ -4,16 +4,16 @@
              Title="EurekaBank" BackgroundColor="{StaticResource Fondo}">
     <ScrollView>
         <VerticalStackLayout Padding="24" Spacing="14">
-            <Label Text="MONSTER · EUREKABANK" TextColor="{StaticResource Acento}" FontSize="13" />
+                <Label Text="EUREKABANK · BANCA PERSONAL" TextColor="{StaticResource Acento}" FontSize="13" FontAttributes="Bold" />
             <Label Text="Banca móvil" TextColor="{StaticResource Texto}" FontSize="28" FontAttributes="Bold" />
             <VerticalStackLayout x:Name="LoginPanel" Spacing="12">
                 <Entry x:Name="UsuarioEntry" Placeholder="Usuario" TextColor="{StaticResource Texto}" />
                 <Entry x:Name="ContrasenaEntry" Placeholder="Contraseña" IsPassword="True" TextColor="{StaticResource Texto}" />
-                <Button Text="Ingresar" Clicked="IniciarSesion_Click" BackgroundColor="{StaticResource Acento}" TextColor="#0B1020" />
+                <Button Text="Ingresar" Clicked="IniciarSesion_Click" BackgroundColor="{StaticResource Acento}" TextColor="White" />
             </VerticalStackLayout>
             <VerticalStackLayout x:Name="BancoPanel" IsVisible="False" Spacing="12">
                 <Label x:Name="SaludoLabel" TextColor="{StaticResource Texto}" FontSize="18" />
-                <Entry x:Name="CuentaConsultaEntry" Placeholder="Cuenta para consultar" Keyboard="Numeric" TextColor="{StaticResource Texto}" />
+                <Picker x:Name="CuentaConsultaPicker" Title="Cuenta para consultar" ItemDisplayBinding="{Binding Etiqueta}" />
                 <Button Text="Consultar movimientos" Clicked="Consultar_Click" />
                 <CollectionView x:Name="MovimientosList" HeightRequest="250">
                     <CollectionView.ItemTemplate>
@@ -41,14 +41,14 @@
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
                 </CollectionView>
-                <Entry x:Name="CuentaDepositoEntry" Placeholder="Cuenta para depositar" Keyboard="Numeric" TextColor="{StaticResource Texto}" />
+                <Picker x:Name="CuentaDepositoPicker" Title="Cuenta para depositar" ItemDisplayBinding="{Binding Etiqueta}" />
                 <Entry x:Name="ImporteEntry" Placeholder="Importe" Keyboard="Numeric" TextColor="{StaticResource Texto}" />
                 <Button Text="Registrar depósito" Clicked="Depositar_Click" />
-                <Entry x:Name="CuentaOrigenTransferenciaEntry" Placeholder="Cuenta origen" Keyboard="Numeric" TextColor="{StaticResource Texto}" />
+                <Picker x:Name="CuentaOrigenTransferenciaPicker" Title="Cuenta origen" ItemDisplayBinding="{Binding Etiqueta}" />
                 <Entry x:Name="CuentaDestinoTransferenciaEntry" Placeholder="Cuenta destino" Keyboard="Numeric" TextColor="{StaticResource Texto}" />
                 <Entry x:Name="ImporteTransferenciaEntry" Placeholder="Importe a transferir" Keyboard="Numeric" TextColor="{StaticResource Texto}" />
                 <Button Text="Transferir" Clicked="Transferir_Click" />
-                <Button Text="Cerrar sesión" Clicked="CerrarSesion_Click" BackgroundColor="#A78BFA" TextColor="#0B1020" />
+                <Button Text="Cerrar sesión" Clicked="CerrarSesion_Click" BackgroundColor="#EAF3F4" TextColor="#143B60" />
             </VerticalStackLayout>
             <Label x:Name="MensajeLabel" TextColor="{StaticResource Acento}" />
         </VerticalStackLayout>

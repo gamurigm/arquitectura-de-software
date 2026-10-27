@@ -22,7 +22,8 @@
 <message name="regDepositoResponse">
 <part name="parameters" element="tns:regDepositoResponse"/>
 </message>
-<portType name="WSEureka">
+<message name="traerCuentas"><part name="parameters" element="tns:traerCuentas"/></message>
+<message name="traerCuentasResponse"><part name="parameters" element="tns:traerCuentasResponse"/></message><portType name="WSEureka">
 <operation name="traerMovimientos">
 <input wsam:Action="http://ws.monster.edu.ec/WSEureka/traerMovimientosRequest" message="tns:traerMovimientos"/>
 <output wsam:Action="http://ws.monster.edu.ec/WSEureka/traerMovimientosResponse" message="tns:traerMovimientosResponse"/>
@@ -35,7 +36,7 @@
 <input wsam:Action="http://ws.monster.edu.ec/WSEureka/regDepositoRequest" message="tns:regDeposito"/>
 <output wsam:Action="http://ws.monster.edu.ec/WSEureka/regDepositoResponse" message="tns:regDepositoResponse"/>
 </operation>
-</portType>
+<operation name="traerCuentas"><input wsam:Action="http://ws.monster.edu.ec/WSEureka/traerCuentasRequest" message="tns:traerCuentas"/><output wsam:Action="http://ws.monster.edu.ec/WSEureka/traerCuentasResponse" message="tns:traerCuentasResponse"/></operation></portType>
 <binding name="WSEurekaPortBinding" type="tns:WSEureka">
 <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
 <operation name="traerMovimientos">
@@ -66,7 +67,7 @@
 </output>
 </operation>
 </binding>
-<service name="WSEureka">
+<operation name="traerCuentas"><soap:operation soapAction=""/><input><soap:body use="literal"/></input><output><soap:body use="literal"/></output></operation><service name="WSEureka">
 <port name="WSEurekaPort" binding="tns:WSEurekaPortBinding">
 <soap:address location="http://127.0.0.1:8080/WS_EurekaBank_SOAP_JAVA_GR09/WSEureka"/>
 </port>

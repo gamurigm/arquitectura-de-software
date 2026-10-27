@@ -5,9 +5,10 @@
     <artifactId>WSConversionUnidades_Java_SOAP_GR09</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>war</packaging>
-    <name>WSConversionUnidades_Java_SOAP_GR09</name>
+    <name>GR09 - SOAP - Java - SIN BDD - Conversiones - Servidor</name>
 
     <properties>
+        <netbeans.hint.jdkPlatform>JDK_25</netbeans.hint.jdkPlatform>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>21</maven.compiler.release>
         <netbeans.hint.deploy.server>pfv5ee8</netbeans.hint.deploy.server>

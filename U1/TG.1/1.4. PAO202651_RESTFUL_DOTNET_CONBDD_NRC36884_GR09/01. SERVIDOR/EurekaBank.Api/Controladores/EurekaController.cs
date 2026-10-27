@@ -16,22 +16,35 @@ public sealed class EurekaController(IEurekaBankService servicio) : ControllerBa
         return Ok(await servicio.IniciarSesionAsync(request.Usuario, request.Contrasena, cancellationToken));
     }
 
+    [HttpGet("cuentas")]
+    public async Task<ActionResult<IReadOnlyList<CuentaResponse>>> ConsultarCuentas(
+        [FromHeader(Name = "Authorization")] string? authorization,
+        CancellationToken cancellationToken)
+    {
+        var cuentas = await servicio.ConsultarCuentasAsync(ExtraerToken(authorization), cancellationToken);
+        return cuentas is null ? Unauthorized() : Ok(cuentas);
+    }
+
     [HttpGet("movimientos")]
     public async Task<ActionResult<IReadOnlyList<MovimientoResponse>>> ConsultarMovimientos(
+        [FromHeader(Name = "Authorization")] string? authorization,
         [FromQuery] string? cuenta,
         CancellationToken cancellationToken)
     {
-        var movimientos = await servicio.ConsultarMovimientosAsync(cuenta ?? string.Empty, cancellationToken);
+        var movimientos = await servicio.ConsultarMovimientosAsync(ExtraerToken(authorization), cuenta ?? string.Empty, cancellationToken);
+        if (movimientos is null) return Unauthorized();
         return Ok(movimientos);
     }
 
     [HttpPost("depositos")]
     public async Task<ActionResult<DepositoResponse>> RegistrarDeposito(
+        [FromHeader(Name = "Authorization")] string? authorization,
         [FromBody] DepositoRequest request,
         CancellationToken cancellationToken)
     {
-        var registrado = await servicio.RegistrarDepositoAsync(request.Cuenta, request.Importe, cancellationToken);
-        return Ok(new DepositoResponse(registrado));
+        var registrado = await servicio.RegistrarDepositoAsync(ExtraerToken(authorization), request.Cuenta, request.Importe, cancellationToken);
+        if (registrado is null) return Unauthorized();
+        return Ok(new DepositoResponse(registrado.Value));
     }
 
     [HttpPost("transferencias")]

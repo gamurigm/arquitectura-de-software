@@ -7,7 +7,7 @@
     <artifactId>ti-1-1-restful-java-sinbdd-gr09</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>TI.1.1 RESTful Java GR09</name>
+    <name>GR09 - REST - Java - SIN BDD - Conversiones - Agregador</name>
     <description>Agrega los módulos Maven activos del proyecto GR09.</description>
 
     <modules>

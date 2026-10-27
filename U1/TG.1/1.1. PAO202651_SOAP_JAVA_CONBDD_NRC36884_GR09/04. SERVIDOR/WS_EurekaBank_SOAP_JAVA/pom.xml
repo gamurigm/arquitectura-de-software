@@ -5,11 +5,12 @@
     <artifactId>WS_EurekaBank_SOAP_JAVA_GR09</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>war</packaging>
-    <name>WS_EurekaBank_SOAP_JAVA_GR09</name>
+    <name>GR09 - SOAP - Java - CON BDD - EurekaBank - Servidor</name>
 
     <properties>
+        <netbeans.hint.jdkPlatform>JDK_25</netbeans.hint.jdkPlatform>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.release>21</maven.compiler.release>
+        <maven.compiler.release>25</maven.compiler.release>
         <netbeans.hint.deploy.server>pfv5ee8</netbeans.hint.deploy.server>
     </properties>
 
@@ -48,7 +49,7 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.13.0</version>
                 <configuration>
-                    <release>25</release>
+                    <release>${maven.compiler.release}</release>
                 </configuration>
             </plugin>
             <plugin>

@@ -8,6 +8,7 @@ public sealed class EurekaBankController(IEurekaBankService servicio)
     private TransferenciaPendiente? _transferenciaPendiente;
     public string? UsuarioActivo { get; private set; }
     public string? Token { get; private set; }
+    public IReadOnlyList<CuentaDto> Cuentas { get; private set; } = [];
     public bool SesionActiva => UsuarioActivo is not null && Token is not null;
 
     public async Task<bool> IniciarSesionAsync(
@@ -23,6 +24,7 @@ public sealed class EurekaBankController(IEurekaBankService servicio)
 
         UsuarioActivo = usuario;
         Token = respuesta.Token;
+        Cuentas = await ConSesionAsync(() => servicio.ConsultarCuentasAsync(Token!, cancellationToken));
         return true;
     }
 
@@ -31,7 +33,7 @@ public sealed class EurekaBankController(IEurekaBankService servicio)
         CancellationToken cancellationToken = default)
     {
         ExigirSesion();
-        return servicio.ConsultarMovimientosAsync(cuenta, Token, cancellationToken);
+        return ConSesionAsync(() => servicio.ConsultarMovimientosAsync(cuenta, Token!, cancellationToken));
     }
 
     public Task<bool> RegistrarDepositoAsync(
@@ -40,7 +42,7 @@ public sealed class EurekaBankController(IEurekaBankService servicio)
         CancellationToken cancellationToken = default)
     {
         ExigirSesion();
-        return servicio.RegistrarDepositoAsync(cuenta, importe, Token, cancellationToken);
+        return ConSesionAsync(() => servicio.RegistrarDepositoAsync(cuenta, importe, Token!, cancellationToken));
     }
 
     public Task<bool> TransferirAsync(string origen, string destino, decimal importe, Guid claveOperacion,
@@ -58,7 +60,7 @@ public sealed class EurekaBankController(IEurekaBankService servicio)
     private async Task<bool> TransferirPendienteAsync(Guid clave, string origen, string destino, decimal importe,
         CancellationToken cancellationToken)
     {
-        var resultado = await servicio.TransferirAsync(origen, destino, importe, clave, Token!, cancellationToken);
+        var resultado = await ConSesionAsync(() => servicio.TransferirAsync(origen, destino, importe, clave, Token!, cancellationToken));
         _transferenciaPendiente = null;
         return resultado;
     }
@@ -68,6 +70,7 @@ public sealed class EurekaBankController(IEurekaBankService servicio)
         var token = Token;
         Token = null;
         UsuarioActivo = null;
+        Cuentas = [];
         await servicio.CerrarSesionAsync(token, cancellationToken);
     }
 
@@ -76,6 +79,19 @@ public sealed class EurekaBankController(IEurekaBankService servicio)
         if (!SesionActiva)
         {
             throw new InvalidOperationException("Inicie sesión antes de operar.");
+        }
+    }
+
+    private async Task<T> ConSesionAsync<T>(Func<Task<T>> operacion)
+    {
+        try { return await operacion(); }
+        catch (HttpRequestException error) when (error.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+        {
+            Token = null;
+            UsuarioActivo = null;
+            Cuentas = [];
+            _transferenciaPendiente = null;
+            throw new UnauthorizedAccessException("La sesión caducó. Inicie sesión nuevamente.", error);
         }
     }
 

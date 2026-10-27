@@ -95,6 +95,15 @@ class EurekaControladorTest {
     }
 
     @Test
+    void restringeOrigenAlListadoDeCuentasDeLaSesion() {
+        autenticar();
+        assertEquals(2, controlador.cuentas().size());
+        assertThrows(IllegalArgumentException.class,
+                () -> controlador.transferir("00999999", "00100002", "1.00"));
+        assertEquals(0, banco.llamadas.get());
+    }
+
+    @Test
     void noInformaExitoCuandoElServidorRechazaDeposito() {
         autenticar();
         banco.resultadoDeposito = -1;

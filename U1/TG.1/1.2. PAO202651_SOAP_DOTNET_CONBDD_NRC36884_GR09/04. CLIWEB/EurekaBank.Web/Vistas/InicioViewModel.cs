@@ -6,6 +6,7 @@ public sealed class InicioViewModel
 {
     public string? Usuario { get; init; }
     public string Cuenta { get; init; } = "";
+    public IReadOnlyList<Cuenta> Cuentas { get; set; } = Array.Empty<Cuenta>();
     public string? Mensaje { get; set; }
     public bool EsError { get; set; }
     public IReadOnlyList<Movimiento> Movimientos { get; set; } = Array.Empty<Movimiento>();

@@ -97,6 +97,9 @@ public final class SoapSimulado implements AutoCloseable {
                                 + "<importe>1234567890.19</importe><nromov>3</nromov>"
                                 + "<tipo>DEPOSITO</tipo></movimiento>");
                     }
+                    case "traerCuentas" -> respuesta("traerCuentas", "<cuenta><numero>00100001</numero>"
+                            + "<moneda>USD</moneda><saldo>50.00</saldo></cuenta><cuenta><numero>00100002</numero>"
+                            + "<moneda>USD</moneda><saldo>25.00</saldo></cuenta>");
                     default -> throw new IllegalArgumentException(operacion);
                 };
             }

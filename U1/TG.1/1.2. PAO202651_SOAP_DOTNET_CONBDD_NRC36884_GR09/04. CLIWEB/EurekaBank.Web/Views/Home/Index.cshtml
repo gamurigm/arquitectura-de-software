@@ -39,12 +39,14 @@ else
         <form asp-action="Movimientos" method="post" class="account-form">
             @Html.AntiForgeryToken()
             <label for="cuenta">Cuenta</label>
-            <input id="cuenta" name="cuenta" value="@Model.Cuenta" maxlength="8" required />
+            <select id="cuenta" name="cuenta" required>
+                @foreach (var cuenta in Model.Cuentas) { <option value="@cuenta.Numero" selected="@(Model.Cuenta == cuenta.Numero)">@cuenta.Etiqueta</option> }
+            </select>
             <button class="button button-primary" type="submit">Consultar</button>
         </form>
     </section>
 
-    @if (Model.Cuenta.Length > 0)
+    @if (Model.Cuentas.Count > 0)
     {
         <section class="balance-card">
             <div><p class="eyebrow">Saldo calculado</p><strong>@Model.Saldo.ToString("N2")</strong></div>
@@ -61,7 +63,9 @@ else
                 @Html.AntiForgeryToken()
                 <input type="hidden" name="claveOperacion" value="@Model.ClaveOperacion" />
                 <label for="cuentaOrigen">Cuenta origen</label>
-                <input id="cuentaOrigen" name="cuentaOrigen" maxlength="8" pattern="[0-9]{8}" required />
+                <select id="cuentaOrigen" name="cuentaOrigen" required>
+                    @foreach (var cuenta in Model.Cuentas) { <option value="@cuenta.Numero">@cuenta.Etiqueta</option> }
+                </select>
                 <label for="cuentaDestino">Cuenta destino</label>
                 <input id="cuentaDestino" name="cuentaDestino" maxlength="8" pattern="[0-9]{8}" value="@Model.Cuenta" required />
                 <label for="importeTransferencia">Importe</label>

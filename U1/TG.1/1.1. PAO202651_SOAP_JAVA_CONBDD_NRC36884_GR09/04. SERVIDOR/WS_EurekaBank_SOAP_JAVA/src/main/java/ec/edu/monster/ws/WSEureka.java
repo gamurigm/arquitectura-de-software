@@ -1,6 +1,7 @@
 package ec.edu.monster.ws;
 
 import ec.edu.monster.modelo.Movimiento;
+import ec.edu.monster.modelo.CuentaDto;
 import ec.edu.monster.servicios.EurekaService;
 import jakarta.jws.WebMethod;
 import jakarta.jws.WebParam;
@@ -44,11 +45,24 @@ public class WSEureka {
         }
     }
 
+    @WebMethod(operationName = "traerCuentas")
+    @WebResult(name = "cuenta")
+    public List<CuentaDto> traerCuentas(@WebParam(name = "token") String token) {
+        try { return service.traerCuentas(token); }
+        catch (SecurityException e) { throw new WebServiceException(e.getMessage()); }
+        catch (RuntimeException e) {
+            LOGGER.log(Level.SEVERE, "Error al consultar cuentas.", e);
+            throw new WebServiceException("No se pudieron consultar las cuentas.", e);
+        }
+    }
+
     @WebMethod(operationName = "traerMovimientos")
     @WebResult(name = "movimiento")
-    public List<Movimiento> traerMovimientos(@WebParam(name = "cuenta") String cuenta) {
+    public List<Movimiento> traerMovimientos(@WebParam(name = "token") String token, @WebParam(name = "cuenta") String cuenta) {
         try {
-            return service.traerMovimientos(cuenta);
+            return service.traerMovimientos(token, cuenta);
+        } catch (SecurityException e) {
+            throw new WebServiceException(e.getMessage());
         } catch (SQLException | RuntimeException e) {
             LOGGER.log(Level.SEVERE, "Error al consultar movimientos.", e);
             throw new WebServiceException("No se pudieron consultar los movimientos.", e);
@@ -58,10 +72,13 @@ public class WSEureka {
     @WebMethod(operationName = "regDeposito")
     @WebResult(name = "resultado")
     public int regDeposito(
+            @WebParam(name = "token") String token,
             @WebParam(name = "cuenta") String cuenta,
             @WebParam(name = "importe") BigDecimal importe) {
         try {
-            return service.registrarDeposito(cuenta, importe);
+            return service.registrarDeposito(token, cuenta, importe);
+        } catch (SecurityException e) {
+            throw new WebServiceException(e.getMessage());
         } catch (SQLException | RuntimeException e) {
             LOGGER.log(Level.SEVERE, "Error al registrar el depósito.", e);
             return -1;
@@ -78,6 +95,8 @@ public class WSEureka {
             @WebParam(name = "claveOperacion") String claveOperacion) {
         try {
             return service.transferir(token, cuentaOrigen, cuentaDestino, importe, claveOperacion) ? 1 : -1;
+        } catch (SecurityException e) {
+            throw new WebServiceException(e.getMessage());
         } catch (SQLException | RuntimeException e) {
             LOGGER.log(Level.SEVERE, "Error al registrar la transferencia.", e);
             return -1;

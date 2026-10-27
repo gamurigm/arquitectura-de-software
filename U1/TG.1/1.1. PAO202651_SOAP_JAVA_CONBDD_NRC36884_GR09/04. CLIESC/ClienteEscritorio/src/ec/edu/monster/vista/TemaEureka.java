@@ -11,6 +11,7 @@ import java.awt.RenderingHints;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -18,9 +19,9 @@ import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
 final class TemaEureka {
-    static final Color TINTA = new Color(21, 39, 68);
-    static final Color AZUL = new Color(35, 91, 216);
-    static final Color SUAVE = new Color(99, 119, 148);
+    static final Color TINTA = new Color(23, 50, 77);
+    static final Color AZUL = new Color(8, 127, 123);
+    static final Color SUAVE = new Color(102, 123, 142);
 
     private TemaEureka() {}
 
@@ -54,6 +55,15 @@ final class TemaEureka {
         campo.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(191, 207, 230), 1, true),
                 new EmptyBorder(10, 12, 10, 12)));
+        campo.setBackground(new Color(255, 255, 255, 225));
+    }
+
+    static void campo(JComboBox<?> campo) {
+        campo.setFont(campo.getFont().deriveFont(15f));
+        campo.setForeground(TINTA);
+        campo.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(191, 207, 230), 1, true),
+                new EmptyBorder(8, 8, 8, 8)));
         campo.setBackground(new Color(255, 255, 255, 225));
     }
 

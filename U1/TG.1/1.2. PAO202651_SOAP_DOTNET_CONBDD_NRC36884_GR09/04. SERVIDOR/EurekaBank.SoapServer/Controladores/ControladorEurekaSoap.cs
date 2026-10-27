@@ -21,9 +21,21 @@ public sealed class ControladorEurekaSoap(EurekaBankService servicio, ILogger<Co
         catch (Exception excepcion) { _logger.LogError(excepcion, "Falló la operación crearSesion."); return null; }
     }
 
-    public async Task<List<ec.edu.monster.Modelos.Movimiento>> TraerMovimientosAsync(string cuenta)
+    public async Task<List<ec.edu.monster.Modelos.Cuenta>> TraerCuentasAsync(string token)
     {
-        try { return await _servicio.TraerMovimientosAsync(cuenta); }
+        try { return await _servicio.TraerCuentasAsync(token); }
+        catch (UnauthorizedAccessException) { throw new FaultException("Token ausente, inválido o caducado.", new FaultCode("Sender")); }
+        catch (Exception excepcion)
+        {
+            _logger.LogError(excepcion, "Falló la operación traerCuentas.");
+            throw new FaultException("No se pudieron consultar las cuentas.", new FaultCode("Server"));
+        }
+    }
+
+    public async Task<List<ec.edu.monster.Modelos.Movimiento>> TraerMovimientosAsync(string token, string cuenta)
+    {
+        try { return await _servicio.TraerMovimientosAsync(token, cuenta); }
+        catch (UnauthorizedAccessException) { throw new FaultException("Token ausente, inválido o caducado.", new FaultCode("Sender")); }
         catch (Exception excepcion)
         {
             _logger.LogError(excepcion, "Falló la operación traerMovimientos.");
@@ -31,9 +43,10 @@ public sealed class ControladorEurekaSoap(EurekaBankService servicio, ILogger<Co
         }
     }
 
-    public async Task<int> RegistrarDepositoAsync(string cuenta, decimal importe)
+    public async Task<int> RegistrarDepositoAsync(string token, string cuenta, decimal importe)
     {
-        try { return await _servicio.RegistrarDepositoAsync(cuenta, importe) ? 1 : -1; }
+        try { return await _servicio.RegistrarDepositoAsync(token, cuenta, importe) ? 1 : -1; }
+        catch (UnauthorizedAccessException) { throw new FaultException("Token ausente, inválido o caducado.", new FaultCode("Sender")); }
         catch (Exception excepcion) { _logger.LogError(excepcion, "Falló la operación regDeposito."); return -1; }
     }
 
@@ -41,6 +54,7 @@ public sealed class ControladorEurekaSoap(EurekaBankService servicio, ILogger<Co
         decimal importe, string claveOperacion)
     {
         try { return await _servicio.TransferirAsync(token, cuentaOrigen, cuentaDestino, importe, claveOperacion) ? 1 : -1; }
+        catch (UnauthorizedAccessException) { throw new FaultException("Token ausente, inválido o caducado.", new FaultCode("Sender")); }
         catch (Exception excepcion) { _logger.LogError(excepcion, "Falló la operación transferir."); return -1; }
     }
 

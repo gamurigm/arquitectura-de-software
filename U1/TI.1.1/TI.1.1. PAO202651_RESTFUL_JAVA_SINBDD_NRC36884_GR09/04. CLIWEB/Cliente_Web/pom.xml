@@ -8,10 +8,11 @@
     <artifactId>Cliente_Web</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>war</packaging>
-    <name>Cliente_Web</name>
+    <name>GR09 - REST - Java - SIN BDD - Conversiones - Cliente Web</name>
     <description>Cliente web (JSP/Servlet) que consume la API REST de Conversion de Unidades Monster</description>
 
     <properties>
+        <netbeans.hint.jdkPlatform>JDK_25</netbeans.hint.jdkPlatform>
         <maven.compiler.release>21</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <jakarta.servlet.version>6.0.0</jakarta.servlet.version>

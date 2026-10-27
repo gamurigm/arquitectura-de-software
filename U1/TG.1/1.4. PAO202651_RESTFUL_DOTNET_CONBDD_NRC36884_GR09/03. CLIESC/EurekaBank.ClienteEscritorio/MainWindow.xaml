@@ -5,8 +5,8 @@
         Background="{StaticResource Fondo}" Foreground="{StaticResource Texto}"
         WindowStartupLocation="CenterScreen">
     <Grid Margin="28">
-        <StackPanel x:Name="LoginPanel" Width="360" VerticalAlignment="Center" HorizontalAlignment="Center">
-            <TextBlock Text="MONSTER · EUREKABANK" Foreground="{StaticResource Acento}" FontSize="14" />
+        <StackPanel x:Name="LoginPanel" Width="360" VerticalAlignment="Center" HorizontalAlignment="Center" Background="{StaticResource Superficie}">
+            <TextBlock Text="EUREKABANK · BANCA PERSONAL" Foreground="{StaticResource Acento}" FontSize="14" FontWeight="Bold" />
             <TextBlock Text="Iniciar sesión" FontSize="30" FontWeight="SemiBold" Margin="0,8,0,22" />
             <TextBlock Text="Usuario" />
             <TextBox x:Name="UsuarioBox" Margin="0,6,0,14" Padding="10" />
@@ -23,7 +23,7 @@
                 <StackPanel>
                     <TextBlock Text="Consulta de movimientos" FontSize="18" FontWeight="SemiBold" />
                     <DockPanel Margin="0,12,0,12">
-                        <TextBox x:Name="CuentaConsultaBox" Width="220" Padding="8" />
+                        <ComboBox x:Name="CuentaConsultaBox" Width="220" Padding="8" />
                         <Button Content="Consultar" Click="Consultar_Click" Margin="10,0,0,0" Padding="12,6" />
                     </DockPanel>
                     <DataGrid x:Name="MovimientosGrid" Height="260" AutoGenerateColumns="False"
@@ -43,7 +43,7 @@
                 <StackPanel>
                     <TextBlock Text="Registrar depósito" FontSize="18" FontWeight="SemiBold" />
                     <DockPanel Margin="0,12,0,0">
-                        <TextBox x:Name="CuentaDepositoBox" Width="220" Padding="8" />
+                        <ComboBox x:Name="CuentaDepositoBox" Width="220" Padding="8" />
                         <TextBox x:Name="ImporteBox" Width="150" Margin="10,0,0,0" Padding="8" />
                         <Button Content="Depositar" Click="Depositar_Click" Margin="10,0,0,0" Padding="12,6" />
                     </DockPanel>
@@ -53,7 +53,7 @@
                 <StackPanel>
                     <TextBlock Text="Transferir" FontSize="18" FontWeight="SemiBold" />
                     <DockPanel Margin="0,12,0,0">
-                        <TextBox x:Name="CuentaOrigenBox" Width="180" Padding="8" ToolTip="Cuenta origen" />
+                        <ComboBox x:Name="CuentaOrigenBox" Width="180" Padding="8" ToolTip="Cuenta origen" />
                         <TextBox x:Name="CuentaDestinoBox" Width="180" Margin="8,0,0,0" Padding="8" ToolTip="Cuenta destino" />
                         <TextBox x:Name="ImporteTransferenciaBox" Width="130" Margin="8,0,0,0" Padding="8" ToolTip="Importe" />
                         <Button Content="Transferir" Click="Transferir_Click" Margin="8,0,0,0" Padding="12,6" />

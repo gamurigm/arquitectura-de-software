@@ -11,8 +11,11 @@
         <h2>Consultar movimientos</h2>
         <form asp-action="Movimientos" method="post">
             @Html.AntiForgeryToken()
-            <label asp-for="Cuenta">Número de cuenta</label>
-            <input asp-for="Cuenta" maxlength="8" inputmode="numeric" />
+            <label asp-for="Cuenta">Cuenta</label>
+            <select asp-for="Cuenta">
+                <option value="">Seleccione una cuenta</option>
+                @foreach (var cuenta in Model.Cuentas) { <option value="@cuenta.Numero">@cuenta.Etiqueta</option> }
+            </select>
             <button type="submit">Consultar</button>
         </form>
     </article>
@@ -20,8 +23,11 @@
         <h2>Registrar depósito</h2>
         <form asp-action="Depositar" method="post">
             @Html.AntiForgeryToken()
-            <label asp-for="CuentaDeposito">Número de cuenta</label>
-            <input asp-for="CuentaDeposito" maxlength="8" inputmode="numeric" />
+            <label asp-for="CuentaDeposito">Cuenta</label>
+            <select asp-for="CuentaDeposito">
+                <option value="">Seleccione una cuenta</option>
+                @foreach (var cuenta in Model.Cuentas) { <option value="@cuenta.Numero">@cuenta.Etiqueta</option> }
+            </select>
             <label asp-for="Importe">Importe</label>
             <input asp-for="Importe" type="number" min="0.01" max="9999999999.99" step="0.01" />
             <button type="submit">Depositar</button>
@@ -33,7 +39,10 @@
             @Html.AntiForgeryToken()
             <input asp-for="ClaveOperacion" type="hidden" />
             <label asp-for="CuentaOrigenTransferencia">Cuenta de origen</label>
-            <input asp-for="CuentaOrigenTransferencia" maxlength="8" inputmode="numeric" />
+            <select asp-for="CuentaOrigenTransferencia">
+                <option value="">Seleccione una cuenta</option>
+                @foreach (var cuenta in Model.Cuentas) { <option value="@cuenta.Numero">@cuenta.Etiqueta</option> }
+            </select>
             <label asp-for="CuentaDestinoTransferencia">Cuenta de destino</label>
             <input asp-for="CuentaDestinoTransferencia" maxlength="8" inputmode="numeric" />
             <label asp-for="ImporteTransferencia">Importe</label>
@@ -42,6 +51,7 @@
         </form>
     </article>
 </section>
+@if (Model.Cuentas.Count == 0) { <p class="notice">No tiene cuentas activas asignadas.</p> }
 @if (!string.IsNullOrWhiteSpace(Model.Mensaje)) { <p class="notice">@Model.Mensaje</p> }
 @if (Model.Movimientos.Count > 0)
 {
