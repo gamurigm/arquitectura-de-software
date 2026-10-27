@@ -1,0 +1,17 @@
+@model PaginaFactura
+<a asp-action="Index">Volver al catálogo</a>
+<h1>Factura @Model.Factura.Id</h1>
+<section class="panel">
+    <p><strong>Estado:</strong> @Model.Factura.Estado</p>
+    <p><strong>Cliente:</strong> @Model.Factura.NombreCliente · @Model.Factura.Cedula</p>
+    <p><strong>Celular:</strong> @Model.Factura.Celular</p>
+    <p><strong>Pago:</strong> @Model.Factura.FormaPago</p>
+    <p><strong>Precio:</strong> $@Model.Factura.Precio.ToString("F2") · <strong>Descuento:</strong> $@Model.Factura.Descuento.ToString("F2")</p>
+    <p class="total"><strong>Total:</strong> $@Model.Factura.Total.ToString("F2")</p>
+    @if (Model.Cuotas.Count > 0) {
+        <h2>Tabla de amortización</h2>
+        <div class="table-wrap"><table><thead><tr><th>Cuota</th><th>Fecha</th><th>Valor</th><th>Interés</th><th>Capital</th><th>Saldo</th></tr></thead><tbody>
+        @foreach (var c in Model.Cuotas) { <tr><td>@c.NumeroCuota</td><td>@c.FechaPago.ToString("yyyy-MM-dd")</td><td>@c.ValorCuota.ToString("F2")</td><td>@c.InteresPagado.ToString("F2")</td><td>@c.CapitalPagado.ToString("F2")</td><td>@c.Saldo.ToString("F2")</td></tr> }
+        </tbody></table></div>
+    }
+</section>

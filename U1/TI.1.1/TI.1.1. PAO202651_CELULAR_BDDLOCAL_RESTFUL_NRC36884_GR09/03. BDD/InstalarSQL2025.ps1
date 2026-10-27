@@ -6,7 +6,7 @@ param(
     [string]$Usuario = [Security.Principal.WindowsIdentity]::GetCurrent().Name
 )
 $ErrorActionPreference = 'Stop'
-$toolsRoot = 'C:\Users\GABI\Documents\ESPE VIII SII2026\tools'
+$toolsRoot = 'D:\tools'
 $sqlInstallRoot = Join-Path $toolsRoot 'SQLServer2025'
 $dataRoot = Join-Path $toolsRoot 'sqlserver2025-data'
 $logs = Join-Path $toolsRoot 'CelularGR09\sql-setup'

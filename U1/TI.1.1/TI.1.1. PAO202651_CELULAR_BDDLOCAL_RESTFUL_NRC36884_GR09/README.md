@@ -13,7 +13,7 @@ El crédito pertenece al proyecto bancario independiente `U1/TG.1/1.4. PAO202651
 
 ## Estado
 
-Implementación en curso. La API de comercializadora compila; las interfaces de consola, WPF, MVC y MAUI siguen pendientes. La API de crédito está en el proyecto del banco. Consulta `05. DOCUMENTACION/AVANCE.md`.
+API y cuatro clientes implementados. Bases, ventas y amortización se verificaron en SQL Server; la app móvil se instaló y abrió en el emulador. Consulta `05. DOCUMENTACION/AVANCE.md`, `05. DOCUMENTACION/VERIFICACION_EXAMEN.md` y `05. DOCUMENTACION/ManualTecnico.md`.
 
 ## Organización
 
@@ -21,7 +21,7 @@ Implementación en curso. La API de comercializadora compila; las interfaces de 
 - `02. MER`: modelo de catálogo y facturación.
 - `03. BDD`: scripts exclusivos de `ComercializadoraCelulares`.
 - `04. SERVIDOR`: contratos de tienda, regla de facturación, inicializador y API de comercializadora.
-- `04. CLICON`, `04. CLIESC`, `04. CLIMOV`, `04. CLIWEB`: clientes previstos.
+- `04. CLICON`, `04. CLIESC`, `04. CLIMOV`, `04. CLIWEB`: clientes implementados.
 - `05. DOCUMENTACION`: plan, avance, arquitectura y manual técnico.
 
 El proyecto de celulares no contiene la API, reglas ni scripts bancarios.

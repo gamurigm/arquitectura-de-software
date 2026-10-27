@@ -1,24 +1,24 @@
-# Avance del proyecto de celulares al 25 de octubre de 2026
+# Avance del proyecto de celulares GR09
 
-## Separación aplicada
+## Implementación
 
-- BanQuito.Api, su dominio y contratos, las reglas de crédito, las pruebas, el inicializador y los scripts BanQuitoCore están en el proyecto bancario REST .NET.
-- La comercializadora mantiene catálogo, facturación, sus propios DTOs del cliente HTTP y `ComercializadoraCelulares`.
-- No hay `ProjectReference` del celular al banco ni scripts bancarios en `U1/TI.1.1/...CELULAR...`.
-- Los dos inicializadores aplicaron sus scripts por separado contra el SQL Server Developer local. Los scripts no borran datos y no recrearon las bases que ya existían.
-- La regla del descuento del 42% y su prueba permanecen en el proyecto de la comercializadora; las reglas y pruebas de crédito permanecen en el proyecto bancario.
+- API REST de tienda y cuatro clientes: consola, WPF, MAUI Android y MVC web.
+- BanQuito mantiene la elegibilidad, el crédito y la amortización en su proyecto REST .NET. La tienda conserva solo el identificador remoto del crédito.
+- El modelo ER de tienda está en `02. MER/ModeloDatos.md`; el diagrama de casos de uso y su descripción están en el proyecto BanQuito.
+- Arquitectura completa en `Arquitectura.md`.
 
-## Verificación
+## Verificación local, 26 de octubre de 2026
 
-- `BanQuito.Api` y sus contratos/dominio compilaron: 0 advertencias, 0 errores.
-- `BanQuito.Administracion` compiló: 0 advertencias, 0 errores.
-- `BanQuito.Pruebas` compiló: 0 advertencias, 0 errores; no se ejecutó la suite.
-- `Comercializadora.Api` y sus contratos/dominio compilaron: 0 advertencias, 0 errores.
-- El inicializador de la comercializadora compiló: 0 advertencias, 0 errores.
-- `Comercializadora.Pruebas` compiló: 0 advertencias, 0 errores; no se ejecutó la suite.
-- Los scripts de cada proyecto se aplicaron sin errores. No se iniciaron APIs ni se hicieron llamadas HTTP en esta corrección.
-- Consola, WPF, MVC y MAUI Android siguen pendientes.
+- SQL Server Express `SQLEXPRESS`: `BanQuitoCore` tiene 5 clientes, 5 cuentas y 50 movimientos. `ComercializadoraCelulares` tiene 3 celulares activos.
+- Pruebas automatizadas de la tienda: 9 de 9 aprobadas.
+- Consola y WPF compilaron sin errores ni advertencias. MVC respondió HTTP 200 y mostró el catálogo.
+- MAUI compiló con Android SDK 36 en `D:\tools\android-sdk`; se ejecutó en `GR10_Pixel_35`, conectó a la API y cargó 3 celulares.
+- API BanQuito devolvió elegibilidad y monto máximo de $2.310 para el cliente 5.
+- API de tienda registró venta en efectivo de $261 y venta a crédito aprobada. Reintento conservó la factura y el crédito. Amortización: 3 cuotas, saldo final $0.
+- Se ejercitaron alta, edición y desactivación del catálogo. El registro de prueba se retiró después de comprobar la desactivación.
 
-## Entorno local
+## Entrega
 
-SQL Server 2025 Developer está activo en la instancia predeterminada para desarrollo local. SQL Server Express sigue siendo el destino previsto de entrega. Los artefactos y paquetes de ambos proyectos quedan bajo `C:\Users\GABI\Documents\ESPE VIII SII2026\tools`.
+- El emulador se usó para abrir la app móvil; no se probó un teléfono físico.
+- Las fuentes Mermaid son editables y se muestran en GitHub. El diagrama y la descripción de casos de uso de crédito están en el proyecto BanQuito.
+- El equipo no tiene unidad CD/DVD. El paquete para grabación queda en `D:\tools\CelularGR09\Entrega_Examen_GR09.zip`.

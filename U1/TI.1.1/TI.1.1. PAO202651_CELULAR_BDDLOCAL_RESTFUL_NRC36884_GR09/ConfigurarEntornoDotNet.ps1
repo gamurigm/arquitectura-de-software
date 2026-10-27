@@ -1,8 +1,9 @@
 $ErrorActionPreference = 'Stop'
-$toolsRoot = 'C:\Users\GABI\Documents\ESPE VIII SII2026\tools'
-$env:DOTNET_ROOT = 'C:\Program Files\dotnet'
+$toolsRoot = 'D:\tools'
+$env:DOTNET_ROOT = Join-Path $toolsRoot 'dotnet10'
+$env:PATH = "$env:DOTNET_ROOT;$env:PATH"
 $env:DOTNET_CLI_HOME = Join-Path $toolsRoot 'dotnet-cli'
-$env:NUGET_PACKAGES = Join-Path $toolsRoot 'nuget-packages'
+$env:NUGET_PACKAGES = 'D:\NuGet\packages'
 $env:TEMP = Join-Path $toolsRoot 'dotnet-temp'
 $env:TMP = $env:TEMP
 $env:CelularBuildRoot = Join-Path $toolsRoot 'CelularGR09'

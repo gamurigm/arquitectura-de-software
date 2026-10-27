@@ -1,4 +1,3 @@
-# 04. CLIWEB
+# Cliente web MVC
 
-Área reservada para el entregable correspondiente del examen GR09. Implementación en curso; consultar 05. DOCUMENTACION/AVANCE.md en la raíz del proyecto.
-
+Consume la API de la comercializadora y permite catálogo, ventas y consultas. Para requisitos y ejecución, consulte `../05. DOCUMENTACION/ManualTecnico.md`.

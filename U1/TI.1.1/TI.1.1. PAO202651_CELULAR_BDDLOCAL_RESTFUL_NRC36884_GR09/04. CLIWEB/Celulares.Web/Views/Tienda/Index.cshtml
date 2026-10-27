@@ -1,0 +1,45 @@
+@model PaginaTienda
+<h1>Catálogo y ventas</h1>
+<p>Seleccione un celular y registre una venta en efectivo o con crédito directo.</p>
+@if (Model.Error is not null || TempData["Error"] is not null) { <p class="error" role="alert">@(Model.Error ?? TempData["Error"])</p> }
+@if (TempData["Mensaje"] is not null) { <p class="notice" role="status">@TempData["Mensaje"]</p> }
+<div class="grid">
+    <section class="panel">
+        <h2>Catálogo de celulares</h2>
+        @if (Model.Catalogo.Count == 0) { <p>No hay celulares disponibles.</p> }
+        else {
+            <div class="table-wrap"><table><thead><tr><th>ID</th><th>Celular</th><th>Precio</th><th></th></tr></thead><tbody>
+            @foreach (var celular in Model.Catalogo) {
+                <tr><td>@celular.Id</td><td>@celular.Nombre</td><td>$@celular.Precio.ToString("F2")</td><td>
+                    <form asp-action="Eliminar" method="post" onsubmit="return confirm('¿Desactivar este celular?')">
+                        <input type="hidden" name="id" value="@celular.Id" /><button class="secondary" type="submit">Desactivar</button>
+                    </form></td></tr>
+            }
+            </tbody></table></div>
+        }
+        <h3>Crear o editar</h3>
+        <form asp-action="Guardar" method="post">
+            <label for="catalogoId">ID para editar <small>(vacío para crear)</small></label><input id="catalogoId" name="id" type="number" min="1" />
+            <label for="nombreCelular">Nombre</label><input id="nombreCelular" name="nombre" maxlength="100" required />
+            <label for="precioCelular">Precio de lista</label><input id="precioCelular" name="precio" type="number" min="0.01" max="99999999.99" step="0.01" required />
+            <button type="submit">Guardar celular</button>
+        </form>
+    </section>
+    <section class="panel">
+        <h2>Registrar venta</h2>
+        <p>En efectivo se aplica el 42% de descuento. El crédito admite de 3 a 18 cuotas.</p>
+        <form asp-action="Vender" method="post">
+            <div asp-validation-summary="All" class="error"></div><input asp-for="Venta.IdOperacion" type="hidden" />
+            <label asp-for="Venta.Cedula">Cédula</label><input asp-for="Venta.Cedula" maxlength="100" required />
+            <label asp-for="Venta.NombreCliente">Nombre del comprador</label><input asp-for="Venta.NombreCliente" maxlength="100" required />
+            <label asp-for="Venta.IdCelular">Celular</label><select asp-for="Venta.IdCelular" required><option value="">Seleccione</option>@foreach (var c in Model.Catalogo) { <option value="@c.Id">@c.Nombre — $@c.Precio.ToString("F2")</option> }</select>
+            <label asp-for="Venta.FormaPago">Forma de pago</label><select asp-for="Venta.FormaPago"><option value="EFECTIVO">Efectivo</option><option value="CREDITO_DIRECTO">Crédito directo</option></select>
+            <label asp-for="Venta.NumeroCuotas">Cuotas para crédito</label><input asp-for="Venta.NumeroCuotas" type="number" min="3" max="18" />
+            <button type="submit">Confirmar venta</button>
+        </form>
+    </section>
+    <section class="panel compact">
+        <h2>Consultar factura y amortización</h2>
+        <form asp-action="Factura" method="get"><label for="facturaId">Número de factura</label><input id="facturaId" name="id" type="number" min="1" required /><button type="submit">Consultar</button></form>
+    </section>
+</div>

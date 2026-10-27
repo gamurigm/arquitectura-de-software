@@ -1,4 +1,4 @@
 # 01. CONCEPTUAL
 
-Área reservada para el entregable correspondiente del examen GR09. Implementación en curso; consultar 05. DOCUMENTACION/AVANCE.md en la raíz del proyecto.
+El modelo ER consolidado de la comercializadora está en [ModeloDatos.md](../ModeloDatos.md). Incluye celulares, facturas y referencias al crédito remoto de BanQuito.
 

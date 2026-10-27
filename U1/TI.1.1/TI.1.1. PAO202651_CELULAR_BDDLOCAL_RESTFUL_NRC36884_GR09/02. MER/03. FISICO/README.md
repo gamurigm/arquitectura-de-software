@@ -1,4 +1,4 @@
 # 03. FISICO
 
-Área reservada para el entregable correspondiente del examen GR09. Implementación en curso; consultar 05. DOCUMENTACION/AVANCE.md en la raíz del proyecto.
+El esquema físico de SQL Server está implementado en [01_CrearBases.sql](<../../03. BDD/01_CrearBases.sql>). El diagrama ER y los tipos de columna están en [ModeloDatos.md](../ModeloDatos.md).
 

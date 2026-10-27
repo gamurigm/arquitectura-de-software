@@ -110,25 +110,8 @@ public class ServicioFacturas(IConfiguration configuracion, ServicioBanQuito ban
 
         try
         {
-            var evaluacion = await banco.Evaluar(factura.Cedula, ct);
-            if (!evaluacion.SujetoCredito)
-                throw new ErrorNegocio(string.IsNullOrWhiteSpace(evaluacion.Motivo)
-                    ? "El cliente no califica para crédito." : evaluacion.Motivo, 409);
-            if (evaluacion.CodigoCliente is not int codigoCliente)
-                throw new ErrorNegocio("BanQuito no devolvió el código del cliente.", 502);
-
-            var credito = await banco.Otorgar(new SolicitudCredito
-            {
-                CodigoCliente = codigoCliente,
-                PrecioTelefono = factura.Total,
-                NumeroCuotas = factura.NumeroCuotas ?? throw new ErrorNegocio("Faltan las cuotas del crédito.", 500),
-                ReferenciaVenta = factura.IdOperacion
-            }, ct);
-            if (credito.CodigoCliente != codigoCliente || credito.Monto != factura.Total ||
-                credito.NumeroCuotas != factura.NumeroCuotas)
-                throw new ErrorNegocio("BanQuito devolvió datos de crédito que no coinciden con la factura.", 502);
-
-            return await MarcarAprobada(factura.IdOperacion, codigoCliente, credito.Id, ct);
+            var credito = await banco.OtorgarParaFactura(factura, ct);
+            return await MarcarAprobada(factura.IdOperacion, credito.CodigoCliente, credito.Id, ct);
         }
         catch (ErrorNegocio error) when (error.Estado is >= 400 and < 500)
         {

@@ -10,7 +10,7 @@ Este directorio implementa la comercializadora de celulares: catálogo, facturas
 
 .NET 10, C# 14, ASP.NET Core REST y SQL Server 2025. La API de la tienda usa el puerto 19102. La API BanQuito del proyecto bancario usa el puerto 19101. Consola, WPF, MAUI Android y web MVC (19103) consumen la API de la comercializadora.
 
-`ComercializadoraCelulares` pertenece a este proyecto. `BanQuitoCore` pertenece al proyecto del banco. Para desarrollo local se usa SQL Server 2025 Developer en la instancia predeterminada; SQLEXPRESS se conserva como destino de entrega. Los artefactos .NET y paquetes se guardan bajo `C:\Users\GABI\Documents\ESPE VIII SII2026\tools`.
+`ComercializadoraCelulares` pertenece a este proyecto. `BanQuitoCore` pertenece al proyecto del banco. El destino es SQL Server 2025 Express (`SQLEXPRESS`). Los artefactos se guardan en `D:\tools` y los paquetes en `D:\NuGet\packages`.
 
 ## Entregables de la comercializadora
 
@@ -46,4 +46,4 @@ La API de tienda expone `GET/POST /api/celulares`, `PUT/DELETE /api/celulares/{i
 
 ## Publicación
 
-La autorización de commit y push registrada para el 23 de octubre de 2026 expiró. No hay autorización vigente para publicar cambios. Cuando se solicite publicación, limitarla a los proyectos GR09 modificados y excluir GR01 y el documento original sin seguimiento. Identificar el avance incompleto como tal.
+El usuario autorizó commit y push del avance de CELULAR GR09 para las 18:00 del 26 de octubre de 2026 (America/Guayaquil). Limitar esa publicación a este proyecto y excluir GR01 y el documento original del examen.
