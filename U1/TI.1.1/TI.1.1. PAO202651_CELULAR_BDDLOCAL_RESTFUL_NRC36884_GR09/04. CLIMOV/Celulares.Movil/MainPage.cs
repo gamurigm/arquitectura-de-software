@@ -529,13 +529,15 @@ public sealed class MainPage : Shell
 #if ANDROID
         if (Microsoft.Maui.ApplicationModel.Platform.CurrentActivity?.Window is { } window && AndroidX.Core.View.WindowCompat.GetInsetsController(window, window.DecorView) is { } bars)
         {
-            bars.AppearanceLightStatusBars = temaClaro;
+            var barraClaraSoportada = temaClaro && Android.OS.Build.VERSION.SdkInt < Android.OS.BuildVersionCodes.VanillaIceCream;
+            bars.AppearanceLightStatusBars = barraClaraSoportada;
             bars.AppearanceLightNavigationBars = temaClaro;
-            var barraSistema = Android.Graphics.Color.ParseColor(temaClaro ? "#F3F6FA" : "#080D18");
+            var barraSistema = Android.Graphics.Color.ParseColor(barraClaraSoportada ? "#F3F6FA" : "#080D18");
+            var barraNavegacion = Android.Graphics.Color.ParseColor(temaClaro ? "#F3F6FA" : "#080D18");
             // Keep legacy system-bar colors on Android 14 while retaining API 23 support.
 #pragma warning disable CA1422
             window.SetStatusBarColor(barraSistema);
-            window.SetNavigationBarColor(barraSistema);
+            window.SetNavigationBarColor(barraNavegacion);
 #pragma warning restore CA1422
         }
 #endif
