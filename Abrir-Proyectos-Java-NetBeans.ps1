@@ -98,7 +98,9 @@ $env:MAVEN_OPTS = (@($env:MAVEN_OPTS, $mavenRepositoryArgument) | Where-Object {
 
 # El modelo Maven del editor no lee MAVEN_OPTS. Usa la misma caché para
 # resolver los POM en NetBeans y para ejecutar Maven desde el IDE.
-$mavenSettingsPath = Join-Path $toolsRoot 'netbeans-maven-settings.xml'
+$mavenSettingsPath = Join-Path (Join-Path $env:APPDATA 'NetBeans\31\config') 'maven-settings.xml'
+$mavenSettingsDirectory = Split-Path -Parent $mavenSettingsPath
+New-Item -ItemType Directory -Force -Path $mavenSettingsDirectory, $mavenRepository | Out-Null
 $baseMavenSettings = Join-Path $env:USERPROFILE '.m2\settings.xml'
 $mavenSettings = New-Object System.Xml.XmlDocument
 $mavenSettings.PreserveWhitespace = $true
@@ -125,7 +127,22 @@ if (Test-Path -LiteralPath $mavenPreferencesPath) {
 $defaultOptionsLine = $mavenPreferences | Where-Object { $_ -match '^defaultOptions=' } | Select-Object -First 1
 $defaultOptions = if ($defaultOptionsLine) { $defaultOptionsLine.Substring('defaultOptions='.Length) } else { '--no-transfer-progress' }
 $defaultOptions = [regex]::Replace($defaultOptions, '(?:^|\s)-Dmaven\.repo\.local=(?:"[^"]*"|\S+)', '').Trim()
-$repositoryOption = '-Dmaven.repo.local="' + $mavenRepository.Replace('\', '/') + '"'
+if (-not ('NetBeansPathShortener' -as [type])) {
+    Add-Type -TypeDefinition @'
+using System.Text;
+using System.Runtime.InteropServices;
+public static class NetBeansPathShortener {
+    [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+    public static extern uint GetShortPathName(string longPath, StringBuilder shortPath, uint bufferLength);
+}
+'@
+}
+$shortRepositoryBuffer = New-Object System.Text.StringBuilder 1024
+$shortRepositoryLength = [NetBeansPathShortener]::GetShortPathName($mavenRepository, $shortRepositoryBuffer, [uint32]$shortRepositoryBuffer.Capacity)
+if ($shortRepositoryLength -eq 0 -or $shortRepositoryLength -ge $shortRepositoryBuffer.Capacity) {
+    throw "No se pudo obtener una ruta Maven sin espacios: $mavenRepository"
+}
+$repositoryOption = '-Dmaven.repo.local=' + $shortRepositoryBuffer.ToString().Replace('\', '/')
 $mavenPreferences = @($mavenPreferences | Where-Object { $_ -notmatch '^(defaultOptions|userSettingsXml)=' })
 $mavenPreferences += 'defaultOptions=' + ((@($defaultOptions, $repositoryOption) | Where-Object { $_ }) -join ' ')
 $mavenPreferences += 'userSettingsXml=' + $mavenSettingsPath.Replace('\', '/')
