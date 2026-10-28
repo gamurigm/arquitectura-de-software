@@ -1,6 +1,7 @@
 package ec.edu.monster.vista;
 
 import ec.edu.monster.controlador.ControladorCliente;
+import ec.edu.monster.servicios.MensajesErrorApi;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -23,9 +24,9 @@ import java.awt.Insets;
  */
 public class VentanaInicioSesion extends JFrame {
 
-    private final JTextField urlField = TemaEscritorio.estilo(new JTextField("http://localhost:8080", 18));
-    private final JTextField usuarioField = TemaEscritorio.estilo(new JTextField("Monster", 14));
-    private final JPasswordField claveField = TemaEscritorio.estilo(new JPasswordField("Monster9", 14));
+    private final JTextField urlField = TemaEscritorio.estilo(new JTextField("http://localhost:8080", 28));
+    private final JTextField usuarioField = TemaEscritorio.estilo(new JTextField("Monster", 22));
+    private final JPasswordField claveField = TemaEscritorio.estilo(new JPasswordField("Monster9", 22));
     private final JLabel errorLabel = new JLabel(" ", SwingConstants.CENTER);
     private final JButton loginButton = new JButton("INICIAR SESION");
 
@@ -49,8 +50,10 @@ public class VentanaInicioSesion extends JFrame {
         gbc.insets = new Insets(9, 14, 9, 14);
         gbc.gridx = 0;
         gbc.gridy = 0;
-        gbc.gridwidth = 2;
+        gbc.gridwidth = GridBagConstraints.REMAINDER;
         gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 1.0;
 
         JLabel titulo = new JLabel("Conversor de unidades");
         titulo.setForeground(TemaEscritorio.TEXTO);
@@ -140,8 +143,7 @@ public class VentanaInicioSesion extends JFrame {
                     new VentanaConversion(api, token, usuario, url).setVisible(true);
                     dispose();
                 } catch (Exception ex) {
-                    Throwable causa = ex.getCause() != null ? ex.getCause() : ex;
-                    errorLabel.setText(causa.getMessage());
+                    errorLabel.setText(MensajesErrorApi.paraInicioSesion(ex));
                 } finally {
                     loginButton.setEnabled(true);
                     loginButton.setText("INICIAR SESION");

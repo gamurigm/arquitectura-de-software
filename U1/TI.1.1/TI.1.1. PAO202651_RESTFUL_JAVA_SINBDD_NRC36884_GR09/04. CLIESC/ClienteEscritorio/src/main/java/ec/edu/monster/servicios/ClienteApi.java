@@ -75,13 +75,26 @@ public class ClienteApi {
 
     private JsonNode enviar(HttpRequest solicitudHttp) throws IOException, InterruptedException, ExcepcionApi {
         HttpResponse<String> respuestaHttp = clienteHttp.send(solicitudHttp, HttpResponse.BodyHandlers.ofString());
-        JsonNode json = respuestaHttp.body() == null || respuestaHttp.body().isBlank()
-                ? serializadorJson.createObjectNode()
-                : serializadorJson.readTree(respuestaHttp.body());
-        if (respuestaHttp.statusCode() >= 400) {
-            throw new ExcepcionApi(respuestaHttp.statusCode(), json.path("mensaje").asText("Error HTTP " + respuestaHttp.statusCode()));
+        int codigoHttp = respuestaHttp.statusCode();
+        JsonNode json;
+        try {
+            json = respuestaHttp.body() == null || respuestaHttp.body().isBlank()
+                    ? serializadorJson.createObjectNode()
+                    : serializadorJson.readTree(respuestaHttp.body());
+        } catch (IOException ex) {
+            if (codigoHttp >= 400) {
+                throw new ExcepcionApi(codigoHttp, "El servidor devolvió una respuesta de error no válida.");
+            }
+            throw new IOException("El servidor devolvió una respuesta JSON inválida (HTTP " + codigoHttp + ").", ex);
         }
-        return json;
+        if (codigoHttp >= 400) {
+            String mensaje = json == null ? "" : json.path("mensaje").asText("");
+            if (mensaje.isBlank() && json != null) {
+                mensaje = json.path("error").asText("");
+            }
+            throw new ExcepcionApi(codigoHttp, mensaje);
+        }
+        return json == null ? serializadorJson.createObjectNode() : json;
     }
 
     private static String validarUrlBase(String valor) {

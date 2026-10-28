@@ -1,12 +1,14 @@
 <Project>
   <PropertyGroup>
-    <CelularBuildRoot Condition="'$(CelularBuildRoot)' == ''">D:\tools\CelularGR09</CelularBuildRoot>
-    <CelularPackagesRoot Condition="'$(CelularPackagesRoot)' == ''">D:\NuGet\packages</CelularPackagesRoot>
+    <!-- Keep outputs relative to this checkout so the project works on any drive or PC. -->
+    <CelularBuildRoot Condition="'$(CelularBuildRoot)' == ''">$(MSBuildThisFileDirectory)..\..\..\tools\CelularGR09</CelularBuildRoot>
+    <CelularPackagesRoot Condition="'$(CelularPackagesRoot)' == ''">$(UserProfile)\.nuget\packages</CelularPackagesRoot>
     <LangVersion>14.0</LangVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <BaseIntermediateOutputPath>$(CelularBuildRoot)\obj\$(MSBuildProjectName)\</BaseIntermediateOutputPath>
     <BaseOutputPath>$(CelularBuildRoot)\bin\$(MSBuildProjectName)\</BaseOutputPath>
+    <!-- Optional per-machine override; default to the standard cache in this user's profile. -->
     <RestorePackagesPath>$(CelularPackagesRoot)</RestorePackagesPath>
   </PropertyGroup>
 </Project>

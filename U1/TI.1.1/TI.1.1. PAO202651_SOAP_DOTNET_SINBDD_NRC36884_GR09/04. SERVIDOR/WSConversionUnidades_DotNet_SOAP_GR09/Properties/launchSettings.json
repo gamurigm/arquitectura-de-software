@@ -1,0 +1,13 @@
+{
+  "profiles": {
+    "WSConversionUnidades_DotNet_SOAP_GR09": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "launchUrl": "04.SERVIDOR/WSConversionUnidades_DotNet_SOAP_GR09?wsdl",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "http://127.0.0.1:19081"
+    }
+  }
+}

@@ -1,13 +1,14 @@
 <Project>
   <PropertyGroup>
-    <BankBuildRoot Condition="'$(BankBuildRoot)' == ''">D:\tools\BankGR09</BankBuildRoot>
-    <BankPackagesRoot Condition="'$(BankPackagesRoot)' == ''">D:\NuGet\packages</BankPackagesRoot>
+    <!-- Keep outputs relative to this checkout so the project works on any drive or PC. -->
+    <BankBuildRoot Condition="'$(BankBuildRoot)' == ''">$(MSBuildThisFileDirectory)..\..\..\..\tools\BankGR09</BankBuildRoot>
     <LangVersion>14.0</LangVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <BaseIntermediateOutputPath>$(BankBuildRoot)\obj\$(MSBuildProjectName)\</BaseIntermediateOutputPath>
     <BaseOutputPath>$(BankBuildRoot)\bin\$(MSBuildProjectName)\</BaseOutputPath>
     <DefaultItemExcludes>$(DefaultItemExcludes);obj\**;bin\**</DefaultItemExcludes>
-    <RestorePackagesPath>$(BankPackagesRoot)</RestorePackagesPath>
+    <!-- Optional per-machine override; otherwise NuGet uses its normal user cache. -->
+    <RestorePackagesPath Condition="'$(BankPackagesRoot)' != ''">$(BankPackagesRoot)</RestorePackagesPath>
   </PropertyGroup>
 </Project>

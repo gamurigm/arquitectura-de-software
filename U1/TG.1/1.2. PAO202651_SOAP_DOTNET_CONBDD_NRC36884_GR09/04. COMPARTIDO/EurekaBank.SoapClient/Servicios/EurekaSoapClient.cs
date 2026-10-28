@@ -9,6 +9,7 @@ namespace ec.edu.monster.Servicios;
 public sealed class EurekaSoapClient : IEurekaSoapClient, IDisposable
 {
     private const string EspacioNombres = "http://ws.monster.edu.ec/";
+    private const string PrefijoAccion = EspacioNombres + "WSEureka/";
     private readonly HttpClient _http;
     private readonly bool _disposeHttp;
     private readonly Uri _endpoint;
@@ -125,7 +126,7 @@ public sealed class EurekaSoapClient : IEurekaSoapClient, IDisposable
         {
             Content = new StringContent(contenido.ToString(), Encoding.UTF8, "text/xml")
         };
-        request.Headers.TryAddWithoutValidation("SOAPAction", "\"\"");
+        request.Headers.TryAddWithoutValidation("SOAPAction", $"\"{PrefijoAccion}{operacion}\"");
         using var response = await _http.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
         var xml = await response.Content.ReadAsStringAsync(cancellationToken);
         var documento = LeerXml(xml);
@@ -174,7 +175,7 @@ public sealed class EurekaSoapClient : IEurekaSoapClient, IDisposable
     private static Uri ResolverEndpoint()
     {
         var valor = Environment.GetEnvironmentVariable("EUREKABANK_SOAP_DOTNET_URL");
-        return new Uri(string.IsNullOrWhiteSpace(valor) ? "http://localhost:5080/WSEureka" : valor);
+        return new Uri(string.IsNullOrWhiteSpace(valor) ? "http://localhost:5083/WSEureka" : valor);
     }
 
     public void Dispose()

@@ -1,0 +1,27 @@
+[
+  {
+    "Name": "SOAP - Todos los proyectos",
+    "Projects": [
+      {
+        "Path": "04. SERVIDOR\\WSConversionUnidades_DotNet_SOAP_GR09\\WSConversionUnidades_DotNet_SOAP_GR09.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "04. CLICON\\ClienteConsola\\ClienteConsolaGR09\\ClienteConsolaGR09.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "04. CLIESC\\ClienteEscritorio\\ClienteEscritorioGR09\\ClienteEscritorioGR09.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "04. CLIWEB\\ClienteWeb\\ClienteWebGR09\\ClienteWebGR09.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "04. CLIMOV\\ClienteMovil\\ClienteMovilGR09\\ClienteMovilGR09.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]

@@ -1,0 +1,12 @@
+<Project>
+  <PropertyGroup>
+    <!-- Se puede cambiar la ruta en cada equipo mediante RestBuildRoot. -->
+    <RestBuildRoot Condition="'$(RestBuildRoot)' == '' and Exists('D:\')">D:\tools\GR09-REST-DotNet</RestBuildRoot>
+    <RestBuildRoot Condition="'$(RestBuildRoot)' == ''">$(LOCALAPPDATA)\GR09-REST-DotNet</RestBuildRoot>
+
+    <BaseIntermediateOutputPath>$(RestBuildRoot)\obj\$(MSBuildProjectName)\</BaseIntermediateOutputPath>
+    <BaseOutputPath>$(RestBuildRoot)\bin\$(MSBuildProjectName)\</BaseOutputPath>
+    <DefaultItemExcludes>$(DefaultItemExcludes);obj\**;bin\**</DefaultItemExcludes>
+    <RestorePackagesPath Condition="'$(RestorePackagesPath)' == '' and Exists('D:\')">D:\tools\nuget-packages</RestorePackagesPath>
+  </PropertyGroup>
+</Project>

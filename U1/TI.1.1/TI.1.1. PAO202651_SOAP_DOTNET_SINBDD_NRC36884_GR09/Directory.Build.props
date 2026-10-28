@@ -1,0 +1,12 @@
+<Project>
+  <PropertyGroup>
+    <!-- Se puede cambiar la ruta en cada equipo mediante SoapBuildRoot. -->
+    <SoapBuildRoot Condition="'$(SoapBuildRoot)' == '' and Exists('D:\')">D:\tools\GR09-SOAP-DotNet</SoapBuildRoot>
+    <SoapBuildRoot Condition="'$(SoapBuildRoot)' == ''">$(LOCALAPPDATA)\GR09-SOAP-DotNet</SoapBuildRoot>
+
+    <BaseIntermediateOutputPath>$(SoapBuildRoot)\obj\$(MSBuildProjectName)\</BaseIntermediateOutputPath>
+    <BaseOutputPath>$(SoapBuildRoot)\bin\$(MSBuildProjectName)\</BaseOutputPath>
+    <DefaultItemExcludes>$(DefaultItemExcludes);obj\**;bin\**</DefaultItemExcludes>
+    <RestorePackagesPath Condition="'$(RestorePackagesPath)' == '' and Exists('D:\')">D:\tools\nuget-packages</RestorePackagesPath>
+  </PropertyGroup>
+</Project>

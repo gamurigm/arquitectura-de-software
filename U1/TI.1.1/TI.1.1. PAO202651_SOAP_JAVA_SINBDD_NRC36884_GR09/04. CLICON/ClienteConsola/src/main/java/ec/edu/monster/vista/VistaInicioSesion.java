@@ -12,8 +12,7 @@ public class VistaInicioSesion {
     private ControladorInicioSesion loginControlador;
 
     public void iniciar() {
-        this.mensajeBienvenida();
-        mensajes.mostrarTitulo("=== CONVERSOR DE UNIDADES - GR 9 ===");
+        mensajes.mostrarMensaje("=== GR 9 ===");
 
         try {
             this.loginControlador = new ControladorInicioSesion();
@@ -48,21 +47,6 @@ public class VistaInicioSesion {
                 mensajes.mostrarError(ex.getMessage());
             }
         }
-    }
-    public void mensajeBienvenida() {
-        // Códigos ANSI para darle color en la consola
-        // Bloque de texto (Java 15+) con las barras invertidas ya escapadas (\\)
-        String mensaje = """
-        ╔────────────────────────────────────────────────────────────╗
-        │    ____            _   _       _     ____  ____  ____      │
-        │   / ___|___  _ __ | | | |_ __ (_)   / ___||  _ \\| ___|     │
-        │  | |   / _ \\| '_ \\| | | | '_ \\| |  | |  _ | |_) |___ \\     │
-        │  | |__| (_) | | | | |_| | | | | |  | |_| ||  _ < ___) |    │
-        │   \\____\\___/|_| |_|\\___/|_| |_|_|   \\____||_| \\_\\____/     │
-        ╚────────────────────────────────────────────────────────────╝""";
-
-        // Imprimir con el color aplicado y luego restaurar al color normal
-        mensajes.mostrarBanner(mensaje);
     }
 }
 

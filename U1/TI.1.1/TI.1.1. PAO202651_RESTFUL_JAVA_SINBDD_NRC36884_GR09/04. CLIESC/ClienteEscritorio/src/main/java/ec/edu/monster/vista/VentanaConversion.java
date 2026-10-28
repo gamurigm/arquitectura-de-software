@@ -2,6 +2,7 @@ package ec.edu.monster.vista;
 
 import ec.edu.monster.controlador.ControladorCliente;
 import ec.edu.monster.servicios.ExcepcionApi;
+import ec.edu.monster.servicios.MensajesErrorApi;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -209,8 +210,10 @@ public class VentanaConversion extends JFrame {
                         catalogo = nuevo;
                         actualizarUnidades();
                     }
-                } catch (Exception ignored) {
-                    // se mantiene el catalogo de respaldo
+                } catch (Exception ex) {
+                    estadoLabel.setForeground(TemaEscritorio.ERROR);
+                    estadoLabel.setText("No se cargó el catálogo del servidor; se usan unidades locales. "
+                            + MensajesErrorApi.paraOperacion(ex));
                 }
             }
         }.execute();
@@ -263,7 +266,7 @@ public class VentanaConversion extends JFrame {
                 } catch (Exception ex) {
                     Throwable causa = ex.getCause() != null ? ex.getCause() : ex;
                     estadoLabel.setForeground(TemaEscritorio.ERROR);
-                    estadoLabel.setText(causa.getMessage());
+                    estadoLabel.setText(MensajesErrorApi.paraOperacion(ex));
                     if (causa instanceof ExcepcionApi apiEx && apiEx.esNoAutorizado()) {
                         volverAlLogin("La sesion expiro. Inicie sesion nuevamente.");
                     }

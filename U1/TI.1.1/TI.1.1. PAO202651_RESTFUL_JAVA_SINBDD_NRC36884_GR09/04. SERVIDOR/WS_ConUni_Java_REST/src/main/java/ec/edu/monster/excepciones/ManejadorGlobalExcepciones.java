@@ -2,6 +2,8 @@ package ec.edu.monster.excepciones;
 
 import ec.edu.monster.modelo.dto.RespuestaError;
 import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -19,6 +21,8 @@ import java.util.stream.Collectors;
  */
 @RestControllerAdvice
 public class ManejadorGlobalExcepciones {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ManejadorGlobalExcepciones.class);
 
     @ExceptionHandler(ExcepcionApi.class)
     public ResponseEntity<RespuestaError> manejarApi(ExcepcionApi ex, HttpServletRequest solicitud) {
@@ -47,8 +51,9 @@ public class ManejadorGlobalExcepciones {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<RespuestaError> manejarGeneral(Exception ex, HttpServletRequest solicitud) {
+        LOGGER.error("Error no controlado al procesar {} {}", solicitud.getMethod(), solicitud.getRequestURI(), ex);
         return construir(HttpStatus.INTERNAL_SERVER_ERROR, "Error interno",
-                ex.getMessage() == null ? "Error inesperado en el servidor." : ex.getMessage(), solicitud);
+                "Ocurrió un error interno en el servidor. Intente nuevamente más tarde.", solicitud);
     }
 
     private ResponseEntity<RespuestaError> construir(HttpStatus estadoHttp, String codigoError, String mensaje, HttpServletRequest solicitud) {

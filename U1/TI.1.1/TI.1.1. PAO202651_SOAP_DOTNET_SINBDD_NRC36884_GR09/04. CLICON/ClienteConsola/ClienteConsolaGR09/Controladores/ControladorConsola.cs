@@ -25,12 +25,19 @@ public sealed class ControladorConsola
                     _vista.MostrarError("El usuario no puede quedar vacío.");
                     continue;
                 }
-                _sesion.Iniciar(await _servicio.IniciarSesionAsync(usuario, contrasenia));
+                var token = await _servicio.IniciarSesionAsync(usuario, contrasenia);
+                if (!Guid.TryParse(token, out _))
+                {
+                    throw new InvalidOperationException("El servidor rechazó las credenciales.");
+                }
+
+                _sesion.Iniciar(token);
                 _vista.MostrarMensaje("Sesión iniciada.");
             }
             catch (Exception excepcion)
             {
                 _vista.MostrarError(excepcion.Message);
+                _vista.MostrarMensaje("Inicio de sesión fallido. Vuelve a ingresar tus credenciales.");
             }
         }
 
