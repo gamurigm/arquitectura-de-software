@@ -1,3 +1,9 @@
+-- MIGRACION PARA ESQUEMAS LEGADOS: usar solo antes de aplicar el soporte actual de transferencias.
+-- No ejecutar en una instalacion nueva ni despues del script vigente de creacion del esquema:
+-- este ya crea Transferencias y agrega Movimiento.id_transferencia y su clave foranea.
+-- Este archivo usa CREATE TABLE y ALTER TABLE sin proteccion de repeticion; volver a ejecutarlo
+-- sobre esos objetos provoca errores por tabla, columna o restriccion ya existentes.
+-- Antes de migrar, respaldar la base y validar la asociacion de Credenciales.chr_cliecodigo.
 USE eurekabank_gr09;
 
 SET @ddl = IF(

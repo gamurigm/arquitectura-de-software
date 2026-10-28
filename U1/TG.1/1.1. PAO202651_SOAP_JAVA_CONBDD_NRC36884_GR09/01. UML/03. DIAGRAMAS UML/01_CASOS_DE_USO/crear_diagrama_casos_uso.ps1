@@ -9,47 +9,61 @@ if ([Environment]::Is64BitProcess) {
     throw 'Ejecute este archivo con Windows PowerShell de 32 bits: %WINDIR%\SysWOW64\WindowsPowerShell\v1.0\powershell.exe'
 }
 
-$powerDesignerPath = 'C:\Program Files (x86)\Sybase\PowerDesigner 16'
 $modelPath = Join-Path $PSScriptRoot 'GR09_CasosUso_EurekaBank.oom'
 $imagePath = Join-Path $PSScriptRoot 'GR09_CasosUso_EurekaBank.png'
+if ((Test-Path -LiteralPath $modelPath) -or (Test-Path -LiteralPath $imagePath)) {
+    if (-not $Force) { throw 'Ya existe el modelo o su exportación. Use -Force para actualizarlos.' }
+}
+if (-not (Test-Path -LiteralPath $modelPath -PathType Leaf)) {
+    throw "No se encontró el modelo PowerDesigner existente: $modelPath"
+}
 
-foreach ($path in @($modelPath, $imagePath)) {
-    if (Test-Path -LiteralPath $path) {
-        if (-not $Force) {
-            throw "Ya existe '$path'. Use -Force para regenerar el modelo y la imagen."
-        }
-        Remove-Item -LiteralPath $path -Force
+$caseSpecs = @(
+    @{ Source = 'CU01'; Code = 'CU01'; Name = 'CU-01 Iniciar sesión'; Description = 'Valida credenciales y crea un token temporal asociado al cliente.'; Pre = 'Servicio SOAP y autenticación disponibles; usuario vinculado a un cliente.'; Post = 'El cliente conserva un token vigente o informa el rechazo.' },
+    @{ Source = $null; Code = 'CU02'; Name = 'CU-02 Consultar cuentas'; Description = 'Presenta las cuentas activas del cliente autenticado.'; Pre = 'El usuario tiene una sesión vigente.'; Post = 'Se muestran las cuentas activas del cliente o una lista vacía.' },
+    @{ Source = 'CU02'; Code = 'CU03'; Name = 'CU-03 Consultar movimientos'; Description = 'Consulta el historial de una cuenta activa del cliente autenticado.'; Pre = 'Existe una sesión vigente y la cuenta pertenece al cliente.'; Post = 'Se muestran movimientos en orden descendente o una lista vacía.' },
+    @{ Source = 'CU03'; Code = 'CU04'; Name = 'CU-04 Registrar depósito'; Description = 'Acredita un importe válido y registra el movimiento de depósito en una transacción.'; Pre = 'Token vigente; cuenta activa del cliente; importe válido.'; Post = 'Saldo y movimiento quedan confirmados juntos o se revierte la operación.' },
+    @{ Source = $null; Code = 'CU05'; Name = 'CU-05 Transferir fondos'; Description = 'Debita origen y acredita destino de forma atómica, con clave de idempotencia.'; Pre = 'Token vigente; cuentas activas, misma moneda; origen del cliente y con fondos.'; Post = 'Dos saldos y movimientos quedan confirmados juntos; una repetición idéntica no duplica.' },
+    @{ Source = 'CU04'; Code = 'CU06'; Name = 'CU-06 Cerrar sesión'; Description = 'Revoca en el servidor el token utilizado por el cliente.'; Pre = 'El cliente conserva un token de sesión.'; Post = 'La sesión se elimina y el cliente vuelve al ingreso o termina.' },
+    @{ Source = 'CU05'; Code = 'CU07'; Name = 'CU-07 Validar credenciales'; Description = 'Comprueba entradas, hash PBKDF2 y asociación del usuario con un cliente.'; Pre = 'Se recibieron usuario y contraseña.'; Post = 'Las credenciales se aceptan o rechazan; no se emite sesión si no hay cliente asociado.' },
+    @{ Source = 'CU06'; Code = 'CU08'; Name = 'CU-08 Validar cuenta'; Description = 'Comprueba cuenta, estado ACTIVO y titularidad según la operación.'; Pre = 'Se recibió un identificador de cuenta.'; Post = 'La cuenta cumple las reglas de acceso y estado.' },
+    @{ Source = 'CU07'; Code = 'CU09'; Name = 'CU-09 Validar datos del depósito'; Description = 'Exige importe positivo, exacto a centavos y precisión admitida.'; Pre = 'Se recibió un importe de depósito.'; Post = 'Los datos cumplen las reglas del servicio.' },
+    @{ Source = 'CU08'; Code = 'CU10'; Name = 'CU-10 Aplicar depósito'; Description = 'Actualiza saldo y contador, inserta movimiento tipo 003 y confirma la transacción.'; Pre = 'La cuenta propia está activa y el importe es válido.'; Post = 'El depósito queda confirmado por completo o se revierte.' }
+)
+
+function Find-UseCase([string] $code) {
+    foreach ($item in $model.UseCases) {
+        if ($item.Code -eq $code) { return $item }
     }
+    return $null
 }
 
-Add-Type -Path (Join-Path $powerDesignerPath 'Interop.PdCommon.dll')
-$powerDesigner = New-Object -ComObject PowerDesigner.Application
-$powerDesigner.ShowMode = $false
-$model = $powerDesigner.CreateModel(403775584, '|Diagram=UseCaseDiagram', 0)
-$model.Name = 'EurekaBank SOAP Java - Casos de uso - Grupo 09'
-$model.Code = 'EUREKABANK_CASOS_USO_GR09'
-$model.Description = 'Modelo UML de casos de uso basado en el servicio EurekaBank SOAP Java con MySQL.'
-$diagram = $model.UseCaseDiagrams.Item(0)
-$diagram.Name = 'Diagrama de casos de uso - EurekaBank'
-$diagram.Code = 'CU_EUREKABANK_GR09'
-$diagram.Comment = 'Operaciones incluidas en la línea base del grupo 09.'
-
-function Add-DiagramObject($object) {
-    $diagram.AttachObject($object) | Out-Null
+function New-UseCase([hashtable] $spec) {
+    $item = $model.UseCases.CreateNew()
+    $item.Code = $spec.Code
+    $item.Name = $spec.Name
+    $item.Description = $spec.Description
+    $item.PreCondition = $spec.Pre
+    $item.PostCondition = $spec.Post
+    $diagram.AttachObject($item) | Out-Null
+    return $item
 }
 
-function New-UseCase([string] $code, [string] $name, [string] $description, [string] $pre, [string] $post) {
-    $useCase = $model.UseCases.CreateNew()
-    $useCase.Code = $code
-    $useCase.Name = $name
-    $useCase.Description = $description
-    $useCase.PreCondition = $pre
-    $useCase.PostCondition = $post
-    Add-DiagramObject $useCase
-    return $useCase
+function Set-UseCase($item, [hashtable] $spec) {
+    $item.Code = $spec.Code
+    $item.Name = $spec.Name
+    $item.Description = $spec.Description
+    $item.PreCondition = $spec.Pre
+    $item.PostCondition = $spec.Post
 }
 
-function New-Association($from, $to, [string] $name) {
+function Ensure-Association($from, $to, [string] $name) {
+    foreach ($link in $model.UseCaseAssociations) {
+        if ($link.Object1.Code -eq $from.Code -and $link.Object2.Code -eq $to.Code) {
+            $link.Name = $name
+            return
+        }
+    }
     $link = $model.UseCaseAssociations.CreateNew()
     $link.Name = $name
     $link.Object1 = $from
@@ -57,7 +71,13 @@ function New-Association($from, $to, [string] $name) {
     $diagram.AttachLinkObject($link, $from, $to) | Out-Null
 }
 
-function New-Include($from, $to, [string] $name) {
+function Ensure-Include($from, $to, [string] $name) {
+    foreach ($link in $model.Dependencies) {
+        if ($link.Object1.Code -eq $from.Code -and $link.Object2.Code -eq $to.Code -and $link.Stereotype -eq 'include') {
+            $link.Name = $name
+            return
+        }
+    }
     $link = $model.Dependencies.CreateNew()
     $link.Name = $name
     $link.Object1 = $from
@@ -66,41 +86,101 @@ function New-Include($from, $to, [string] $name) {
     $diagram.AttachLinkObject($link, $from, $to) | Out-Null
 }
 
-$actor = $model.Actors.CreateNew()
-$actor.Code = 'USUARIO_AUTORIZADO'
-$actor.Name = 'Usuario autorizado'
-$actor.Description = 'Empleado u operador que utiliza el cliente EurekaBank.'
-Add-DiagramObject $actor
+$powerDesigner = New-Object -ComObject PowerDesigner.Application
+$powerDesigner.ShowMode = $false
+$model = $powerDesigner.OpenModel($modelPath, 0)
+$diagram = $model.UseCaseDiagrams.Item(0)
+$diagram.Name = 'Diagrama de casos de uso - EurekaBank'
+$diagram.Code = 'CU_EUREKABANK_GR09'
+$diagram.Comment = 'Línea base con seis objetivos de usuario, token temporal y transferencia idempotente.'
+$actor = $model.Actors.Item(0)
+$actor.Name = 'Usuario'
+$actor.Description = 'Persona autenticada que utiliza cualquiera de los cuatro clientes EurekaBank.'
 
-$caseLogin = New-UseCase 'CU01' 'CU-01 Iniciar sesión' 'Valida las credenciales y habilita el flujo local del cliente.' 'Servicio SOAP y base de datos disponibles.' 'El cliente presenta el menú si la operación devuelve 1; no se crea una sesión remota.'
-$caseMovements = New-UseCase 'CU02' 'CU-02 Consultar movimientos' 'Consulta y presenta los movimientos asociados a una cuenta.' 'El usuario llegó al menú del cliente.' 'Se muestran movimientos ordenados o una lista vacía.'
-$caseDeposit = New-UseCase 'CU03' 'CU-03 Registrar depósito' 'Acredita un importe en una cuenta activa y registra el movimiento.' 'El usuario llegó al menú; la cuenta está activa.' 'Saldo y movimiento quedan confirmados en una transacción.'
-$caseLogout = New-UseCase 'CU04' 'CU-04 Cerrar sesión local' 'Sale del menú y retorna al ingreso o finaliza el cliente.' 'El usuario está en el menú local.' 'El cliente elimina su estado local; no se llama al servidor.'
+$versioned = $model.Description -like '*USE_CASES_V2*'
+if ($versioned) {
+    $oldSession = Find-UseCase 'CU08'
+    if ($null -ne $oldSession -and $oldSession.Name -eq 'CU-08 Validar sesión') {
+        $oldAccount = Find-UseCase 'CU09'
+        $oldDepositData = Find-UseCase 'CU10'
+        $oldApplyDeposit = Find-UseCase 'CU11'
+        foreach ($link in @($model.Dependencies)) {
+            if ($link.Object1.Code -eq 'CU08' -or $link.Object2.Code -eq 'CU08') { $link.Delete() }
+        }
+        $oldAccount.Code = 'TMP_CU09'
+        $oldDepositData.Code = 'TMP_CU10'
+        $oldApplyDeposit.Code = 'TMP_CU11'
+        $oldSession.Delete()
+        $oldAccount.Code = 'CU08'
+        $oldDepositData.Code = 'CU09'
+        $oldApplyDeposit.Code = 'CU10'
+    }
+}
+$bySource = @{}
+if (-not $versioned) {
+    foreach ($item in $model.UseCases) { $bySource[$item.Code] = $item }
+    foreach ($spec in $caseSpecs | Where-Object { $null -ne $_.Source }) {
+        if (-not $bySource.ContainsKey($spec.Source)) { throw "Falta el caso existente $($spec.Source); no se modificó el modelo." }
+    }
+    foreach ($item in $model.UseCases) { $item.Code = ('TMP_' + $item.Code) }
+    foreach ($spec in $caseSpecs | Where-Object { $null -ne $_.Source }) {
+        Set-UseCase $bySource[$spec.Source] $spec
+    }
+}
+foreach ($spec in $caseSpecs) {
+    $item = Find-UseCase $spec.Code
+    if ($null -eq $item) {
+        $item = New-UseCase $spec
+    }
+    else {
+        Set-UseCase $item $spec
+    }
+}
+$model.Description = 'Modelo UML de casos de uso de EurekaBank SOAP Java, Grupo 09. USE_CASES_V2'
+$caseByCode = @{}
+foreach ($item in $model.UseCases) { $caseByCode[$item.Code] = $item }
 
-$caseCredentials = New-UseCase 'CU05' 'CU-05 Validar credenciales' 'Comprueba las entradas y verifica el hash almacenado.' 'Se recibieron usuario y contraseña.' 'La credencial se acepta o se rechaza.'
-$caseAccount = New-UseCase 'CU06' 'CU-06 Validar cuenta' 'Rechaza una cuenta vacía o de más de ocho caracteres.' 'Se recibió un identificador de cuenta.' 'La cuenta puede consultarse o procesarse.'
-$caseAmount = New-UseCase 'CU07' 'CU-07 Validar datos del depósito' 'Exige importe positivo, exacto a centavos y de precisión admitida.' 'Se recibió un importe.' 'Los datos cumplen las reglas del servicio.'
-$caseApply = New-UseCase 'CU08' 'CU-08 Aplicar depósito' 'Actualiza saldo y contador, inserta el movimiento y confirma la transacción.' 'La cuenta existe y está activa.' 'El depósito se confirma por completo o se revierte.'
+$primaryNames = @{
+    'CU01' = 'Usuario - iniciar sesión'
+    'CU02' = 'Usuario - consultar cuentas'
+    'CU03' = 'Usuario - consultar movimientos'
+    'CU04' = 'Usuario - registrar depósito'
+    'CU05' = 'Usuario - transferir fondos'
+    'CU06' = 'Usuario - cerrar sesión'
+}
+foreach ($code in $primaryNames.Keys) { Ensure-Association $actor $caseByCode[$code] $primaryNames[$code] }
 
-New-Association $actor $caseLogin 'Usuario - iniciar sesión'
-New-Association $actor $caseMovements 'Usuario - consultar movimientos'
-New-Association $actor $caseDeposit 'Usuario - registrar depósito'
-New-Association $actor $caseLogout 'Usuario - cerrar sesión local'
-New-Include $caseLogin $caseCredentials 'Iniciar sesión incluye validar credenciales'
-New-Include $caseMovements $caseAccount 'Consultar incluye validar cuenta'
-New-Include $caseDeposit $caseAccount 'Depositar incluye validar cuenta'
-New-Include $caseDeposit $caseAmount 'Depositar incluye validar importe'
-New-Include $caseDeposit $caseApply 'Depositar incluye aplicar depósito'
+$includeSpecs = @(
+    @{ From = 'CU01'; To = 'CU07'; Name = 'Iniciar sesión incluye validar credenciales' },
+    @{ From = 'CU03'; To = 'CU08'; Name = 'Consultar movimientos incluye validar cuenta' },
+    @{ From = 'CU04'; To = 'CU08'; Name = 'Depositar incluye validar cuenta' },
+    @{ From = 'CU04'; To = 'CU09'; Name = 'Depositar incluye validar importe' },
+    @{ From = 'CU04'; To = 'CU10'; Name = 'Depositar incluye aplicar depósito' },
+    @{ From = 'CU05'; To = 'CU08'; Name = 'Transferir incluye validar cuentas' }
+)
+$desiredIncludePairs = @{}
+foreach ($spec in $includeSpecs) { $desiredIncludePairs[($spec.From + '|' + $spec.To)] = $true }
+foreach ($link in @($model.Dependencies)) {
+    if ($link.Stereotype -eq 'include') {
+        $pair = $link.Object1.Code + '|' + $link.Object2.Code
+        if (-not $desiredIncludePairs.ContainsKey($pair)) { $link.Delete() }
+    }
+}
+foreach ($spec in $includeSpecs) {
+    Ensure-Include $caseByCode[$spec.From] $caseByCode[$spec.To] $spec.Name
+}
 
 $diagram.AutoLayout() | Out-Null
 $model.Save($modelPath, $false, '')
-
+$model.Close($false)
+$null = [Runtime.InteropServices.Marshal]::ReleaseComObject($model)
+# Keep the active PowerDesigner automation process available to the layout script.
 $layoutScript = Join-Path $PSScriptRoot 'ajustar_diagrama_casos_uso.vbs'
 $cscript = Join-Path $env:WINDIR 'SysWOW64\cscript.exe'
 & $cscript //NoLogo $layoutScript $modelPath $imagePath
 if ($LASTEXITCODE -ne 0) {
     throw "El ajuste o la exportación del diagrama en PowerDesigner falló con código $LASTEXITCODE."
 }
-
-Write-Output "Modelo PowerDesigner: $modelPath"
+$null = [Runtime.InteropServices.Marshal]::ReleaseComObject($powerDesigner)
+Write-Output "Modelo PowerDesigner actualizado sin reconstruir su identidad: $modelPath"
 Write-Output "Diagrama exportado: $imagePath"

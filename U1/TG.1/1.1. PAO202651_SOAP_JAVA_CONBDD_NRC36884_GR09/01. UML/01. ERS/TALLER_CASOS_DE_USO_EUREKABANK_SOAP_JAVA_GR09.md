@@ -2,13 +2,9 @@
 title: "Especificación de casos de uso"
 subtitle: "EurekaBank SOAP Java con base de datos — Grupo 09"
 author: "Grupo 09"
-date: "21 de octubre de 2026"
+date: "28 de octubre de 2026"
 lang: es
 ---
-
-```{=openxml}
-<w:p><w:r><w:br w:type="page"/></w:r></w:p>
-```
 
 # Control del documento
 
@@ -16,50 +12,51 @@ lang: es
 |---|---|
 | Proyecto | EurekaBank SOAP Java con base de datos |
 | Grupo | 09 |
-| Versión | 1.0 |
-| Estado | Línea base documental del código del proyecto |
-| Documento relacionado | `ERS_EUREKABANK_SOAP_JAVA_GR09.docx` |
+| Versión | 2.1 |
+| Estado | Especificación alineada al código; aceptación formal por verificar |
+| Documento relacionado | ERS_EUREKABANK_SOAP_JAVA_GR09 |
 
 # Introducción
 
-Este documento describe los objetivos del usuario y los flujos funcionales de EurekaBank. El modelo se limita a las operaciones existentes en el servidor SOAP y a los flujos de consola y escritorio observados en el repositorio. Se conserva la organización visual de la documentación de referencia, adaptando actores, operaciones y restricciones al sistema bancario.
+Este documento describe los objetivos de los usuarios y sus flujos en EurekaBank. El sistema cuenta con un servidor Java SOAP, persistencia MySQL y cuatro clientes: consola, escritorio, Android y web. Los clientes consumen las mismas operaciones; el servidor valida la sesión y concentra las reglas de negocio y las transacciones bancarias.
 
 # Alcance y actor
 
-El sistema de casos de uso incluye autenticación, consulta de movimientos, registro de depósitos y cierre de la sesión local del cliente. El actor principal es el **Usuario autorizado**, quien opera la solución desde el cliente de consola o el cliente de escritorio.
+El modelo contempla iniciar sesión, consultar cuentas, consultar movimientos, registrar depósitos, transferir fondos y cerrar la sesión remota. El actor principal es Usuario, quien opera cualquiera de los cuatro clientes.
 
-La base de datos, el servidor Payara y SOAP son componentes de la solución y no actores humanos. La figura representa objetivos funcionales; no afirma que cada operación de consulta o depósito tenga autorización de sesión aplicada por el servidor.
+Payara, SOAP y MySQL son componentes técnicos, no actores humanos. Los casos protegidos requieren un token vigente. La operación login, publicada por compatibilidad, valida credenciales sin crear token y no habilita operaciones bancarias.
 
 # Diagrama general de casos de uso
 
-![Diagrama de casos de uso EurekaBank, grupo 09](<../03. DIAGRAMAS UML/01_CASOS_DE_USO/GR09_CasosUso_EurekaBank.png>){width=6.6in}
+![Ilustración 1. Diagrama de casos de uso EurekaBank, grupo 09](<../03. DIAGRAMAS UML/01_CASOS_DE_USO/GR09_CasosUso_EurekaBank.png>){width=6.6in}
 
 ## Relaciones del modelo
 
-- El actor Usuario autorizado participa en los cuatro objetivos principales.
-- `<<include>>` apunta desde el caso principal hacia el comportamiento incluido, obligatorio en ese flujo.
-- CU-01 incluye CU-05 Validar credenciales.
-- CU-02 y CU-03 incluyen CU-06 Validar cuenta.
-- CU-03 incluye CU-07 Validar datos del depósito y CU-08 Aplicar depósito.
-- No se modelan relaciones `<<extend>>`: los rechazos, errores de conexión y resultados vacíos son flujos alternativos de los casos principales, no objetivos opcionales independientes.
-- El cierre de sesión es local al cliente y no genera una operación SOAP.
+- El actor Usuario participa en los seis objetivos principales.
+- <<include>> apunta desde el caso que requiere el comportamiento hacia el caso incluido.
+- CU-01 incluye CU-07 Validar credenciales.
+- CU-02 a CU-06 exigen un token vigente como precondición; el servidor verifica ese token en cada operación protegida.
+- CU-03 incluye CU-08 Validar cuenta.
+- CU-04 incluye CU-08 Validar cuenta, CU-09 Validar datos del depósito y CU-10 Aplicar depósito.
+- CU-05 incluye CU-08 Validar cuenta. La validación de solicitud, idempotencia y transacción también se especifican en el flujo de transferencia.
+- CU-06 exige token vigente, lo revoca en el servidor y elimina la copia local del cliente.
 
 ## Resumen de casos
 
 | ID | Caso de uso | Objetivo |
 |---|---|---|
-| CU-01 | Iniciar sesión | Validar las credenciales del usuario y permitir que el flujo del cliente continúe. |
-| CU-02 | Consultar movimientos | Presentar los movimientos de una cuenta consultada. |
-| CU-03 | Registrar depósito | Acreditar un importe en una cuenta activa y registrar el movimiento. |
-| CU-04 | Cerrar sesión local | Salir del menú y retornar al formulario de ingreso o finalizar el cliente. |
-| CU-05 | Validar credenciales | Comprobar las credenciales almacenadas para el usuario ingresado. |
-| CU-06 | Validar cuenta | Comprobar que el identificador recibido no esté vacío y no exceda ocho caracteres. |
-| CU-07 | Validar datos del depósito | Comprobar que el importe sea positivo, exacto a centavos y de precisión admitida. |
-| CU-08 | Aplicar depósito | Actualizar saldo y contador, insertar movimiento y confirmar de forma atómica. |
+| CU-01 | Iniciar sesión | Validar credenciales y obtener un token temporal. |
+| CU-02 | Consultar cuentas | Presentar las cuentas activas asociadas al cliente autenticado. |
+| CU-03 | Consultar movimientos | Consultar y mostrar el historial de una cuenta propia activa. |
+| CU-04 | Registrar depósito | Acreditar un importe válido y registrar el movimiento en una transacción. |
+| CU-05 | Transferir fondos | Debitar origen y acreditar destino de forma atómica e idempotente. |
+| CU-06 | Cerrar sesión | Revocar el token y finalizar el acceso del cliente. |
+| CU-07 | Validar credenciales | Verificar contraseña y asociación del usuario con un cliente. |
+| CU-08 | Validar cuenta | Comprobar formato, estado activo y restricciones de titularidad. |
+| CU-09 | Validar datos del depósito | Exigir importe positivo, exacto a centavos y dentro de precisión. |
+| CU-10 | Aplicar depósito | Actualizar saldo y registrar movimiento en una sola transacción. |
 
-```{=openxml}
-<w:p><w:r><w:br w:type="page"/></w:r></w:p>
-```
+\newpage
 
 # Especificaciones detalladas
 
@@ -67,134 +64,180 @@ La base de datos, el servidor Payara y SOAP son componentes de la solución y no
 
 | Campo | Descripción |
 |---|---|
-| Actor principal | Usuario autorizado |
-| Propósito | Permitir que el usuario inicie el flujo del cliente con sus credenciales. |
-| Disparador | El usuario abre el cliente e indica que desea ingresar. |
-| Precondiciones | El servicio SOAP está publicado y la base de datos de autenticación está disponible. El usuario dispone de credenciales registradas. |
-| Resultado exitoso | El cliente acepta la respuesta `1` y muestra el menú de operaciones. No se crea una sesión remota ni un token. |
+| Actor principal | Usuario |
+| Propósito | Obtener una sesión remota asociada a la identidad del usuario. |
+| Disparador | El usuario abre un cliente e ingresa sus credenciales. |
+| Precondiciones | El endpoint SOAP y la base de autenticación están disponibles; existe un código de cliente asociado al usuario. |
+| Resultado exitoso | crearSesion devuelve un token opaco y el cliente muestra el menú. |
 
 ### Flujo principal
 
-1. El cliente solicita el nombre de usuario y la contraseña.
+1. El cliente solicita usuario y contraseña.
 2. El usuario ingresa sus credenciales.
-3. El cliente invoca la operación SOAP `login(usuario, contrasena)`.
-4. El servicio valida los parámetros y consulta la credencial asociada al usuario.
-5. El servidor verifica el hash PBKDF2-HMAC-SHA-256 de la contraseña.
-6. El servicio responde `1` si la validación es correcta.
-7. El cliente presenta el menú de consulta, depósito y salida.
+3. El adaptador SOAP invoca crearSesion.
+4. El servidor valida límites, consulta Credenciales y verifica el hash PBKDF2.
+5. El servidor obtiene el código de cliente y crea una sesión temporal de 20 minutos.
+6. El cliente conserva el token y muestra el menú de operaciones.
 
 ### Flujos alternativos y excepciones
 
-- **A1 — Credenciales incorrectas:** el servicio responde `-1`; el cliente informa que el usuario o la contraseña son incorrectos y no habilita el menú.
-- **A2 — Datos faltantes o fuera de límites:** la validación rechaza el usuario vacío, usuario de más de 30 caracteres, contraseña vacía o contraseña de más de 1024 caracteres.
-- **A3 — Servicio o base de datos indisponible:** el servicio no puede completar la operación; el cliente muestra un mensaje de comunicación o autenticación fallida y permanece en el ingreso.
+- **A1 — Credenciales incorrectas o usuario sin cliente asociado:** crearSesion devuelve null; el cliente muestra el rechazo y no habilita operaciones.
+- **A2 — Datos fuera de límites:** el servicio rechaza usuario vacío o de más de 30 caracteres, contraseña vacía o de más de 1024 caracteres.
+- **A3 — Servicio o base de datos indisponible:** el cliente informa el fallo sin crear una sesión.
+- **A4 — Operación login de compatibilidad:** devuelve 1 o -1, pero no crea token ni autoriza las operaciones protegidas.
 
-### Variación por cliente
-
-El cliente de escritorio abre la pantalla principal luego del resultado positivo. El cliente de consola autentica al usuario antes de entrar al ciclo del menú; al salir del menú finaliza su flujo.
-
-## CU-02 — Consultar movimientos
+## CU-02 — Consultar cuentas
 
 | Campo | Descripción |
 |---|---|
-| Actor principal | Usuario autorizado |
-| Propósito | Consultar los movimientos registrados para una cuenta. |
-| Disparador | El usuario selecciona “Consultar movimientos”. |
-| Precondiciones | El usuario llegó al menú del cliente y el servicio SOAP está disponible. El identificador de cuenta no está vacío y no excede ocho caracteres. |
-| Resultado exitoso | El cliente muestra los movimientos recibidos, ordenados por número descendente, con cuenta, número, fecha, tipo, acción e importe. |
+| Actor principal | Usuario |
+| Propósito | Mostrar las cuentas activas vinculadas al cliente autenticado. |
+| Disparador | El usuario abre la vista de cuentas o el menú inicial carga las cuentas. |
+| Precondiciones | Existe un token vigente. |
+| Resultado exitoso | El cliente muestra número, moneda y saldo de las cuentas devueltas. |
 
 ### Flujo principal
 
-1. El cliente solicita el número de cuenta.
-2. El usuario ingresa la cuenta.
-3. El cliente invoca `traerMovimientos(cuenta)`.
-4. El servicio valida el identificador y consulta la información de movimientos y sus tipos.
-5. El servidor devuelve la lista ordenada por número de movimiento descendente.
-6. El cliente presenta los datos de cada movimiento.
+1. El cliente envía traerCuentas con el token.
+2. El servidor valida la sesión y obtiene el código de cliente asociado.
+3. El DAO consulta las cuentas ACTIVO de ese cliente y las ordena por código.
+4. El cliente presenta la lista y permite seleccionar una cuenta para consultar movimientos u operar.
 
 ### Flujos alternativos y excepciones
 
-- **A1 — No hay movimientos:** el servicio devuelve una lista vacía; el cliente informa que no hay movimientos para la consulta. La respuesta no permite distinguir una cuenta inexistente de una cuenta sin movimientos.
-- **A2 — Cuenta vacía o de más de ocho caracteres:** el servicio no realiza la consulta y devuelve una lista vacía. La interfaz Swing además limita el ingreso a entre uno y ocho dígitos; el cliente de consola solicita una cadena y delega al servicio las validaciones comunes.
-- **A3 — Error de base de datos o SOAP:** el servicio comunica el error como excepción SOAP; el cliente informa que no se pudo completar la consulta.
+- **A1 — Token inválido, ausente o caducado:** el servicio rechaza la solicitud; el cliente retorna al ingreso.
+- **A2 — El cliente no tiene cuentas activas:** se devuelve una lista vacía.
+- **A3 — Error de base de datos o SOAP:** el cliente informa que no pudo cargar las cuentas.
 
-### Datos de salida
-
-Cada elemento contiene cuenta, número de movimiento, fecha, descripción del tipo, acción e importe. Los tipos y acciones se obtienen de las tablas `Movimiento` y `TipoMovimiento`.
-
-```{=openxml}
-<w:p><w:r><w:br w:type="page"/></w:r></w:p>
-```
-
-## CU-03 — Registrar depósito
+## CU-03 — Consultar movimientos
 
 | Campo | Descripción |
 |---|---|
-| Actor principal | Usuario autorizado |
-| Propósito | Acreditar un importe en una cuenta activa y registrar el movimiento correspondiente. |
-| Disparador | El usuario selecciona “Registrar depósito”. |
-| Precondiciones | El usuario llegó al menú del cliente; la cuenta existe y está activa; el servicio y la base de datos están disponibles. |
-| Resultado exitoso | El saldo y el contador de movimientos se actualizan y se registra un movimiento tipo depósito en una sola transacción. El servicio responde `1`. |
+| Actor principal | Usuario |
+| Propósito | Presentar los movimientos de una cuenta activa del cliente autenticado. |
+| Disparador | El usuario selecciona una cuenta y solicita su historial. |
+| Precondiciones | Hay token vigente; la cuenta pertenece al cliente y está activa. |
+| Resultado exitoso | El cliente muestra movimientos por número descendente, con cuenta, número, fecha, tipo, acción e importe. |
 
 ### Flujo principal
 
-1. El cliente solicita la cuenta y el importe.
-2. El usuario ingresa ambos datos.
-3. El cliente valida los datos que corresponden a su interfaz y llama `regDeposito(cuenta, importe)`.
-4. El servicio valida la cuenta y normaliza el importe a dos decimales sin redondear valores que excedan los centavos.
-5. El DAO inicia una transacción y bloquea la fila de la cuenta activa.
-6. El DAO calcula el siguiente número de movimiento, suma el importe al saldo y aumenta el contador.
-7. El DAO inserta el movimiento de depósito con tipo `003` y empleado técnico `0001`.
-8. El DAO confirma la transacción.
-9. El servicio devuelve `1` y el cliente informa que el depósito se registró.
+1. El usuario selecciona una cuenta.
+2. El cliente invoca traerMovimientos con token y cuenta.
+3. El servidor valida la sesión y las restricciones del identificador.
+4. El DAO filtra por cuenta, cliente y estado ACTIVO.
+5. El cliente presenta los resultados.
 
 ### Flujos alternativos y excepciones
 
-- **A1 — Cuenta o importe inválido:** una cuenta vacía, de más de ocho caracteres, un importe nulo, cero, negativo, con más de dos decimales no reducibles exactamente o con precisión superior a doce dígitos no se procesa. El servicio responde `-1`.
-- **A2 — Cuenta inexistente o inactiva:** el DAO no obtiene una cuenta activa; la transacción se revierte y el servicio rechaza la solicitud.
-- **A3 — Error al actualizar saldo o insertar movimiento:** el DAO revierte la transacción. No debe quedar actualizado el saldo sin el movimiento correspondiente.
-- **A4 — Resultado de red incierto:** el cliente puede no recibir la respuesta aunque el servidor haya confirmado el depósito. El cliente de escritorio indica consultar movimientos antes de repetir la operación; no se reintenta automáticamente.
+- **A1 — No hay movimientos o la cuenta no es accesible:** se devuelve una lista vacía.
+- **A2 — Cuenta vacía o de más de ocho caracteres:** el servicio no consulta y devuelve una lista vacía.
+- **A3 — Token inválido o vencido:** el servicio comunica un error SOAP y el cliente vuelve al ingreso.
+- **A4 — Error de base de datos o SOAP:** el cliente informa que no pudo completar la consulta.
 
-### Variación por cliente
-
-El escritorio limita la cuenta a ocho dígitos, admite importes de `0,01` a `9.999.999.999,99` y deshabilita el envío mientras espera. La consola interpreta el importe como decimal; el servicio aplica las reglas finales.
-
-## CU-04 — Cerrar sesión local
+## CU-04 — Registrar depósito
 
 | Campo | Descripción |
 |---|---|
-| Actor principal | Usuario autorizado |
-| Propósito | Salir del menú para finalizar el uso local del cliente. |
-| Disparador | El usuario selecciona “Cerrar sesión” o salir. |
-| Precondiciones | El usuario está en el menú local del cliente. |
-| Resultado | El cliente vuelve a la pantalla de ingreso o termina su ejecución. El servidor no recibe una petición de cierre de sesión. |
+| Actor principal | Usuario |
+| Propósito | Acreditar dinero en una cuenta activa propia y registrar el movimiento. |
+| Disparador | El usuario selecciona registrar depósito. |
+| Precondiciones | Token vigente; cuenta del cliente en estado ACTIVO. |
+| Resultado exitoso | Se actualizan saldo, contador y movimiento tipo 003 en una transacción; el servicio responde 1. |
 
 ### Flujo principal
 
-1. El usuario selecciona la opción de salida.
-2. El cliente limpia su estado local de autenticación, cuando ese estado se mantiene en memoria.
-3. El cliente de escritorio retorna a la pantalla de ingreso; el cliente de consola termina el ciclo del menú y su ejecución.
+1. El cliente solicita cuenta e importe.
+2. El usuario ingresa y revisa los datos.
+3. El adaptador invoca regDeposito con token, cuenta e importe.
+4. El servicio valida token, cuenta e importe positivo, exacto a dos decimales y de hasta doce dígitos.
+5. El DAO bloquea la cuenta del cliente y determina el siguiente número de movimiento.
+6. El DAO actualiza saldo y contador, inserta el movimiento tipo 003 con empleado fijo 0001 y confirma la transacción.
+7. El cliente presenta el resultado confirmado.
+
+### Flujos alternativos y excepciones
+
+- **A1 — Cuenta o importe inválido:** el servicio rechaza con -1 sin actualizar la cuenta.
+- **A2 — Cuenta inexistente, inactiva o de otro cliente:** el DAO revierte la transacción y el servicio rechaza.
+- **A3 — Error antes del commit:** el DAO ejecuta rollback; no queda saldo actualizado sin movimiento.
+- **A4 — Respuesta perdida después del commit:** el depósito puede haberse aplicado. No hay clave idempotente; el operador consulta movimientos antes de decidir si repite.
+
+## CU-05 — Transferir fondos
+
+| Campo | Descripción |
+|---|---|
+| Actor principal | Usuario |
+| Propósito | Transferir un importe entre dos cuentas activas. |
+| Disparador | El usuario selecciona transferir e ingresa origen, destino e importe. |
+| Precondiciones | Token vigente; ambas cuentas están activas; el origen pertenece al cliente autenticado. |
+| Resultado exitoso | Se debita origen y se acredita destino en una transacción; se registran dos movimientos y se devuelve 1. |
+
+### Flujo principal
+
+1. El cliente solicita origen, destino e importe.
+2. El usuario ingresa cuentas distintas de ocho dígitos e importe positivo exacto a centavos, no mayor a 9.999.999.999,99.
+3. El cliente genera una clave UUID para la solicitud y la envía junto al token.
+4. El servicio valida token, cuentas, importe y formato de clave.
+5. El DAO busca primero una transferencia previa del mismo usuario con esa clave.
+6. Si no es repetida, el DAO bloquea las cuentas por código para mantener un orden estable.
+7. El DAO verifica que ambas cuentas estén activas, que tengan la misma moneda, que el origen sea del cliente autenticado y tenga saldo suficiente.
+8. El DAO registra la transferencia, actualiza ambos saldos y contadores, inserta débito tipo 009 y crédito tipo 008 y confirma la transacción.
+9. El cliente presenta el resultado.
+
+### Flujos alternativos y excepciones
+
+- **A1 — Token inválido o vencido:** el servicio rechaza la solicitud.
+- **A2 — Datos inválidos, cuentas iguales o clave no UUID:** el servicio devuelve -1.
+- **A3 — Cuenta inactiva, origen ajeno, moneda distinta o saldo insuficiente:** el DAO revierte y devuelve rechazo.
+- **A4 — Reintento con la misma clave y los mismos datos:** el servidor reconoce la solicitud y no duplica la transferencia.
+- **A5 — Reutilización de la clave con datos distintos:** el servidor rechaza la solicitud.
+- **A6 — Error durante los cambios bancarios:** el DAO ejecuta rollback; no queda solo el débito o solo el crédito.
+- **A7 — Respuesta perdida:** el consumidor conserva y reutiliza la misma clave y datos para resolver el resultado.
+
+## CU-06 — Cerrar sesión
+
+| Campo | Descripción |
+|---|---|
+| Actor principal | Usuario |
+| Propósito | Revocar en el servidor el token del cliente. |
+| Disparador | El usuario selecciona cerrar sesión o salir. |
+| Precondiciones | El cliente conserva el token de sesión. |
+| Resultado | El servidor revoca el token; el cliente elimina su copia y vuelve al ingreso o termina. |
+
+### Flujo principal
+
+1. El usuario selecciona cerrar sesión.
+2. El cliente invoca cerrarSesion con el token.
+3. El servidor elimina la sesión de su memoria.
+4. El cliente borra el token local y cierra el menú.
+
+### Flujos alternativos y excepciones
+
+- **A1 — Token ya vencido o inexistente:** no existe sesión que revocar; el cliente elimina su copia local.
+- **A2 — Falla de comunicación:** el cliente limpia su estado local y solicita ingresar nuevamente al próximo uso.
 
 ## Casos incluidos
 
 | ID | Comportamiento incluido | Regla observable |
 |---|---|---|
-| CU-05 | Validar credenciales | Rechazar entradas vacías o fuera de los límites y comprobar la contraseña contra el hash almacenado. |
-| CU-06 | Validar cuenta | Rechazar la cuenta vacía o con más de ocho caracteres antes de consultar o depositar. La validación de solo dígitos existe en la interfaz Swing. |
-| CU-07 | Validar datos del depósito | Exigir importe positivo, exacto a dos decimales y precisión máxima de doce dígitos. |
-| CU-08 | Aplicar depósito | Confirmar actualización de saldo y alta del movimiento como una sola transacción; revertir si ocurre un error. |
+| CU-07 | Validar credenciales | Comprobar hash PBKDF2 y código de cliente asociado. |
+| CU-08 | Validar cuenta | Las consultas y depósitos se limitan a cuentas ACTIVAS del cliente; el origen de transferencia debe pertenecer a este. |
+| CU-09 | Validar datos del depósito | Importe positivo, exacto a centavos y con precisión máxima de doce dígitos. |
+| CU-10 | Aplicar depósito | Actualizar cuenta e insertar movimiento tipo 003 y empleado 0001 de forma atómica. |
 
 # Trazabilidad
 
-- **CU-01 — Iniciar sesión:** RF-01, RF-02 y RNF-01. Operación y componentes: `login`, autenticación DAO y clientes.
-- **CU-02 — Consultar movimientos:** RF-03 y RF-08. Operación y módulo: `traerMovimientos`, consulta DAO.
-- **CU-03 — Registrar depósito:** RF-04, RF-05, RF-06, RF-07, RF-08, RNF-03 y RNF-04. Operación y módulo: `regDeposito`, transacción DAO.
-- **CU-04 — Cerrar sesión local:** RF-09. Componentes: menú de consola y controlador Swing.
+- **CU-01 — Iniciar sesión:** RF-01 y RF-02; crearSesion, autenticación DAO y sesiones.
+- **CU-02 — Consultar cuentas:** RF-02 y RF-09; traerCuentas y consulta DAO.
+- **CU-03 — Consultar movimientos:** RF-02, RF-03 y RF-09; traerMovimientos y consulta DAO.
+- **CU-04 — Registrar depósito:** RF-02, RF-04 a RF-07 y RF-09; regDeposito y transacción DAO.
+- **CU-05 — Transferir fondos:** RF-02, RF-08 y RF-09; transferir, validación, idempotencia y transacción DAO.
+- **CU-06 — Cerrar sesión:** RF-09 y RF-10; cerrarSesion y controladores de los clientes.
 
 # Observaciones de fidelidad
 
-- El resultado positivo de `login` habilita el flujo de los clientes, pero el servicio no crea una sesión, no devuelve token y no exige dicho resultado en las llamadas de consulta o depósito.
-- El cierre de sesión descrito es local. No hay operación SOAP para revocar una sesión.
-- La operación de depósito registra al empleado `0001` configurado en el código del servidor; no registra la identidad del operador que inició sesión.
-- Los errores de consulta se representan como excepción SOAP; los errores de login y depósito se exponen como `-1`.
-- No se modelan funciones de web, móvil, transferencias ni administración porque no están implementadas en el alcance revisado.
+- Los clientes de consola, escritorio, Android y web consumen operaciones SOAP y utilizan el token creado por crearSesion.
+- login es una operación de compatibilidad: valida credenciales con 1/-1, pero no crea una sesión.
+- El token se conserva en memoria del servidor, vence a los 20 minutos y se revoca al cerrar sesión; el reinicio del servidor invalida las sesiones.
+- El depósito usa el empleado fijo 0001 y no implementa idempotencia.
+- La transferencia es idempotente por usuario y clave UUID cuando se repiten los mismos datos; los datos diferentes se rechazan.
+- Las consultas SOAP pueden devolver lista vacía para cuenta sin movimientos o no accesible; los errores de sesión y comunicación deben mostrarse por separado.

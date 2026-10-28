@@ -31,7 +31,7 @@ Inicialice el esquema y sus datos desde la raíz bancaria con:
 
 ~~~powershell
 $env:BANQUITO_SQL_MASTER = 'Server=.;Database=master;Integrated Security=True;Encrypt=True;TrustServerCertificate=True;Connect Timeout=8'
-dotnet run --project '.\01. SERVIDOR\BanQuito.Administracion\BanQuito.Administracion.csproj' -- --aplicar '.\03. BDD\BanQuito_01_CrearBase.sql' '.\03. BDD\BanQuito_02_DatosPrueba.sql'
+dotnet run --project '.\04. SERVIDOR\BanQuito.Administracion\BanQuito.Administracion.csproj' -- --aplicar '.\03. BDD\BanQuito_01_CrearBase.sql' '.\03. BDD\BanQuito_02_DatosPrueba.sql'
 ~~~
 
 BanQuito expone `GET /api/salud`, elegibilidad por cédula, monto máximo por código de cliente, otorgamiento idempotente y consulta de amortización. El contrato completo está en `01. UML/CasosUsoCreditoBanQuito.md`. Sus datos están descritos en `02. MER/ModeloDatosBanQuito.md`.

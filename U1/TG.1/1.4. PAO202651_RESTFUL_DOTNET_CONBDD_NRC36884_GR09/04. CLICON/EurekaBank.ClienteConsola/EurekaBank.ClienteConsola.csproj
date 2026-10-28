@@ -6,6 +6,6 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="../../00. COMPARTIDO/EurekaBank.Cliente/EurekaBank.Cliente.csproj" />
+    <ProjectReference Include="../../04. COMPARTIDO/EurekaBank.Cliente/EurekaBank.Cliente.csproj" />
   </ItemGroup>
 </Project>

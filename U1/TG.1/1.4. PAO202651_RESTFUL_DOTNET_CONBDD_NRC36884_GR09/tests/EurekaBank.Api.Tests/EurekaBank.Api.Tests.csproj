@@ -15,6 +15,6 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\01. SERVIDOR\EurekaBank.Api\EurekaBank.Api.csproj" />
+    <ProjectReference Include="..\..\04. SERVIDOR\EurekaBank.Api\EurekaBank.Api.csproj" />
   </ItemGroup>
 </Project>

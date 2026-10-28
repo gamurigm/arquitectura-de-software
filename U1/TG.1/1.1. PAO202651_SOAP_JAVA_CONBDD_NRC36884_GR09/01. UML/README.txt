@@ -9,3 +9,4 @@ Documentación UML — EurekaBank SOAP Java — Grupo 09
   GR09_CasosUso_EurekaBank.oom: modelo nativo PowerDesigner.
   GR09_CasosUso_EurekaBank.png: exportación del diagrama desde el modelo.
   crear_diagrama_casos_uso.ps1 y ajustar_diagrama_casos_uso.vbs: automatización PowerDesigner para regenerar el modelo y la imagen.
+La copia histórica ARCHIVO_ERS_EUREKABANK_SOAP_JAVA_CONBDD_GR09.docx se conserva solo como antecedente; no es documento canónico.

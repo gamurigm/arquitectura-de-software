@@ -3,7 +3,7 @@ if (Test-Path -LiteralPath $cargarVariables) {
     . $cargarVariables
 }
 
-$api = Join-Path $PSScriptRoot '01. SERVIDOR/BanQuito.Api/BanQuito.Api.csproj'
+$api = Join-Path $PSScriptRoot '04. SERVIDOR/BanQuito.Api/BanQuito.Api.csproj'
 
 if (-not [string]::IsNullOrWhiteSpace($env:BANQUITO_DB_CONNECTION_STRING)) {
     $env:ConnectionStrings__BaseDatos = $env:BANQUITO_DB_CONNECTION_STRING
